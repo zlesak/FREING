@@ -18,6 +18,12 @@
 *.zip
 *.tar.gz
 *.rar
+# Keep Gradle wrapper JARs versioned
+!**/gradle/wrapper/gradle-wrapper.jar
+
+# Spring Initializr helper files (ignore in any module)
+HELP.md
+**/HELP.md
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
@@ -25,3 +31,55 @@ replay_pid*
 
 # Kotlin Gradle plugin data, see https://kotlinlang.org/docs/whatsnew20.html#new-directory-for-kotlin-data-in-gradle-projects
 .kotlin/
+
+# ---------------- Added consolidated ignores ----------------
+# IDE / Editor
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+
+# OS / Misc
+.DS_Store
+Thumbs.db
+
+# Gradle & build outputs (multi-module)
+.gradle/
+**/build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+# If you ever need to keep a specific build artifact, add an exception with !path
+
+# Node / Angular workspace
+node_modules/
+**/node_modules/
+dist/
+**/dist/
+out-tsc/
+.angular/cache/
+.tmp/
+tmp/
+bazel-out/
+# Angular test / coverage
+coverage/
+
+# Logs & reports
+npm-debug.log*
+yarn-error.log
+pnpm-debug.log*
+
+# Sass / cache
+.sass-cache/
+
+# Generated screenshots or artifacts
+__screenshots__/
+
+# Local tooling
+/.history/
+
+# Ignore local env / secrets (uncomment and adapt if introduced)
+# .env
+# *.local.env
+
+# End of file
