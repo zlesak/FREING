@@ -1,0 +1,53 @@
+@startuml
+left to right direction
+
+:Accountant: as a
+
+:Customer: as c
+:Finance: as f
+
+package "FREING" as freing {
+    rectangle "Invoice service" as invoice_service {
+        usecase (Create invoice) as ci
+        usecase (Read invoice) as ri
+        usecase (Update invoice) as ui
+        usecase (Delete invoice) as di
+        usecase (Make report) as mr
+        usecase (Export report) as er
+    }
+    rectangle "Customer service" as customer_service {
+        usecase (Create user) as cu
+        usecase (Read user) as ru
+        usecase (Update user) as uu
+        usecase (Delete user) as du
+    }
+    rectangle "Render service" as render_service {
+        usecase (Generate invoice PDF) as gip
+        usecase (Generate report PDF) as grp
+    }
+    rectangle "Payment service" as payment_service {
+        usecase (Pay invoice) as pi
+        usecase (Download invoice) as doi
+    }
+}
+
+a --> ci
+a --> ri
+a --> ui
+a --> di
+a --> cu
+a --> ru
+a --> uu
+a --> du
+
+pi <-- c
+ri <-- c
+doi <-- c
+gip <-- c
+
+f --> ri
+f --> mr
+f --> er
+f --> grp
+
+@enduml
