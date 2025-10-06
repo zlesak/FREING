@@ -1,0 +1,39 @@
+@startuml
+left to right direction
+
+:Accountant: as a
+:Customer: as c
+:Finance: as f
+
+rectangle "FREING" <<system>> as freing {
+
+'    component "Invoice service" as invoice_service {
+'    }
+'    component "Customer service" as customer_service {
+'    }
+'    component "Render service" as render_service {
+'    }
+'    component "Payment service" as payment_service {
+'    }
+}
+
+node PayPal as paypal{
+}
+
+node ExchangeRates as exchange_rates{
+}
+
+node ARES as ares{
+}
+
+freing -- paypal
+freing -- exchange_rates
+freing -- ares
+
+
+a -- freing
+c -- freing
+f -- freing
+
+
+@enduml

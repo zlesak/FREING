@@ -1,0 +1,54 @@
+<section class="page invoices">
+  <h2>Faktury</h2>
+
+  <div class="toolbar"><a routerLink="/invoices/new">+ Nová faktura</a></div>
+
+  @if (loading) {
+    <div>Načítám…</div>
+  }
+
+  @if (error) {
+    <div class="error">{{ error }}</div>
+  }
+
+  @if (!loading && !error && invoices.length) {
+    <table class="invoices-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Číslo</th>
+          <th>Zákazník</th>
+          <th>Datum</th>
+          <th>Splatnost</th>
+          <th>Částka</th>
+          <th>Stav</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (inv of invoices; track inv.id ?? inv.invoiceNumber; let i = $index) {
+          <tr>
+            <td>{{ page * size + i + 1 }}</td>
+            <td>{{ inv.invoiceNumber }}</td>
+            <td>{{ inv.customerName }}</td>
+            <td>{{ inv.issueDate }}</td>
+            <td>{{ inv.dueDate }}</td>
+            <td>{{ inv.amount }} {{ inv.currency }}</td>
+            <td>{{ inv.status }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+
+  @if (!loading && !error && !invoices.length) {
+    <p>Žádné faktury k zobrazení.</p>
+  }
+
+  @if (totalPages > 1) {
+    <div class="pagination">
+      <button (click)="prev()" [disabled]="page === 0">Předchozí</button>
+      <span>Stránka {{ page + 1 }} / {{ totalPages }} ({{ totalElements }} faktur)</span>
+      <button (click)="next()" [disabled]="page + 1 >= totalPages">Další</button>
+    </div>
+  }
+</section>
