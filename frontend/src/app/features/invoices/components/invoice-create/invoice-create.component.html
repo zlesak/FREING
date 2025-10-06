@@ -1,0 +1,74 @@
+<section class="invoice-create">
+  <h2>Nová faktura</h2>
+
+  @if (error) { <div class="alert error">{{ error }}</div> }
+  @if (success) { <div class="alert success">{{ success }}</div> }
+
+  <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <div class="grid two-cols">
+      <label>Číslo faktury
+        <input formControlName="invoiceNumber" placeholder="20250001" />
+        @if (form.get('invoiceNumber')?.touched && form.get('invoiceNumber')?.invalid) {
+          <small class="invalid">Vyplňte číslo faktury (min. 3 znaky)</small>
+        }
+      </label>
+      <label>Zákazník
+        <input formControlName="customerName" />
+        @if (form.get('customerName')?.touched && form.get('customerName')?.invalid) {
+          <small class="invalid">Jméno je povinné</small>
+        }
+      </label>
+      <label>Email
+        <input formControlName="customerEmail" type="email" />
+        @if (form.get('customerEmail')?.touched && form.get('customerEmail')?.invalid) {
+          <small class="invalid">Platný email je povinný</small>
+        }
+      </label>
+      <label>Datum vystavení
+        <input formControlName="issueDate" type="date" />
+      </label>
+      <label>Splatnost
+        <input formControlName="dueDate" type="date" />
+      </label>
+      <label>Měna
+        <select formControlName="currency">
+          @for (c of currencyOptions; track c) { <option [value]="c">{{ c }}</option> }
+        </select>
+      </label>
+      <label>Stav
+        <select formControlName="status">
+          @for (s of statusOptions; track s) { <option [value]="s">{{ s }}</option> }
+        </select>
+      </label>
+      <label>Celková částka
+        <input formControlName="amount" type="number" step="0.01" readonly />
+      </label>
+    </div>
+
+    <h3>Položky</h3>
+    <table class="items">
+      <thead>
+        <tr>
+          <th>Popis</th><th>Množství</th><th>Jedn. cena</th><th>Celkem</th><th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (item of items.controls; track item; let i = $index) {
+          <tr [formGroup]="$any(item)">
+            <td><input formControlName="description" (change)="recalcItemTotal(i)" /></td>
+            <td><input formControlName="quantity" type="number" min="1" (input)="recalcItemTotal(i)" /></td>
+            <td><input formControlName="unitPrice" type="number" step="0.01" min="0" (input)="recalcItemTotal(i)" /></td>
+            <td><input formControlName="totalPrice" readonly /></td>
+            <td><button type="button" (click)="removeItem(i)" [disabled]="items.length===1">✕</button></td>
+          </tr>
+        }
+      </tbody>
+    </table>
+    <button type="button" (click)="addItem()">+ Přidat položku</button>
+
+    <div class="actions">
+      <button type="submit" [disabled]="submitting || form.invalid">Vytvořit</button>
+      <a routerLink="/invoices" class="btn-link">Zpět</a>
+    </div>
+  </form>
+</section>

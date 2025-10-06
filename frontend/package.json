@@ -1,12 +1,18 @@
 {
   "name": "frontend",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "openapi:clean": "rm -rf src/app/api/generated",
+    "openapi:download": "curl -s http://localhost:8080/v3/api-docs > openapi.json",
+    "openapi:gen": "npm run openapi:download && npx openapi --input openapi.json --output src/app/api/generated --client fetch --useOptions --useUnionTypes",
+    "openapi:refresh": "npm run openapi:gen",
+    "openapi:ensure": "[ -d src/app/api/generated ] && [ -f src/app/api/generated/index.ts ] && echo 'OpenAPI client already present' || (echo 'Generating OpenAPI client...' && npm run openapi:gen || echo 'WARNING: OpenAPI generation failed (is backend running on :8080?)')",
+    "postinstall": "npm run openapi:ensure || true"
   },
   "prettier": {
     "printWidth": 100,
@@ -43,6 +49,7 @@
     "karma-chrome-launcher": "~3.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
-    "typescript": "~5.9.2"
+    "typescript": "~5.9.2",
+    "openapi-typescript-codegen": "^0.29.0"
   }
 }

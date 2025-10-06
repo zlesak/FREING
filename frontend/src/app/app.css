@@ -1,0 +1,12 @@
+*,*::before,*::after { box-sizing: border-box; }
+html,body { height: 100%; margin: 0; font-family: Inter, Arial, sans-serif; background:#f8fafc; color:#1f2937; }
+body { line-height: 1.4; }
+:root { --page-max-width: 1200px; }
+
+.app-content { max-width: var(--page-max-width); margin: 1.25rem auto; padding: 0 1.25rem; width:100%; }
+
+h1,h2,h3 { font-weight: 600; line-height: 1.2; margin: 0 0 .75rem; }
+p { margin: 0 0 1rem; }
+
+.page { width:100%; }
+

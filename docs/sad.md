@@ -65,11 +65,11 @@ Hlavními aktéry jsou firmy, které budou vytvářet a odesílat faktury, a kon
 Systém bude také poskytovat funkce pro správu uživatelských účtů, sledování stavu faktur a generování reportů.  
 
 Systém FREING bude komunikovat s externími systémy, jako jsou bankovní systémy pro zpracování plateb, registry ekonomických subjektů pro ověřování firem nebo kurzovními systémy pro převod měn.
-![Business Context](FREING_BUSINESS_CONTEXT_DIAGRAM.png "Business Context")
+![Business Context](../diagrams/FREING_BUSINESS_CONTEXT_DIAGRAM.png "Business Context")
 
 ### 3.2 Use Case diagram
 Use Case diagram zobrazuje hlavní funkce systému a interakce mezi uživateli a systémem.    
-![Use Case](FREING_USE_CASE_DIAGRAM.png "Use Case")  
+![Use Case](../diagrams/FREING_USE_CASE_DIAGRAM.png "Use Case")  
 Role
 - Účetní (Accounting)
 - Finanční manager (Finance)
