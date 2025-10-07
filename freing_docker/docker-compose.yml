@@ -30,7 +30,7 @@ services:
       KC_HEALTH_ENABLED: 'true'
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: password
-    command: start-dev
+    command: start-dev --import-realm
     depends_on:
       - keycloak_db
     networks:
@@ -44,6 +44,7 @@ services:
       - freing_network
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./keycloak/realms/freing-realm.json:/opt/keycloak/data/import/freing-realm.json:ro
     environment:
       POSTGRES_DB: keycloak
       POSTGRES_USER: keycloak
