@@ -1,14 +1,14 @@
 services:
-  api_gateway:
+  gateway:
     image: nginx:1.29.2
-    hostname: api_gateway
-    container_name: api_gateway
+    hostname: gateway
+    container_name: gateway
     networks:
       - freing_network
     ports:
       - "80:80"
     volumes:
-      - ./api_gateway/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./gateway/nginx.conf:/etc/nginx/nginx.conf:ro
 
   keycloak_web:
     image: quay.io/keycloak/keycloak:23.0.2
