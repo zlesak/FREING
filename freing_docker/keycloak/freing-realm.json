@@ -46,6 +46,33 @@
   "roles": {
     "realm": [
       {
+        "id": "cdf85ec5-cf30-4322-9317-9f97db016450",
+        "name": "manager",
+        "description": "",
+        "composite": false,
+        "clientRole": false,
+        "containerId": "83f945f4-5593-470c-b895-c8761c774224",
+        "attributes": {}
+      },
+      {
+        "id": "30e9fea4-18db-41f2-b2ed-0a92e6c43921",
+        "name": "accountant",
+        "description": "",
+        "composite": false,
+        "clientRole": false,
+        "containerId": "83f945f4-5593-470c-b895-c8761c774224",
+        "attributes": {}
+      },
+      {
+        "id": "4362cd03-c11b-4dbd-bb2d-82aceaa49369",
+        "name": "customer",
+        "description": "",
+        "composite": false,
+        "clientRole": false,
+        "containerId": "83f945f4-5593-470c-b895-c8761c774224",
+        "attributes": {}
+      },
+      {
         "id": "8dc33fb7-97be-4310-932d-9fe0c8d74583",
         "name": "offline_access",
         "description": "${role_offline-access}",
@@ -407,7 +434,10 @@
     {
       "id": "8963417e-55bc-4ec1-b052-4518b2664227",
       "name": "customers",
-      "path": "/customers"
+      "path": "/customers",
+      "realmRoles": [
+        "customer"
+      ]
     },
     {
       "id": "2bda7bba-816c-4f21-820c-91301b82087d",
@@ -418,13 +448,19 @@
           "id": "9f9456e3-2039-4890-9f6e-a41b39ab3e79",
           "name": "accountants",
           "path": "/employees/accountants",
-          "parentId": "2bda7bba-816c-4f21-820c-91301b82087d"
+          "parentId": "2bda7bba-816c-4f21-820c-91301b82087d",
+          "realmRoles": [
+            "accountant"
+          ]
         },
         {
           "id": "df4e6b05-c9b5-4f07-8bae-57fd4f55bd2f",
           "name": "management",
           "path": "/employees/management",
-          "parentId": "2bda7bba-816c-4f21-820c-91301b82087d"
+          "parentId": "2bda7bba-816c-4f21-820c-91301b82087d",
+          "realmRoles": [
+            "manager"
+          ]
         }
       ]
     }
