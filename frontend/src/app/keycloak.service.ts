@@ -1,5 +1,6 @@
+// frontend/src/app/keycloak.service.ts
 import { Injectable } from '@angular/core';
-import Keycloak, { KeycloakInstance } from 'keycloak-js';
+import Keycloak, { KeycloakInstance, KeycloakInitOptions } from 'keycloak-js';
 
 @Injectable({ providedIn: 'root' })
 export class KeycloakService {
@@ -7,12 +8,19 @@ export class KeycloakService {
 
   public async init(): Promise<void> {
     this.keycloakAuth = new Keycloak({
-      url: 'http://localhost:8080/', // upravte dle potřeby
+      url: 'http://auth.test/',
       realm: 'freing',
       clientId: 'frontend',
     });
+
+    const initOptions: KeycloakInitOptions = {
+      onLoad: 'login-required',
+      checkLoginIframe: false,
+      enableLogging: true,
+    };
+
     return new Promise((resolve, reject) => {
-      this.keycloakAuth.init({ onLoad: 'login-required' }).then((authenticated) => {
+      this.keycloakAuth.init(initOptions).then((authenticated) => {
         if (authenticated) {
           resolve();
         } else {
@@ -38,4 +46,3 @@ export class KeycloakService {
     this.keycloakAuth.logout();
   }
 }
-

@@ -14,7 +14,7 @@ const routes: Routes = [
   { path: 'invoices/new', component: InvoiceCreateComponent, canActivate: [AuthGuard] },
   { path: 'customers', component: CustomersPageComponent, canActivate: [AuthGuard] },
   { path: 'payments', component: PaymentsPageComponent, canActivate: [AuthGuard] },
-  { path: '**', redirectTo: 'home', canActivate: [AuthGuard] }
+  { path: '**', redirectTo: 'home'}
 ];
 
 @NgModule({
