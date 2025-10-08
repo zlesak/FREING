@@ -105,3 +105,21 @@ Kontakt / další kroky
 
 ---
 Soubor `docker-compose.yml` a `api_gateway/nginx.conf` v tomto adresáři definují nastavení — uprav je, pokud potřebuješ jiné hostnames/porty.
+
+## Testovací účty
+
+Pro rychlé testování přihlášení a rolí v Keycloaku jsou dostupné tyto účty:
+
+- Uživatelské jméno: `alice.accountant`  
+  Heslo: `XK3mMLHm7nH5mygTW`  
+  Role: `accountant`
+
+- Uživatelské jméno: `bob.manager`  
+  Heslo: `1p470ZIoQPNGyJioZ`  
+  Role: `manager`
+
+- Uživatelské jméno: `john.customer`  
+  Heslo: `9a1onhpI8rpu3WW73`  
+  Role: `customer`
+
+Poznámka: Tyto účty jsou určeny pouze pro lokální vývoj. Pokud Keycloak importuje realm z `keycloak/freing-realm.json`, účty by měly být dostupné po importu. Pokud nejsou, přidejte nebo upravte uživatele v Keycloak admin konzoli (`http://auth.test`).
