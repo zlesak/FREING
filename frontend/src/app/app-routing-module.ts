@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { AuthGuard } from './auth.guard';
-import { App } from './app';
 import { InvoicesPageComponent } from './features/invoices/view/invoices-page.component';
 import { CustomersPageComponent } from './features/customers/view/customers-page.component';
 import { PaymentsPageComponent } from './features/payments/view/payments-page.component';
@@ -15,7 +14,7 @@ const routes: Routes = [
   { path: 'invoices/new', component: InvoiceCreateComponent, canActivate: [AuthGuard] },
   { path: 'customers', component: CustomersPageComponent, canActivate: [AuthGuard] },
   { path: 'payments', component: PaymentsPageComponent, canActivate: [AuthGuard] },
-  { path: '**', redirectTo: 'home' }
+  { path: '**', redirectTo: 'home', canActivate: [AuthGuard] }
 ];
 
 @NgModule({
