@@ -1,0 +1,135 @@
+services:
+  gateway:
+    image: nginx:1.29.2
+    hostname: gateway
+    container_name: gateway
+    networks:
+      - freing_network
+    ports:
+      - "80:80"
+    volumes:
+      - ./gateway/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - keycloak_web
+
+  keycloak_web:
+    image: quay.io/keycloak/keycloak:23.0.2
+    hostname: keycloak_web
+    container_name: keycloak_web
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://keycloak_db:5432/keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: keycloak
+
+      KC_HOSTNAME: auth.test
+      KC_HOSTNAME_PORT: 80
+      KC_HOSTNAME_STRICT: false
+      KC_HOSTNAME_STRICT_HTTPS: false
+
+      KC_LOG_LEVEL: info
+      KC_METRICS_ENABLED: true
+      KC_HEALTH_ENABLED: true
+
+      KC_PROXY: edge
+      KC_PROXY_HEADERS: xforwarded
+
+      KC_HTTP_PORT: 8100
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: password
+      KC_HTTP_ENABLED: true
+    command: start-dev --import-realm
+    depends_on:
+      - keycloak_db
+    networks:
+      - freing_network
+    ports:
+      - '8100:8100'
+    volumes:
+      - ./keycloak/freing-realm.json:/opt/keycloak/data/import/freing-realm.json:ro
+
+  keycloak_db:
+    image: postgres:16
+    networks:
+      - freing_network
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: keycloak
+
+  # Backend services (run with Gradle wrapper from host source)
+  customer_service:
+    image: openjdk:17-jdk
+    container_name: customer_service
+    working_dir: /app
+    volumes:
+      - ../backend/customer-service:/app:cached
+    environment:
+      - SERVER_PORT=8081
+    command: ["sh", "-c", "./gradlew bootRun"]
+    ports:
+      - "8081:8081"
+    networks:
+      - freing_network
+    depends_on:
+      - keycloak_web
+
+  invoice_service:
+    image: openjdk:17-jdk
+    container_name: invoice_service
+    working_dir: /app
+    volumes:
+      - ../backend/invoice-service:/app:cached
+    environment:
+      - SERVER_PORT=8082
+    command: ["sh", "-c", "./gradlew bootRun"]
+    ports:
+      - "8082:8082"
+    networks:
+      - freing_network
+    depends_on:
+      - keycloak_web
+
+  payment_service:
+    image: openjdk:17-jdk
+    container_name: payment_service
+    working_dir: /app
+    volumes:
+      - ../backend/payment-service:/app:cached
+    environment:
+      - SERVER_PORT=8083
+    command: ["sh", "-c", "./gradlew bootRun"]
+    ports:
+      - "8083:8083"
+    networks:
+      - freing_network
+    depends_on:
+      - keycloak_web
+
+  rendering_service:
+    image: openjdk:17-jdk
+    container_name: rendering_service
+    working_dir: /app
+    volumes:
+      - ../backend/rendering-service:/app:cached
+    environment:
+      - SERVER_PORT=8084
+    command: ["sh", "-c", "./gradlew bootRun"]
+    ports:
+      - "8084:8084"
+    networks:
+      - freing_network
+    depends_on:
+      - keycloak_web
+
+volumes:
+  postgres_data:
+
+networks:
+  freing_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/28

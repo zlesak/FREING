@@ -1,15 +1,16 @@
-import { NgModule, provideBrowserGlobalErrorListeners } from '@angular/core';
+import { NgModule, provideBrowserGlobalErrorListeners, APP_INITIALIZER } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { AppRoutingModule } from './app-routing-module';
 import { App } from './app';
-import { HeaderComponent } from './components/header/header.components';
-import { InvoicesPageComponent } from './features/invoices/view/invoices-page.component';
-import { CustomersPageComponent } from './features/customers/view/customers-page.component';
-import { PaymentsPageComponent } from './features/payments/view/payments-page.component';
+import { KeycloakService } from './keycloak.service';
+import {HeaderComponent} from './components/header/header.components';
 import {HomePageComponent} from './features/home/view/home-page.component';
-import { InvoiceCreateComponent } from './features/invoices/components/invoice-create/invoice-create.component';
+import {InvoicesPageComponent} from './features/invoices/view/invoices-page.component';
+import {CustomersPageComponent} from './features/customers/view/customers-page.component';
+import {PaymentsPageComponent} from './features/payments/view/payments-page.component';
+import {InvoiceCreateComponent} from './features/invoices/components/invoice-create/invoice-create.component';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -28,7 +29,14 @@ import { InvoiceCreateComponent } from './features/invoices/components/invoice-c
     ReactiveFormsModule
   ],
   providers: [
-    provideBrowserGlobalErrorListeners()
+    provideBrowserGlobalErrorListeners(),
+    KeycloakService,
+    {
+      provide: APP_INITIALIZER,
+      useFactory: (keycloakService: KeycloakService) => () => keycloakService.init(),
+      deps: [KeycloakService],
+      multi: true
+    }
   ],
   bootstrap: [App]
 })
