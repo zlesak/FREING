@@ -105,14 +105,14 @@ class InvoiceServiceTests(
         val request = createSampleRequest()
         val saved = service.createInvoice(request)
         val found = service.getInvoice(saved.id!!)
-        assertThat(found).isPresent
-        assertThat(found.get().invoiceNumber).isEqualTo(saved.invoiceNumber)
+        assertThat(found).isNotNull
+        assertThat(found?.invoiceNumber).isEqualTo(saved.invoiceNumber)
     }
 
     @Test
-    fun `getInvoice returns empty for non-existing id`() {
+    fun `getInvoice returns null for non-existing id`() {
         val found = service.getInvoice(-999L)
-        assertThat(found).isNotPresent
+        assertThat(found).isNull()
     }
 
     @Test

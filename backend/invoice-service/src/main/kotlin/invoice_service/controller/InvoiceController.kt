@@ -47,7 +47,7 @@ class InvoiceController (private val service: InvoiceService) {
         @Parameter(description = "ID faktury", example = "1")
         @PathVariable id: Long
     ): ResponseEntity<Invoice> =
-        service.getInvoice(id).map { ResponseEntity.ok(it) }.orElse(ResponseEntity.notFound().build())
+        service.getInvoice(id)?.let{ ResponseEntity.ok(it) }?:(ResponseEntity.notFound().build())
 
     @Operation(summary = "Vytvořit novou fakturu", description = "Vytvoří novou fakturu na základě požadavku.")
     @ApiResponses(

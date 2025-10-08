@@ -3,15 +3,16 @@ package invoice_service.service
 import invoice_service.dto.InvoiceCreateRequest
 import invoice_service.dto.InvoiceUpdateRequest
 import invoice_service.dto.PagedResponse
+import invoice_service.dto.toInvoice
 import invoice_service.model.Invoice
 import invoice_service.model.InvoiceItem
 import invoice_service.repository.InvoiceRepository
 import jakarta.transaction.Transactional
 import org.modelmapper.ModelMapper
 import org.springframework.data.domain.Pageable
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
-import java.time.LocalDateTime
-import java.util.Optional
+import java.time.Instant
 
 @Service
 class InvoiceService (
@@ -21,19 +22,19 @@ class InvoiceService (
 
     @Transactional
     fun createInvoice(request: InvoiceCreateRequest) : Invoice {
-        if (repo.existsByInvoiceNumber(request.invoiceNumber)) {
-            throw IllegalArgumentException("Faktura s tímto číslem již existuje.")
-        }
-        val invoice = modelMapper.map(request, Invoice::class.java)
-        invoice.createdAt = LocalDateTime.now()
-        invoice.updatedAt = LocalDateTime.now()
+        if (repo.existsByInvoiceNumber(request.invoiceNumber)) throw IllegalArgumentException("Faktura s tímto číslem již existuje.")
+
+      //  val invoice = modelMapper.map(request, Invoice::class.java)
+        val invoice = request.toInvoice()
+ //       invoice.createdAt = LocalDateTime.now()
+ //       invoice.updatedAt = LocalDateTime.now()
         invoice.items.forEach {
             it.id = null
         }
         return repo.save(invoice)
     }
 
-    fun getInvoice(id: Long): Optional<Invoice> = repo.findById(id)
+    fun getInvoice(id: Long): Invoice? = repo.findByIdOrNull(id)
 
     fun getAllInvoices(pageable: Pageable) : PagedResponse<Invoice> {
         val allInvoices = repo.findAll()
@@ -66,7 +67,7 @@ class InvoiceService (
             existingInvoice.amount = request.amount
             existingInvoice.currency = request.currency
             existingInvoice.status = request.status
-            existingInvoice.updatedAt = LocalDateTime.now()
+            existingInvoice.updatedAt = Instant.now()
 
             val requestItemsMap = request.items.associateBy { it.id }
             val itemsToRemove = existingInvoice.items.filter { it.id !in requestItemsMap.keys }

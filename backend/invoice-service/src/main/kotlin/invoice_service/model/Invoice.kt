@@ -5,11 +5,12 @@ import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalDateTime
 import io.swagger.v3.oas.annotations.media.Schema
+import java.time.Instant
 
 @Schema(description = "Faktura v systému")
 @Entity
 @Table(name = "invoices")
-class Invoice(
+data class Invoice(
     @Schema(description = "ID faktury", example = "1")
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,
@@ -54,11 +55,11 @@ class Invoice(
 
     @Schema(description = "Datum vytvoření záznamu", example = "2025-10-05T10:00:00")
     @Column(nullable = false, updatable = false)
-    var createdAt: LocalDateTime = LocalDateTime.now(),
+    var createdAt: Instant = Instant.now(),
 
     @Schema(description = "Datum poslední aktualizace", example = "2025-10-05T10:00:00")
     @Column(nullable = false)
-    var updatedAt: LocalDateTime = LocalDateTime.now()
+    var updatedAt: Instant = Instant.now()
 ) {
     fun addItem(item: InvoiceItem) {
         items.add(item)
@@ -68,15 +69,15 @@ class Invoice(
         items.remove(item)
     }
 
-    override fun toString(): String {
-        return "Invoice(id=$id, invoiceNumber='$invoiceNumber', customerName='$customerName', amount=$amount, status=$status)"
-    }
+  //  override fun toString(): String {
+  //      return "Invoice(id=$id, invoiceNumber='$invoiceNumber', customerName='$customerName', amount=$amount, status=$status)"
+  //  }
 
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is Invoice) return false
-        return id != null && id == other.id
-    }
+ //   override fun equals(other: Any?): Boolean {
+ //       if (this === other) return true
+ //       if (other !is Invoice) return false
+ //       return id != null && id == other.id
+ //   }
 
-    override fun hashCode(): Int = id?.hashCode() ?: 0
+  //  override fun hashCode(): Int = id?.hashCode() ?: 0
 }

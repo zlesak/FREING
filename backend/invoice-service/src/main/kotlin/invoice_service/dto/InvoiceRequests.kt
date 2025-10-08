@@ -1,5 +1,7 @@
 package invoice_service.dto
 
+import invoice_service.model.Invoice
+import invoice_service.model.InvoiceItem
 import invoice_service.model.InvoiceStatus
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -62,3 +64,28 @@ data class InvoiceItemRequest(
     @Schema(description = "Celková cena", example = "15000.00")
     val totalPrice: BigDecimal
 )
+
+
+fun InvoiceCreateRequest.toInvoice(): Invoice{
+    return Invoice(
+        invoiceNumber = this.invoiceNumber,
+        customerName = this.customerName,
+        customerEmail = this.customerEmail,
+        issueDate = this.issueDate,
+        dueDate = this.dueDate,
+        amount = this.amount,
+        currency = this.currency,
+        status = this.status,
+        items = this.items.map { it.toInvoiceItem() }.toMutableList()
+        )
+}
+
+
+fun InvoiceItemRequest.toInvoiceItem(): InvoiceItem {
+    return InvoiceItem(
+        description = this.description,
+        quantity = this.quantity,
+        unitPrice = this.unitPrice,
+        totalPrice = this.totalPrice,
+    )
+}
