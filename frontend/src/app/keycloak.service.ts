@@ -45,4 +45,28 @@ export class KeycloakService {
   public logout(): void {
     this.keycloakAuth.logout();
   }
+
+  // Přidáno: zkontroluje, zda token obsahuje některou z požadovaných rolí
+  public hasAnyRole(requiredRoles: string[]): boolean {
+    if (!this.keycloakAuth || !this.keycloakAuth.tokenParsed) {
+      return false;
+    }
+
+    const tokenParsed: any = this.keycloakAuth.tokenParsed;
+    const rolesSet = new Set<string>();
+
+    if (tokenParsed.realm_access && Array.isArray(tokenParsed.realm_access.roles)) {
+      tokenParsed.realm_access.roles.forEach((r: string) => rolesSet.add(r));
+    }
+
+    if (tokenParsed.resource_access && typeof tokenParsed.resource_access === 'object') {
+      Object.values(tokenParsed.resource_access).forEach((client: any) => {
+        if (client && Array.isArray(client.roles)) {
+          client.roles.forEach((r: string) => rolesSet.add(r));
+        }
+      });
+    }
+
+    return requiredRoles.some(r => rolesSet.has(r));
+  }
 }
