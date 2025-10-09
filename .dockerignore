@@ -1,0 +1,17 @@
+# Ignore typical files to keep Docker build context small
+.git
+.gitignore
+.gradle
+build
+**/build
+**/.gradle
+**/.idea
+.vscode
+node_modules
+**/node_modules
+.DS_Store
+*.log
+**/*.iml
+**/.venv
+**/out
+
