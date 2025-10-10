@@ -45,6 +45,76 @@
   "quickLoginCheckMilliSeconds" : 1000,
   "maxDeltaTimeSeconds" : 43200,
   "failureFactor" : 30,
+  "users" : [ {
+    "id" : "05ba424c-01ba-4945-94c6-854289a7076d",
+    "createdTimestamp" : 1760079775881,
+    "username" : "alice",
+    "enabled" : true,
+    "totp" : false,
+    "emailVerified" : false,
+    "firstName" : "Alice",
+    "lastName" : "Accountant",
+    "email" : "alice.accountant@company.com",
+    "credentials" : [ {
+      "id" : "03b8e011-e1a1-4ef1-9ace-40b301c4bbc6",
+      "type" : "password",
+      "userLabel" : "My password",
+      "createdDate" : 1760079785364,
+      "secretData" : "{\"value\":\"luSFYafDgmlPIcN2kJLeq2sLznv/6zs4UopIHfLIF9I=\",\"salt\":\"4wnx6a75spr+CIfTGbXsXQ==\",\"additionalParameters\":{}}",
+      "credentialData" : "{\"hashIterations\":27500,\"algorithm\":\"pbkdf2-sha256\",\"additionalParameters\":{}}"
+    } ],
+    "disableableCredentialTypes" : [ ],
+    "requiredActions" : [ ],
+    "realmRoles" : [ "default-roles-freing" ],
+    "notBefore" : 0,
+    "groups" : [ "/employees/accountants" ]
+  }, {
+    "id" : "239ca32f-f068-4ef3-8ce7-f88846691019",
+    "createdTimestamp" : 1760079821559,
+    "username" : "bob",
+    "enabled" : true,
+    "totp" : false,
+    "emailVerified" : false,
+    "firstName" : "Bob",
+    "lastName" : "Manager",
+    "email" : "bob.manager@company.com",
+    "credentials" : [ {
+      "id" : "96c6f17d-c3a6-4159-a853-35feaa75b1ea",
+      "type" : "password",
+      "userLabel" : "My password",
+      "createdDate" : 1760079829221,
+      "secretData" : "{\"value\":\"vmHJ6f39iySaB2hzOtJUFToLgLh4lmqjcnLaytqlBKU=\",\"salt\":\"B4ORSFvIjNuC9/HWy2BOhg==\",\"additionalParameters\":{}}",
+      "credentialData" : "{\"hashIterations\":27500,\"algorithm\":\"pbkdf2-sha256\",\"additionalParameters\":{}}"
+    } ],
+    "disableableCredentialTypes" : [ ],
+    "requiredActions" : [ ],
+    "realmRoles" : [ "default-roles-freing" ],
+    "notBefore" : 0,
+    "groups" : [ "/employees/management" ]
+  }, {
+    "id" : "fac42278-adde-485c-917a-b222aac76dbd",
+    "createdTimestamp" : 1760079859212,
+    "username" : "john",
+    "enabled" : true,
+    "totp" : false,
+    "emailVerified" : false,
+    "firstName" : "John",
+    "lastName" : "Customer",
+    "email" : "john.customer@customers.com",
+    "credentials" : [ {
+      "id" : "6ca60869-b6d2-41bc-90fc-cd04da2a037f",
+      "type" : "password",
+      "userLabel" : "My password",
+      "createdDate" : 1760079868110,
+      "secretData" : "{\"value\":\"g1D5+5CLGGVD48+ssnWEte5+LhBXQXWE6B7dJMksg3o=\",\"salt\":\"0+kqihzT+0wYzWFlE9qooQ==\",\"additionalParameters\":{}}",
+      "credentialData" : "{\"hashIterations\":27500,\"algorithm\":\"pbkdf2-sha256\",\"additionalParameters\":{}}"
+    } ],
+    "disableableCredentialTypes" : [ ],
+    "requiredActions" : [ ],
+    "realmRoles" : [ "default-roles-freing" ],
+    "notBefore" : 0,
+    "groups" : [ "/customers" ]
+  } ],
   "roles" : {
     "realm" : [ {
       "id" : "cdf85ec5-cf30-4322-9317-9f97db016450",
@@ -1192,7 +1262,7 @@
       "subType" : "authenticated",
       "subComponents" : { },
       "config" : {
-        "allowed-protocol-mapper-types" : [ "oidc-address-mapper", "oidc-full-name-mapper", "oidc-usermodel-property-mapper", "oidc-sha256-pairwise-sub-mapper", "oidc-usermodel-attribute-mapper", "saml-user-attribute-mapper", "saml-role-list-mapper", "saml-user-property-mapper" ]
+        "allowed-protocol-mapper-types" : [ "saml-role-list-mapper", "oidc-usermodel-attribute-mapper", "saml-user-property-mapper", "oidc-address-mapper", "oidc-sha256-pairwise-sub-mapper", "saml-user-attribute-mapper", "oidc-usermodel-property-mapper", "oidc-full-name-mapper" ]
       }
     }, {
       "id" : "5d1a591d-5d5c-48a3-ada0-fc93c19eed98",
@@ -1224,7 +1294,7 @@
       "subType" : "anonymous",
       "subComponents" : { },
       "config" : {
-        "allowed-protocol-mapper-types" : [ "oidc-sha256-pairwise-sub-mapper", "oidc-usermodel-attribute-mapper", "saml-role-list-mapper", "saml-user-property-mapper", "saml-user-attribute-mapper", "oidc-address-mapper", "oidc-usermodel-property-mapper", "oidc-full-name-mapper" ]
+        "allowed-protocol-mapper-types" : [ "oidc-sha256-pairwise-sub-mapper", "oidc-usermodel-attribute-mapper", "saml-user-property-mapper", "saml-user-attribute-mapper", "oidc-address-mapper", "oidc-full-name-mapper", "saml-role-list-mapper", "oidc-usermodel-property-mapper" ]
       }
     }, {
       "id" : "0cfcc830-0aa4-4650-a19a-34a2a85ae608",
