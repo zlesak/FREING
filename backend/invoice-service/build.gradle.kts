@@ -31,6 +31,7 @@ dependencies {
 	implementation("org.modelmapper:modelmapper:3.2.5")
 
 	runtimeOnly("com.h2database:h2")
+	runtimeOnly("org.postgresql:postgresql:42.6.0")
 
 	testImplementation("org.springframework.boot:spring-boot-starter-test") {
 		exclude(group = "org.junit.vintage")

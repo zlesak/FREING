@@ -1,6 +1,6 @@
 # Multi-stage Dockerfile for building Kotlin/Spring Boot services using Gradle wrapper
 # Build stage: use local builder base from backend-builder.Dockerfile (inlined)
-FROM amazoncorretto:21 as builder
+FROM amazoncorretto:21 AS builder
 
 # Keep running as root so downstream builds can change file permissions and run gradle safely
 USER root

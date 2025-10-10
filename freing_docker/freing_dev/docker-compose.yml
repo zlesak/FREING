@@ -47,86 +47,165 @@ services:
     volumes:
       - ./keycloak/freing-realm.json:/opt/keycloak/data/import/freing-realm.json:ro
 
+  # Database services for Keycloak
   db_keycloak:
     image: postgres:17.6
     networks:
       - freing_network
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_data_keycloak:/var/lib/postgresql/data
+    ports:
+      - "5432:5432" # host:container - useful for connecting from IDE to this DB
     environment:
       POSTGRES_DB: keycloak
       POSTGRES_USER: keycloak
       POSTGRES_PASSWORD: keycloak
 
+  # Database services for backend services
+  db_service_customer:
+    image: postgres:17.6
+    networks:
+      - freing_network
+    volumes:
+      - postgres_data_customer:/var/lib/postgresql/data
+    ports:
+      - "5433:5432" # host 5433 -> container 5432
+    environment:
+      POSTGRES_DB: customer
+      POSTGRES_USER: customer
+      POSTGRES_PASSWORD: customer_pass
+
+  db_service_invoice:
+    image: postgres:17.6
+    networks:
+      - freing_network
+    volumes:
+      - postgres_data_invoice:/var/lib/postgresql/data
+    ports:
+      - "5434:5432" # host 5434 -> container 5432
+    environment:
+      POSTGRES_DB: invoice
+      POSTGRES_USER: invoice
+      POSTGRES_PASSWORD: invoice_pass
+
+  db_service_payment:
+    image: postgres:17.6
+    networks:
+      - freing_network
+    volumes:
+      - postgres_data_payment:/var/lib/postgresql/data
+    ports:
+      - "5435:5432" # host 5435 -> container 5432
+    environment:
+      POSTGRES_DB: payment
+      POSTGRES_USER: payment
+      POSTGRES_PASSWORD: payment_pass
+
+  db_service_rendering:
+    image: postgres:17.6
+    networks:
+      - freing_network
+    volumes:
+      - postgres_data_rendering:/var/lib/postgresql/data
+    ports:
+      - "5436:5432" # host 5436 -> container 5432
+    environment:
+      POSTGRES_DB: rendering
+      POSTGRES_USER: rendering
+      POSTGRES_PASSWORD: rendering_pass
+
   # Backend services (built from repository using multi-stage Dockerfile)
-  customer_service:
+  service_customer:
     build:
       context: ../..
-      # Dockerfile path must be relative to build context (repo root)
       dockerfile: freing_docker/freing_dev/build_docker/backend-service.Dockerfile
       args:
         SERVICE_DIR: customer-service
-    image: freing_customer_service:dev
-    container_name: customer_service
+    image: freing_service_customer:dev
+    container_name: service_customer
     environment:
       - SERVER_PORT=8081
+      - DB_HOST=db_service_customer
+      - DB_PORT=5432
+      - DB_NAME=customer
+      - DB_USER=customer
+      - DB_PASSWORD=customer_pass
     ports:
       - "8081:8081"
     networks:
       - freing_network
     depends_on:
       - keycloak_web
+      - db_service_customer
 
-  invoice_service:
+  service_invoice:
     build:
       context: ../..
       dockerfile: freing_docker/freing_dev/build_docker/backend-service.Dockerfile
       args:
         SERVICE_DIR: invoice-service
-    image: freing_invoice_service:dev
-    container_name: invoice_service
+    image: freing_service_invoice:dev
+    container_name: service_invoice
     environment:
       - SERVER_PORT=8082
+      - DB_HOST=db_service_invoice
+      - DB_PORT=5432
+      - DB_NAME=invoice
+      - DB_USER=invoice
+      - DB_PASSWORD=invoice_pass
     ports:
       - "8082:8082"
     networks:
       - freing_network
     depends_on:
       - keycloak_web
+      - db_service_invoice
 
-  payment_service:
+  service_payment:
     build:
       context: ../..
       dockerfile: freing_docker/freing_dev/build_docker/backend-service.Dockerfile
       args:
         SERVICE_DIR: payment-service
-    image: freing_payment_service:dev
-    container_name: payment_service
+    image: freing_service_payment:dev
+    container_name: service_payment
     environment:
       - SERVER_PORT=8083
+      - DB_HOST=db_service_payment
+      - DB_PORT=5432
+      - DB_NAME=payment
+      - DB_USER=payment
+      - DB_PASSWORD=payment_pass
     ports:
       - "8083:8083"
     networks:
       - freing_network
     depends_on:
       - keycloak_web
+      - db_service_payment
 
-  rendering_service:
+  service_rendering:
     build:
       context: ../..
       dockerfile: freing_docker/freing_dev/build_docker/backend-service.Dockerfile
       args:
         SERVICE_DIR: rendering-service
-    image: freing_rendering_service:dev
-    container_name: rendering_service
+    image: freing_service_rendering:dev
+    container_name: service_rendering
     environment:
       - SERVER_PORT=8084
+      - DB_HOST=db_service_rendering
+      - DB_PORT=5432
+      - DB_NAME=rendering
+      - DB_USER=rendering
+      - DB_PASSWORD=rendering_pass
     ports:
       - "8084:8084"
     networks:
       - freing_network
     depends_on:
       - keycloak_web
+      - db_service_rendering
 
   frontend:
     build:
@@ -140,10 +219,14 @@ services:
       - "4100:4100"
     depends_on:
       - keycloak_web
-      - invoice_service
+      - service_invoice
 
 volumes:
-  postgres_data:
+  postgres_data_keycloak:
+  postgres_data_customer:
+  postgres_data_invoice:
+  postgres_data_payment:
+  postgres_data_rendering:
 
 networks:
   freing_network:
