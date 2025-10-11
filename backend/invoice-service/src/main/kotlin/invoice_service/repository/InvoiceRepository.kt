@@ -1,6 +1,6 @@
 package invoice_service.repository
 
-import invoice_service.model.Invoice
+import invoice_service.models.invoices.Invoice
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor
 

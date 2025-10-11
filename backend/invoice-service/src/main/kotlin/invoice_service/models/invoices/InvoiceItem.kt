@@ -1,11 +1,11 @@
-package invoice_service.model
+package invoice_service.models.invoices
 
 import jakarta.persistence.*
 import java.math.BigDecimal
 
 @Entity
 @Table(name = "invoice_items")
-class InvoiceItem(
+data class InvoiceItem(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,
 
@@ -22,16 +22,4 @@ class InvoiceItem(
     var totalPrice: BigDecimal = BigDecimal.ZERO
 ) {
     constructor() : this(null, "", 1, BigDecimal.ZERO, BigDecimal.ZERO)
-
-    override fun toString(): String {
-        return "InvoiceItem(id=$id, description='$description', quantity=$quantity, unitPrice=$unitPrice, totalPrice=$totalPrice)"
-    }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is InvoiceItem) return false
-        return id != null && id == other.id
-    }
-
-    override fun hashCode(): Int = id?.hashCode() ?: 0
 }

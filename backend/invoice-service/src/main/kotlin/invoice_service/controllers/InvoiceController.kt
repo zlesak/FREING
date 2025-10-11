@@ -1,10 +1,10 @@
-package invoice_service.controller
+package invoice_service.controllers
 
-import invoice_service.dto.InvoiceCreateRequest
-import invoice_service.dto.InvoiceUpdateRequest
-import invoice_service.dto.PagedResponse
-import invoice_service.model.Invoice
-import invoice_service.service.InvoiceService
+import invoice_service.dtos.invoices.requests.InvoiceCreateRequest
+import invoice_service.dtos.invoices.requests.InvoiceUpdateRequest
+import invoice_service.dtos.invoices.responses.InvoicesPagedResponse
+import invoice_service.models.invoices.Invoice
+import invoice_service.services.InvoiceService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.tags.Tag
@@ -36,7 +36,7 @@ class InvoiceController (private val service: InvoiceService) {
         @RequestParam(defaultValue = "0") page: Int,
         @Parameter(description = "Velikost stránky", example = "10")
         @RequestParam(defaultValue = "10") size: Int
-    ): PagedResponse<Invoice> {
+    ): InvoicesPagedResponse<Invoice> {
         val pageable = PageRequest.of(page, size)
         return service.getAllInvoices(pageable)
     }

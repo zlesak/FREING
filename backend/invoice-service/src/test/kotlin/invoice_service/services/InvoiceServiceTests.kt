@@ -1,9 +1,9 @@
-package invoice_service.service
+package invoice_service.services
 
-import invoice_service.dto.InvoiceCreateRequest
-import invoice_service.dto.InvoiceItemRequest
-import invoice_service.dto.InvoiceUpdateRequest
-import invoice_service.model.InvoiceStatus
+import invoice_service.dtos.invoices.requests.InvoiceCreateRequest
+import invoice_service.dtos.invoices.requests.InvoiceItemRequest
+import invoice_service.dtos.invoices.requests.InvoiceUpdateRequest
+import invoice_service.models.invoices.InvoiceStatusEnum
 import invoice_service.repository.InvoiceRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -31,7 +31,7 @@ class InvoiceServiceTests(
             dueDate = LocalDate.now().plusDays(14),
             amount = BigDecimal("123.45"),
             currency = "CZK",
-            status = InvoiceStatus.DRAFT,
+            status = InvoiceStatusEnum.DRAFT,
             items = listOf(
                 InvoiceItemRequest(description = "Item 1", quantity = 2, unitPrice = BigDecimal("10.00"), totalPrice = BigDecimal("20.00")),
                 InvoiceItemRequest(description = "Item 2", quantity = 1, unitPrice = BigDecimal("50.00"), totalPrice = BigDecimal("50.00"))
@@ -59,7 +59,7 @@ class InvoiceServiceTests(
             dueDate = original.dueDate.plusDays(7),
             amount = BigDecimal("999.99"),
             currency = "EUR",
-            status = InvoiceStatus.PENDING,
+            status = InvoiceStatusEnum.PENDING,
             items = listOf(
                 InvoiceItemRequest(
                     id = original.items.first().id,

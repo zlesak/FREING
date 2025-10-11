@@ -3,17 +3,18 @@
   "version": "0.0.1",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
     "start:docker": "ng serve --configuration docker --host 0.0.0.0 --port 4100",
-    "build": "ng build",
-    "watch": "ng build --watch --configuration development",
+    "start": "npm run openapi:check && ng serve",
+    "build": "npm run openapi:check && ng build",
+    "watch": "npm run openapi:check && ng build --watch --configuration development",
     "test": "ng test",
-    "openapi:clean": "rm -rf src/app/api/generated",
-    "openapi:download": "curl -s http://localhost:8082/v3/api-docs > openapi.json",
+    "openapi:clean": "rimraf src/app/api/generated && rimraf .openapi.hash && rimraf openapi.json",
+    "openapi:download": "curl -s http://localhost:8082/v3/api-docs -o openapi.json",
     "openapi:gen": "npm run openapi:download && npx openapi --input openapi.json --output src/app/api/generated --client fetch --useOptions --useUnionTypes",
-    "openapi:refresh": "npm run openapi:gen",
-    "openapi:ensure": "[ -d src/app/api/generated ] && [ -f src/app/api/generated/index.ts ] && echo 'OpenAPI client already present' || (echo 'Generating OpenAPI client...' && npm run openapi:gen || echo 'WARNING: OpenAPI generation failed (is backend running on :8082?)')",
-    "postinstall": "npm run openapi:ensure || true"
+    "openapi:refresh": "npm run openapi:clean && npm run openapi:gen",
+    "openapi:check": "node scripts/openapi-check.js",
+    "openapi:ensure": "node -e \"const fs = require('fs'); const path = 'src/app/api/generated/index.ts'; if (fs.existsSync(path)) { console.log('OpenAPI client already present'); } else { console.log('Generating OpenAPI client...'); process.exit(1); }\" || npm run openapi:gen",
+    "postinstall": "npm run openapi:check || echo Postinstall completed"
   },
   "prettier": {
     "printWidth": 100,
@@ -35,8 +36,8 @@
     "@angular/forms": "^20.3.0",
     "@angular/platform-browser": "^20.3.0",
     "@angular/router": "^20.3.0",
-    "keycloak-js": "^25.0.6",
     "keycloak-angular": "^20.0.0",
+    "keycloak-js": "^25.0.6",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.15.0"
@@ -46,13 +47,15 @@
     "@angular/cli": "^20.3.4",
     "@angular/compiler-cli": "^20.3.0",
     "@types/jasmine": "~5.1.0",
+    "cross-env": "^10.1.0",
     "jasmine-core": "~5.9.0",
     "karma": "~6.4.0",
-    "karma-coverage": "~2.2.0",
     "karma-chrome-launcher": "~3.2.0",
+    "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
-    "typescript": "~5.9.2",
-    "openapi-typescript-codegen": "^0.29.0"
+    "openapi-typescript-codegen": "^0.29.0",
+    "rimraf": "^6.0.1",
+    "typescript": "~5.9.2"
   }
 }
