@@ -1,15 +1,32 @@
 # FREING Docker - dev
 
-## 1. přidání testovacích domén do /etc/hosts
-- Aby fungovaly domény používané v konfiguraci (např. `auth.test`, `freing.test` a `service.freing.test`), je nutné přidat záznamy do vašeho `/etc/hosts`, například:
+## Lokální vývojové prostředí pro FREING pomocí Docker Compose
+Tento projekt obsahuje `docker-compose.yml` pro spuštění lokálního vývojového prostředí FREING pomocí Docker Compose.  
+Služby:  
+- Keycloak (pro autentizaci a autorizaci)
+- PostgreSQL databáze (jedna pro každou mikroservisu)
+- PgAdmin pro správu databází
+- FREING mikroservisy (Customer Service, Invoice Service, Payment Service, Rendering Service)
+- Frontend aplikaci
 
-  `sudo nano /etc/hosts`
-  přidejte tento řádek: 127.0.0.1 auth.test freing.test service.freing.test
+## Postup pro spuštění
+### 1. Přidání testovacích domén do /etc/hosts (unix-based systémy)
+Aby fungovaly domény používané v konfiguraci (např. `auth.test`, `freing.test`, `service.freing.test` a `pgadmin.freing.test`), je nutné přidat záznamy do `/etc/hosts`.  
+Otevřte `sudo nano /etc/hosts` a přidejte tento řádek: `127.0.0.1 auth.test freing.test service.freing.test pgadmin.freing.test`  
 
-## 2. spuštění `docker compose up -d`
+nebo použijte příkaz:
+```bash
+ echo "127.0.0.1 auth.test freing.test service.freing.test pgadmin.freing.test" >> /etc/hosts
+```
+Pro Windows upravte `C:\Windows\System32\drivers\etc\hosts` obdobně.
+
+
+### 2. Spuštění Docker Compose
+
+V IDE nebo terminálu přejděte do složky `freing_docker` a spusťte Docker Compose a spusťte `docker compose up -d` (nebo skrzer IDE).
 
 ```bash
-cd /path/to/FREING/freing_docker
+cd /{YOUR_PATH_TO_THE_PROJECT_DIRECTORY}/FREING/freing_docker
 docker compose up -d
 ```
 
@@ -56,3 +73,12 @@ Pro rychlé testování přihlášení a rolí v Keycloaku jsou dostupné tyto �
   - Role: `customer`
 
 Poznámka: Tyto účty jsou určeny pouze pro lokální vývoj. Pokud Keycloak importuje realm z `keycloak/freing-realm.json`, účty by měly být dostupné po importu. Pokud nejsou, přidejte nebo upravte uživatele v Keycloak admin konzoli (`http://auth.test`).
+
+
+## PGAdmin
+V případě potřeby je možno se připojit k databázím pomocí těchto údajů:
+- Přístup do PGAdmin: `http://pgadmin.freing.test`
+- Uživatelské jméno: `admin@example.com`
+- Heslo: `admin`
+
+
