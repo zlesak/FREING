@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "cz.uhk.fim"
-version = "1.0.1"
+version = "1.0.2"
 description = "Invoice Service"
 
 java {
@@ -38,6 +38,7 @@ dependencies {
 		exclude(group = "org.junit.vintage")
 	}
 	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
+    testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
