@@ -11,3 +11,5 @@ Modul pro frontend projektu FREING
     - Při npm install je třeba sldovat konzoli (a je nutné mít zapnutou SVC, aby se to vygenerovalo)
 - version **0.0.2** (2025-10-11)
   - Script update, launch settings fix, env var fix.
+- version **0.0.3** (2025-10-11)
+  - Přidán exchange rate přepočet při zadávání faktury. 

@@ -3,6 +3,8 @@ import { FormArray, FormBuilder, FormGroup, Validators, FormControl } from '@ang
 import { Router } from '@angular/router';
 import { InvoicesServiceController } from '../../controller/invoices.service';
 import { InvoiceCreateRequest, InvoiceItemRequest } from '../../../../api/generated';
+import { ExchangeRatesController } from '../../controller/exchange.service';
+import { distinctUntilChanged } from 'rxjs';
 
 @Component({
   selector: 'app-invoice-create',
@@ -22,7 +24,8 @@ export class InvoiceCreateComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private invoicesService: InvoicesServiceController,
-    private router: Router
+    private router: Router,
+    private exchangeRates: ExchangeRatesController
   ) {}
 
   ngOnInit(): void {
@@ -40,6 +43,37 @@ export class InvoiceCreateComponent implements OnInit {
       items: this.fb.array([])
     });
     this.addItem();
+
+    this.lastCurrency = this.form.get('currency')!.value;
+    this.form.get('currency')!.valueChanges.pipe(distinctUntilChanged()).subscribe(newCur => {
+      if (!newCur || newCur === this.lastCurrency) return;
+      this.convertAllItemsCurrency(this.lastCurrency, newCur);
+    });
+  }
+
+  private lastCurrency: string = 'CZK';
+
+  private convertAllItemsCurrency(from: string, to: string): void {
+    if (this.items.length === 0) { this.lastCurrency = to; return; }
+    this.exchangeRates.getRate(from, to).subscribe({
+      next: factor => {
+        for (let i = 0; i < this.items.length; i++) {
+          const grp = this.items.at(i) as FormGroup;
+          const unit = grp.get('unitPrice')?.value || 0;
+          const qty = grp.get('quantity')?.value || 0;
+          const newUnit = +(unit * factor).toFixed(2);
+          grp.get('unitPrice')?.setValue(newUnit);
+          const newTotal = +(newUnit * qty).toFixed(2);
+            grp.get('totalPrice')?.setValue(newTotal);
+        }
+        this.recalcInvoiceAmount();
+        this.lastCurrency = to;
+      },
+      error: err => {
+        this.form.get('currency')?.setValue(from, { emitEvent: false });
+        this.error = 'Chyba při převodu měny: ' + (err.message || 'neznámá chyba');
+      }
+    });
   }
 
   get items(): FormArray<FormGroup> { return this.form.get('items') as FormArray<FormGroup>; }
