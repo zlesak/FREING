@@ -1,14 +1,12 @@
-package invoice_service.service
+package invoice_service.services
 
-import invoice_service.dto.InvoiceCreateRequest
-import invoice_service.dto.InvoiceUpdateRequest
-import invoice_service.dto.PagedResponse
-import invoice_service.dto.toInvoice
-import invoice_service.model.Invoice
-import invoice_service.model.InvoiceItem
+import invoice_service.dtos.invoices.requests.InvoiceCreateRequest
+import invoice_service.dtos.invoices.requests.InvoiceUpdateRequest
+import invoice_service.dtos.invoices.responses.InvoicesPagedResponse
+import invoice_service.models.invoices.Invoice
+import invoice_service.models.invoices.InvoiceItem
 import invoice_service.repository.InvoiceRepository
 import jakarta.transaction.Transactional
-import org.modelmapper.ModelMapper
 import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -16,18 +14,14 @@ import java.time.Instant
 
 @Service
 class InvoiceService (
-    private val repo: InvoiceRepository,
-    private val modelMapper: ModelMapper
+    private val repo: InvoiceRepository
 ) {
 
     @Transactional
     fun createInvoice(request: InvoiceCreateRequest) : Invoice {
         if (repo.existsByInvoiceNumber(request.invoiceNumber)) throw IllegalArgumentException("Faktura s tímto číslem již existuje.")
 
-      //  val invoice = modelMapper.map(request, Invoice::class.java)
         val invoice = request.toInvoice()
- //       invoice.createdAt = LocalDateTime.now()
- //       invoice.updatedAt = LocalDateTime.now()
         invoice.items.forEach {
             it.id = null
         }
@@ -36,7 +30,7 @@ class InvoiceService (
 
     fun getInvoice(id: Long): Invoice? = repo.findByIdOrNull(id)
 
-    fun getAllInvoices(pageable: Pageable) : PagedResponse<Invoice> {
+    fun getAllInvoices(pageable: Pageable) : InvoicesPagedResponse<Invoice> {
         val allInvoices = repo.findAll()
 
         val startIndex = pageable.pageNumber * pageable.pageSize
@@ -47,7 +41,7 @@ class InvoiceService (
             emptyList<Invoice>()
         }
 
-        return PagedResponse(
+        return InvoicesPagedResponse(
             content = pageContent,
             totalElements = allInvoices.size.toLong(),
             totalPages = (allInvoices.size + pageable.pageSize - 1) / pageable.pageSize,
