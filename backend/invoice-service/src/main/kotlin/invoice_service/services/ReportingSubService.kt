@@ -1,14 +1,14 @@
-package invoice_service.service
+package invoice_service.services
 
-import invoice_service.model.Invoice
-import invoice_service.dto.AggregatedReportResponse
-import invoice_service.dto.CustomerSummary
-import invoice_service.dto.InvoiceSummary
+import invoice_service.models.invoices.Invoice
+import invoice_service.dtos.reports.responses.AggregatedReportResponse
+import invoice_service.dtos.reports.responses.CustomerInvoicesReportResponse
+import invoice_service.dtos.reports.responses.AllInvoicesReportResponse
 import invoice_service.repository.InvoiceRepository
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import java.math.BigDecimal
-import invoice_service.dto.InvoiceReportRequest
+import invoice_service.dtos.reports.requests.InvoiceReportRequest
 
 @Service
 class ReportingSubService(private val repo: InvoiceRepository) {
@@ -18,14 +18,14 @@ class ReportingSubService(private val repo: InvoiceRepository) {
         val totalAmount = invoices.fold(BigDecimal.ZERO) { acc, inv -> acc + inv.amount }
         val perCustomer = invoices.groupBy { it.customerName }
             .map { (name, list) ->
-                CustomerSummary(
+                CustomerInvoicesReportResponse(
                     customerName = name,
                     invoiceCount = list.size,
                     totalAmount = list.fold(BigDecimal.ZERO) { acc, inv -> acc + inv.amount }
                 )
             }
         val invoiceSummaries = invoices.map { inv ->
-            InvoiceSummary(
+            AllInvoicesReportResponse(
                 id = inv.id!!,
                 invoiceNumber = inv.invoiceNumber,
                 customerName = inv.customerName,

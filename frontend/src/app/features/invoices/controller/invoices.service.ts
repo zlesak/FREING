@@ -11,7 +11,7 @@ import {
   InvoiceUpdateRequest,
   InvoiceReportRequest,
   AggregatedReportResponse,
-  PagedResponseInvoice
+  InvoicesPagedResponse
 } from '../../../api/generated';
 
 @Injectable({ providedIn: 'root' })
@@ -20,7 +20,7 @@ export class InvoicesServiceController {
     OpenAPI.BASE = environment.apiBase;
   }
 
-  getInvoices(page = 0, size = 10): Observable<PagedResponseInvoice> {
+  getInvoices(page = 0, size = 10): Observable<InvoicesPagedResponse> {
     return from(GenInvoicesService.getAllInvoices({ page, size })).pipe(
       catchError(this.handleError)
     );

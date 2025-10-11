@@ -1,8 +1,8 @@
-package invoice_service.controller
+package invoice_service.controllers
 
-import invoice_service.dto.InvoiceReportRequest
-import invoice_service.dto.AggregatedReportResponse
-import invoice_service.service.ReportingSubService
+import invoice_service.dtos.reports.requests.InvoiceReportRequest
+import invoice_service.dtos.reports.responses.AggregatedReportResponse
+import invoice_service.services.ReportingSubService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.HttpHeaders

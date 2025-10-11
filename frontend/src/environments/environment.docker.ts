@@ -1,4 +1,4 @@
 export const environment = {
   production: false,
-  apiBase: 'http://service_invoice:8082'
+  apiBase: 'http://service.freing.test/invoice'
 };

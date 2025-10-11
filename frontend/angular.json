@@ -76,7 +76,7 @@
         "serve": {
           "builder": "@angular/build:dev-server",
           "options": {
-            "allowedHosts": ["localhost","freing.test"]
+            "allowedHosts": ["localhost","freing.test","frontend"]
           },
           "configurations": {
             "production": {

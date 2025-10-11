@@ -8,6 +8,8 @@ USER root
 ENV FREING_BUILDER_IMAGE=1
 LABEL maintainer="FREING"
 
+RUN yum -y install curl && yum clean all
+
 # Copy repository backend sources into builder
 COPY backend/ /home/gradle/project/backend/
 # We'll build a specific subproject by passing SERVICE_DIR build-arg
@@ -37,6 +39,11 @@ ENV JAVA_OPTS="-Xms256m -Xmx512m"
 ENV SERVER_PORT=8080
 
 EXPOSE ${SERVER_PORT}
+
+HEALTHCHECK --interval=15s --timeout=4s --retries=6 --start-period=60s \
+  CMD sh -c 'P="${SERVER_PORT:-8080}"; \
+    BODY=$(curl -sf http://127.0.0.1:$P/actuator/health 2>/dev/null || true); \
+    echo "$BODY" | grep -q "\"status\":\"UP\"" || exit 1'
 
 # Use start.sh as entrypoint (JSON form is recommended)
 ENTRYPOINT ["/bin/sh", "/app/start.sh"]

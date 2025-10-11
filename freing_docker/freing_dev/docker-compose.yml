@@ -4,7 +4,11 @@ services:
     hostname: gateway
     container_name: gateway
     networks:
-      - freing_network
+      freing_network:
+        aliases:
+          - auth.test
+          - freing.test
+          - service.freing.test
     ports:
       - "80:80"
     volumes:
@@ -13,7 +17,7 @@ services:
   keycloak_web:
     image: quay.io/keycloak/keycloak:23.0.2
     hostname: keycloak_web
-    container_name: keycloak_web
+    container_name: keycloak-web
     environment:
       KC_DB: postgres
       KC_DB_URL: jdbc:postgresql://db_keycloak:5432/keycloak
@@ -55,7 +59,7 @@ services:
     volumes:
       - postgres_data_keycloak:/var/lib/postgresql/data
     ports:
-      - "5432:5432" # host:container - useful for connecting from IDE to this DB
+      - "5432:5432"
     environment:
       POSTGRES_DB: keycloak
       POSTGRES_USER: keycloak
@@ -69,7 +73,7 @@ services:
     volumes:
       - postgres_data_customer:/var/lib/postgresql/data
     ports:
-      - "5433:5432" # host 5433 -> container 5432
+      - "5433:5432"
     environment:
       POSTGRES_DB: customer
       POSTGRES_USER: customer
@@ -82,7 +86,7 @@ services:
     volumes:
       - postgres_data_invoice:/var/lib/postgresql/data
     ports:
-      - "5434:5432" # host 5434 -> container 5432
+      - "5434:5432"
     environment:
       POSTGRES_DB: invoice
       POSTGRES_USER: invoice
@@ -95,7 +99,7 @@ services:
     volumes:
       - postgres_data_payment:/var/lib/postgresql/data
     ports:
-      - "5435:5432" # host 5435 -> container 5432
+      - "5435:5432"
     environment:
       POSTGRES_DB: payment
       POSTGRES_USER: payment
@@ -108,7 +112,7 @@ services:
     volumes:
       - postgres_data_rendering:/var/lib/postgresql/data
     ports:
-      - "5436:5432" # host 5436 -> container 5432
+      - "5436:5432"
     environment:
       POSTGRES_DB: rendering
       POSTGRES_USER: rendering
@@ -122,7 +126,7 @@ services:
       args:
         SERVICE_DIR: customer-service
     image: freing_service_customer:dev
-    container_name: service_customer
+    container_name: service-customer
     environment:
       - SERVER_PORT=8081
       - DB_HOST=db_service_customer
@@ -145,7 +149,7 @@ services:
       args:
         SERVICE_DIR: invoice-service
     image: freing_service_invoice:dev
-    container_name: service_invoice
+    container_name: service-invoice
     environment:
       - SERVER_PORT=8082
       - DB_HOST=db_service_invoice
@@ -168,7 +172,7 @@ services:
       args:
         SERVICE_DIR: payment-service
     image: freing_service_payment:dev
-    container_name: service_payment
+    container_name: service-payment
     environment:
       - SERVER_PORT=8083
       - DB_HOST=db_service_payment
@@ -191,7 +195,7 @@ services:
       args:
         SERVICE_DIR: rendering-service
     image: freing_service_rendering:dev
-    container_name: service_rendering
+    container_name: service-rendering
     environment:
       - SERVER_PORT=8084
       - DB_HOST=db_service_rendering
@@ -215,11 +219,19 @@ services:
     container_name: frontend
     networks:
       - freing_network
+    depends_on:
+      service_invoice:
+        condition: service_healthy
+      service_customer:
+        condition: service_healthy
+      service_payment:
+        condition: service_healthy
+      service_rendering:
+        condition: service_healthy
     ports:
       - "4100:4100"
-    depends_on:
-      - keycloak_web
-      - service_invoice
+    environment:
+      - DOCKER=true
 
 volumes:
   postgres_data_keycloak:
