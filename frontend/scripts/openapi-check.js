@@ -2,7 +2,7 @@ const fs = require('fs');
 const crypto = require('crypto');
 const { execSync } = require('child_process');
 
-const OPENAPI_URL = 'http://localhost:8082/v3/api-docs';
+const OPENAPI_URL = process.env.OPENAPI_URL || (process.env.DOCKER ? 'http://service-invoice:8082/v3/api-docs' : 'http://localhost:8082/v3/api-docs');
 const OPENAPI_FILE = 'openapi.json';
 const HASH_FILE = '.openapi.hash';
 const GENERATED_INDEX = 'src/app/api/generated/index.ts';
