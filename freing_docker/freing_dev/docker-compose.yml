@@ -9,6 +9,7 @@ services:
           - auth.test
           - freing.test
           - service.freing.test
+          - pgadmin.freing.test
     ports:
       - "80:80"
     volumes:
@@ -18,11 +19,12 @@ services:
     image: quay.io/keycloak/keycloak:23.0.2
     hostname: keycloak_web
     container_name: keycloak-web
+    env_file: .env
     environment:
       KC_DB: postgres
-      KC_DB_URL: jdbc:postgresql://db_keycloak:5432/keycloak
-      KC_DB_USERNAME: keycloak
-      KC_DB_PASSWORD: keycloak
+      KC_DB_URL: jdbc:postgresql://db_keycloak:5432/${KEYCLOAK_DB_NAME}
+      KC_DB_USERNAME: ${KEYCLOAK_DB_USER}
+      KC_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD}
 
       KC_HOSTNAME: auth.test
       KC_HOSTNAME_PORT: 80
@@ -37,8 +39,8 @@ services:
       KC_PROXY_HEADERS: xforwarded
 
       KC_HTTP_PORT: 8100
-      KEYCLOAK_ADMIN: admin
-      KEYCLOAK_ADMIN_PASSWORD: password
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN_USER}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
       KC_HTTP_ENABLED: true
     command: start-dev --import-realm
     depends_on:
@@ -60,10 +62,17 @@ services:
       - postgres_data_keycloak:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+    env_file: .env
     environment:
-      POSTGRES_DB: keycloak
-      POSTGRES_USER: keycloak
-      POSTGRES_PASSWORD: keycloak
+      POSTGRES_DB: ${KEYCLOAK_DB_NAME}
+      POSTGRES_USER: ${KEYCLOAK_DB_USER}
+      POSTGRES_PASSWORD: ${KEYCLOAK_DB_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U keycloak -d keycloak"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
   # Database services for backend services
   db_service_customer:
@@ -74,10 +83,17 @@ services:
       - postgres_data_customer:/var/lib/postgresql/data
     ports:
       - "5433:5432"
+    env_file: .env
     environment:
-      POSTGRES_DB: customer
-      POSTGRES_USER: customer
-      POSTGRES_PASSWORD: customer_pass
+      POSTGRES_DB: ${CUSTOMER_DB_NAME}
+      POSTGRES_USER: ${CUSTOMER_DB_USER}
+      POSTGRES_PASSWORD: ${CUSTOMER_DB_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U customer -d customer"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
   db_service_invoice:
     image: postgres:17.6
@@ -87,10 +103,17 @@ services:
       - postgres_data_invoice:/var/lib/postgresql/data
     ports:
       - "5434:5432"
+    env_file: .env
     environment:
-      POSTGRES_DB: invoice
-      POSTGRES_USER: invoice
-      POSTGRES_PASSWORD: invoice_pass
+      POSTGRES_DB: ${INVOICE_DB_NAME}
+      POSTGRES_USER: ${INVOICE_DB_USER}
+      POSTGRES_PASSWORD: ${INVOICE_DB_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U invoice -d invoice"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
   db_service_payment:
     image: postgres:17.6
@@ -100,10 +123,17 @@ services:
       - postgres_data_payment:/var/lib/postgresql/data
     ports:
       - "5435:5432"
+    env_file: .env
     environment:
-      POSTGRES_DB: payment
-      POSTGRES_USER: payment
-      POSTGRES_PASSWORD: payment_pass
+      POSTGRES_DB: ${PAYMENT_DB_NAME}
+      POSTGRES_USER: ${PAYMENT_DB_USER}
+      POSTGRES_PASSWORD: ${PAYMENT_DB_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U payment -d payment"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
   db_service_rendering:
     image: postgres:17.6
@@ -113,10 +143,17 @@ services:
       - postgres_data_rendering:/var/lib/postgresql/data
     ports:
       - "5436:5432"
+    env_file: .env
     environment:
-      POSTGRES_DB: rendering
-      POSTGRES_USER: rendering
-      POSTGRES_PASSWORD: rendering_pass
+      POSTGRES_DB: ${RENDERING_DB_NAME}
+      POSTGRES_USER: ${RENDERING_DB_USER}
+      POSTGRES_PASSWORD: ${RENDERING_DB_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U rendering -d rendering"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
   # Backend services (built from repository using multi-stage Dockerfile)
   service_customer:
@@ -127,13 +164,14 @@ services:
         SERVICE_DIR: customer-service
     image: freing_service_customer:dev
     container_name: service-customer
+    env_file: .env
     environment:
       - SERVER_PORT=8081
       - DB_HOST=db_service_customer
       - DB_PORT=5432
-      - DB_NAME=customer
-      - DB_USER=customer
-      - DB_PASSWORD=customer_pass
+      - DB_NAME=${CUSTOMER_DB_NAME}
+      - DB_USER=${CUSTOMER_DB_USER}
+      - DB_PASSWORD=${CUSTOMER_DB_PASSWORD}
     ports:
       - "8081:8081"
     networks:
@@ -150,13 +188,14 @@ services:
         SERVICE_DIR: invoice-service
     image: freing_service_invoice:dev
     container_name: service-invoice
+    env_file: .env
     environment:
       - SERVER_PORT=8082
       - DB_HOST=db_service_invoice
       - DB_PORT=5432
-      - DB_NAME=invoice
-      - DB_USER=invoice
-      - DB_PASSWORD=invoice_pass
+      - DB_NAME=${INVOICE_DB_NAME}
+      - DB_USER=${INVOICE_DB_USER}
+      - DB_PASSWORD=${INVOICE_DB_PASSWORD}
     ports:
       - "8082:8082"
     networks:
@@ -173,13 +212,14 @@ services:
         SERVICE_DIR: payment-service
     image: freing_service_payment:dev
     container_name: service-payment
+    env_file: .env
     environment:
       - SERVER_PORT=8083
       - DB_HOST=db_service_payment
       - DB_PORT=5432
-      - DB_NAME=payment
-      - DB_USER=payment
-      - DB_PASSWORD=payment_pass
+      - DB_NAME=${PAYMENT_DB_NAME}
+      - DB_USER=${PAYMENT_DB_USER}
+      - DB_PASSWORD=${PAYMENT_DB_PASSWORD}
     ports:
       - "8083:8083"
     networks:
@@ -196,13 +236,14 @@ services:
         SERVICE_DIR: rendering-service
     image: freing_service_rendering:dev
     container_name: service-rendering
+    env_file: .env
     environment:
       - SERVER_PORT=8084
       - DB_HOST=db_service_rendering
       - DB_PORT=5432
-      - DB_NAME=rendering
-      - DB_USER=rendering
-      - DB_PASSWORD=rendering_pass
+      - DB_NAME=${RENDERING_DB_NAME}
+      - DB_USER=${RENDERING_DB_USER}
+      - DB_PASSWORD=${RENDERING_DB_PASSWORD}
     ports:
       - "8084:8084"
     networks:
@@ -221,17 +262,39 @@ services:
       - freing_network
     depends_on:
       service_invoice:
-        condition: service_healthy
+        condition: service_started
       service_customer:
-        condition: service_healthy
+        condition: service_started
       service_payment:
-        condition: service_healthy
+        condition: service_started
       service_rendering:
-        condition: service_healthy
+        condition: service_started
     ports:
       - "4100:4100"
     environment:
       - DOCKER=true
+
+  pgadmin:
+    image: dpage/pgadmin4:9.8
+    container_name: pgadmin
+    env_file: .env
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
+      PGADMIN_CONFIG_SERVER_MODE: 'True'
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: 'True'
+    ports:
+      - "5050:80"
+    volumes:
+      - ./pgadmin/servers.json:/pgadmin4/servers.json:ro
+      - pgadmin_data:/var/lib/pgadmin
+    depends_on:
+      - db_service_customer
+      - db_service_invoice
+      - db_service_payment
+      - db_service_rendering
+    networks:
+      - freing_network
 
 volumes:
   postgres_data_keycloak:
@@ -239,6 +302,7 @@ volumes:
   postgres_data_invoice:
   postgres_data_payment:
   postgres_data_rendering:
+  pgadmin_data:
 
 networks:
   freing_network:
