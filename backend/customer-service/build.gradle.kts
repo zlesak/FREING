@@ -24,6 +24,8 @@ dependencies {
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("org.springframework.boot:spring-boot-starter-actuator")
+	// Přidáno: RabbitMQ (AMQP) starter
+	implementation("org.springframework.boot:spring-boot-starter-amqp")
 	// PostgreSQL JDBC driver for runtime
 	runtimeOnly("org.postgresql:postgresql:42.6.0")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")

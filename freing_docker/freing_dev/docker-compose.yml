@@ -17,7 +17,6 @@ services:
 
   keycloak_web:
     image: quay.io/keycloak/keycloak:23.0.2
-    hostname: keycloak_web
     container_name: keycloak-web
     env_file: .env
     environment:
@@ -155,6 +154,22 @@ services:
       retries: 5
       start_period: 10s
 
+  # RabbitMQ for inter-service messaging
+  rabbitmq:
+    image: rabbitmq:3.12-management
+    container_name: rabbitmq
+    hostname: rabbitmq
+    ports:
+      - "5672:5672"    # AMQP
+      - "15672:15672"  # Management UI
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-guest}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-guest}
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - freing_network
+
   # Backend services (built from repository using multi-stage Dockerfile)
   service_customer:
     build:
@@ -172,6 +187,15 @@ services:
       - DB_NAME=${CUSTOMER_DB_NAME}
       - DB_USER=${CUSTOMER_DB_USER}
       - DB_PASSWORD=${CUSTOMER_DB_PASSWORD}
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_USER=${RABBITMQ_USER:-guest}
+      - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD:-guest}
+      # Spring Boot RabbitMQ env (mapované)
+      - SPRING_RABBITMQ_HOST=rabbitmq
+      - SPRING_RABBITMQ_PORT=5672
+      - SPRING_RABBITMQ_USERNAME=${RABBITMQ_USER:-guest}
+      - SPRING_RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD:-guest}
     ports:
       - "8081:8081"
     networks:
@@ -179,6 +203,7 @@ services:
     depends_on:
       - keycloak_web
       - db_service_customer
+      - rabbitmq
 
   service_invoice:
     build:
@@ -196,6 +221,15 @@ services:
       - DB_NAME=${INVOICE_DB_NAME}
       - DB_USER=${INVOICE_DB_USER}
       - DB_PASSWORD=${INVOICE_DB_PASSWORD}
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_USER=${RABBITMQ_USER:-guest}
+      - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD:-guest}
+      # Spring Boot RabbitMQ env (mapované)
+      - SPRING_RABBITMQ_HOST=rabbitmq
+      - SPRING_RABBITMQ_PORT=5672
+      - SPRING_RABBITMQ_USERNAME=${RABBITMQ_USER:-guest}
+      - SPRING_RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD:-guest}
     ports:
       - "8082:8082"
     networks:
@@ -203,6 +237,7 @@ services:
     depends_on:
       - keycloak_web
       - db_service_invoice
+      - rabbitmq
 
   service_payment:
     build:
@@ -220,6 +255,15 @@ services:
       - DB_NAME=${PAYMENT_DB_NAME}
       - DB_USER=${PAYMENT_DB_USER}
       - DB_PASSWORD=${PAYMENT_DB_PASSWORD}
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_USER=${RABBITMQ_USER:-guest}
+      - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD:-guest}
+      # Spring Boot RabbitMQ env (mapované)
+      - SPRING_RABBITMQ_HOST=rabbitmq
+      - SPRING_RABBITMQ_PORT=5672
+      - SPRING_RABBITMQ_USERNAME=${RABBITMQ_USER:-guest}
+      - SPRING_RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD:-guest}
     ports:
       - "8083:8083"
     networks:
@@ -227,6 +271,7 @@ services:
     depends_on:
       - keycloak_web
       - db_service_payment
+      - rabbitmq
 
   service_rendering:
     build:
@@ -244,6 +289,15 @@ services:
       - DB_NAME=${RENDERING_DB_NAME}
       - DB_USER=${RENDERING_DB_USER}
       - DB_PASSWORD=${RENDERING_DB_PASSWORD}
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_USER=${RABBITMQ_USER:-guest}
+      - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD:-guest}
+      # Spring Boot RabbitMQ env (mapované)
+      - SPRING_RABBITMQ_HOST=rabbitmq
+      - SPRING_RABBITMQ_PORT=5672
+      - SPRING_RABBITMQ_USERNAME=${RABBITMQ_USER:-guest}
+      - SPRING_RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD:-guest}
     ports:
       - "8084:8084"
     networks:
@@ -251,6 +305,7 @@ services:
     depends_on:
       - keycloak_web
       - db_service_rendering
+      - rabbitmq
 
   frontend:
     build:
@@ -303,10 +358,11 @@ volumes:
   postgres_data_payment:
   postgres_data_rendering:
   pgadmin_data:
+  rabbitmq_data:
 
 networks:
   freing_network:
     driver: bridge
     ipam:
       config:
-        - subnet: 172.20.0.0/28
+        - subnet: 172.20.0.0/24

@@ -28,8 +28,9 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-actuator")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0")
+	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0")
 	implementation("org.modelmapper:modelmapper:3.2.5")
+	implementation("org.springframework.boot:spring-boot-starter-amqp")
 
 	runtimeOnly("com.h2database:h2")
 	runtimeOnly("org.postgresql:postgresql:42.6.0")
