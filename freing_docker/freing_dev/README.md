@@ -11,12 +11,12 @@ Služby:
 
 ## Postup pro spuštění
 ### 1. Přidání testovacích domén do /etc/hosts (unix-based systémy)
-Aby fungovaly domény používané v konfiguraci (např. `auth.test`, `freing.test`, `service.freing.test` a `pgadmin.freing.test`), je nutné přidat záznamy do `/etc/hosts`.  
-Otevřte `sudo nano /etc/hosts` a přidejte tento řádek: `127.0.0.1 auth.test freing.test service.freing.test pgadmin.freing.test`  
+Aby fungovaly domény používané v konfiguraci (např. `auth.freing.test`, `freing.test`, `service.freing.test` a `pgadmin.freing.test`), je nutné přidat záznamy do `/etc/hosts`.  
+Otevřte `sudo nano /etc/hosts` a přidejte tento řádek: `127.0.0.1 auth.freing.test freing.test service.freing.test pgadmin.freing.test`  
 
 nebo použijte příkaz:
 ```bash
- echo "127.0.0.1 auth.test freing.test service.freing.test pgadmin.freing.test" >> /etc/hosts
+ echo "127.0.0.1 auth.freing.test freing.test service.freing.test pgadmin.freing.test" >> /etc/hosts
 ```
 Pro Windows upravte `C:\Windows\System32\drivers\etc\hosts` obdobně.
 
@@ -31,7 +31,7 @@ docker compose up -d
 ```
 
 ## Přístup do keycloak admin konzole
-- Otevřete v prohlížeči: `http://auth.test/admin/` — mělo by vás přesměrovat do Keycloak (admin konzole). Admin přihlašovací údaje jsou nastaveny v compose (pro dev):
+- Otevřete v prohlížeči: `http://auth.freing.test/admin/` — mělo by vás přesměrodit do Keycloak (admin konzole). Admin přihlašovací údaje jsou nastaveny v compose (pro dev):
 
 - Uživatelské jméno: `admin`
 - Heslo: `password`
@@ -41,7 +41,7 @@ Poznámka: compose používá `start-dev --import-realm`, takže realm `freing` 
 ## Přístup do aplikace FREING
 
 - Keycloak (autentizace, autorizace):
-  - `http://auth.test`
+  - `http://auth.freing.test`
 - Frontend aplikace:
   - `http://freing.test`
 - Backend services:
@@ -72,7 +72,7 @@ Pro rychlé testování přihlášení a rolí v Keycloaku jsou dostupné tyto �
   - Heslo: `9a1onhpI8rpu3WW73`
   - Role: `customer`
 
-Poznámka: Tyto účty jsou určeny pouze pro lokální vývoj. Pokud Keycloak importuje realm z `keycloak/freing-realm.json`, účty by měly být dostupné po importu. Pokud nejsou, přidejte nebo upravte uživatele v Keycloak admin konzoli (`http://auth.test`).
+Poznámka: Tyto účty jsou určeny pouze pro lokální vývoj. Pokud Keycloak importuje realm z `keycloak/freing-realm.json`, účty by měly být dostupné po importu. Pokud nejsou, přidejte nebo upravte uživatele v Keycloak admin konzoli (`http://auth.freing.test`).
 
 
 ## PGAdmin
@@ -80,5 +80,3 @@ V případě potřeby je možno se připojit k databázím pomocí těchto údaj
 - Přístup do PGAdmin: `http://pgadmin.freing.test`
 - Uživatelské jméno: `admin@example.com`
 - Heslo: `admin`
-
-

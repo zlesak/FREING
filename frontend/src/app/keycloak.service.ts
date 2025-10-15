@@ -8,7 +8,7 @@ export class KeycloakService {
 
   public async init(): Promise<void> {
     this.keycloakAuth = new Keycloak({
-      url: 'http://auth.test/',
+      url: 'http://auth.freing.test/',
       realm: 'freing',
       clientId: 'frontend',
     });
