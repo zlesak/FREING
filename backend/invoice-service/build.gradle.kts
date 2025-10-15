@@ -10,17 +10,13 @@ group = "cz.uhk.fim"
 version = "1.0.2"
 description = "Invoice Service"
 
-java {
-	toolchain {
-		languageVersion = JavaLanguageVersion.of(21)
-	}
-}
 
 repositories {
 	mavenCentral()
 }
 
 dependencies {
+	implementation(project(":common"))
 	implementation("org.springframework.boot:spring-boot-starter")
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")

@@ -1,4 +1,4 @@
-package rendering_service
+package com.uhk.fim.prototype.renderingservice
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
@@ -7,5 +7,5 @@ import org.springframework.boot.runApplication
 class RenderingServiceApplication
 
 fun main(args: Array<String>) {
-	runApplication<RenderingServiceApplication>(*args)
+    runApplication<RenderingServiceApplication>(*args)
 }
