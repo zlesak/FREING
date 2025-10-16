@@ -1,6 +1,6 @@
 package invoice_service.controllers
 
-import invoice_service.external.ExchangeRatesException
+import invoice_service.dtos.rates.responses.CurrencyConversionResponse
 import invoice_service.services.ExchangeRateService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
@@ -8,15 +8,12 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
-import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import java.math.BigDecimal
 import java.math.RoundingMode
-import invoice_service.dtos.rates.responses.CurrencyConversionResponse
 
 @Tag(name = "Exchange", description = "Externí směnné kurzy - převod částek")
 @RestController
@@ -35,8 +32,4 @@ class ExchangeController(private val exchangeRateService: ExchangeRateService) {
         val rateOut = result.rate.setScale(8, RoundingMode.HALF_UP)
         return CurrencyConversionResponse(from.uppercase(), to.uppercase(), amount, rateOut, result.converted)
     }
-
-    @ExceptionHandler(ExchangeRatesException::class)
-    fun handleExchangeError(ex: ExchangeRatesException): ResponseEntity<Map<String, String>> =
-        ResponseEntity.status(ex.status).body(mapOf("error" to ex.message.orEmpty()))
 }

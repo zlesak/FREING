@@ -7,6 +7,7 @@ import invoice_service.models.invoices.Invoice
 import invoice_service.models.invoices.InvoiceItem
 import invoice_service.repository.InvoiceRepository
 import jakarta.transaction.Transactional
+import org.apache.coyote.BadRequestException
 import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -19,7 +20,7 @@ class InvoiceService (
 
     @Transactional
     fun createInvoice(request: InvoiceCreateRequest) : Invoice {
-        if (repo.existsByInvoiceNumber(request.invoiceNumber)) throw IllegalArgumentException("Faktura s tímto číslem již existuje.")
+        if (repo.existsByInvoiceNumber(request.invoiceNumber)) throw BadRequestException("Faktura s tímto číslem již existuje.")
 
         val invoice = request.toInvoice()
         invoice.items.forEach {
