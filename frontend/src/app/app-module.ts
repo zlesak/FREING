@@ -10,7 +10,6 @@ import {HomePageComponent} from './features/home/view/home-page.component';
 import {InvoicesPageComponent} from './features/invoices/view/invoices-page.component';
 import {CustomersPageComponent} from './features/customers/view/customers-page.component';
 import {PaymentsPageComponent} from './features/payments/view/payments-page.component';
-import {InvoiceCreateComponent} from './features/invoices/components/invoice-create/invoice-create.component';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 
 @NgModule({
@@ -18,17 +17,16 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
     App,
     HeaderComponent,
     HomePageComponent,
-    InvoicesPageComponent,
     CustomersPageComponent,
     PaymentsPageComponent,
-    InvoiceCreateComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     FormsModule,
     ReactiveFormsModule,
-    HttpClientModule
+    HttpClientModule,
+    InvoicesPageComponent,
   ],
   providers: [
     provideBrowserGlobalErrorListeners(),
