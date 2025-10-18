@@ -1,9 +1,14 @@
 <section class="page invoices">
   <h2>Faktury</h2>
 
-  <div class="toolbar"><a routerLink="/invoices/new">+ Nová faktura</a></div>
+  <div class="toolbar">
+    <button mat-button class="add-button" (click)="router.navigate(['/invoices/new'])">
+      <mat-icon color="white" aria-label="add">add</mat-icon>
+      Nová faktura
+    </button>
+  </div>
 
-  @if (loading) {
+  @if (loading()) {
     <div>Načítám…</div>
   }
 
@@ -11,7 +16,7 @@
     <div class="error">{{ error }}</div>
   }
 
-  @if (!loading && !error && invoices.length) {
+  @if (!loading() && !error && invoices.length) {
     <table class="invoices-table">
       <thead>
         <tr>
@@ -40,7 +45,7 @@
     </table>
   }
 
-  @if (!loading && !error && !invoices.length) {
+  @if (!loading() && !error && !invoices.length) {
     <p>Žádné faktury k zobrazení.</p>
   }
 
