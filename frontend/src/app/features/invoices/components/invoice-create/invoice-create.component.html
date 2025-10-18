@@ -1,124 +1,136 @@
 <section class="invoice-create">
-  <h2>Nová faktura</h2>
+  <mat-card class="card" appearance="raised">
+    <mat-card-header>
+      <h2>Nová faktura</h2>
+    </mat-card-header>
 
-  @if (error) { <div class="alert error">{{ error }}</div> }
-  @if (success) { <div class="alert success">{{ success }}</div> }
+    <mat-card-content>
+      @if (error) {
+        <div class="alert error">{{ error }}</div>
+      }
 
-  <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
-    <div class="grid two-cols">
-      <label>Číslo faktury
-        <input formControlName="invoiceNumber" placeholder="20251107" />
-        @if (form.get('invoiceNumber')?.touched && form.get('invoiceNumber')?.invalid) {
-          <small class="invalid">Vyplňte číslo faktury (min. 3 znaky)</small>
-        }
-      </label>
+      @if (success) {
+        <div class="alert success">{{ success }}</div>
+      }
 
-      <label>Referenční číslo faktury
-        <input formControlName="referenceNumber" placeholder="INV-2025-11-07" />
-      </label>
+      <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        <div class="grid two-cols">
+          <mat-form-field appearance="outline">
+            <mat-label>Číslo faktury</mat-label>
+            <input matInput formControlName="invoiceNumber" placeholder="20250001" />
+            @if (form.get('invoiceNumber')?.touched && form.get('invoiceNumber')?.invalid) {
+              <mat-error class="alert error" >Vyplňte číslo faktury (min. 3 znaky)</mat-error>
+            }
+          </mat-form-field>
 
-      <label>Zákazník (ID)
-        <input formControlName="customerId" type="number" />
-        @if (form.get('customerId')?.touched && form.get('customerId')?.invalid) {
-          <small class="invalid">ID zákazníka je povinné</small>
-        }
-      </label>
-      <label>Datum vystavení
-        <input formControlName="issueDate" type="date" />
-      </label>
-      <label>Splatnost
-        <input formControlName="dueDate" type="date" />
-      </label>
-      <label>Měna
-        <select formControlName="currency">
-          @for (c of currencyOptions; track c) { <option [value]="c">{{ c }}</option> }
-        </select>
-      </label>
-      <label>Stav
-        <select formControlName="status">
-          @for (s of statusOptions; track s) { <option [value]="s">{{ s }}</option> }
-        </select>
-      </label>
-      <label>Celková částka bez daně
-        <input formControlName="subAmount" type="number" step="0.01" readonly />
-      </label>
-      <label>Celková částka s daní
-        <input formControlName="amount" type="number" step="0.01" readonly />
-      </label>
-    </div>
+          <mat-form-field appearance="outline">
+            <mat-label>Zákazník</mat-label>
+            <input matInput formControlName="customerName" />
+            @if (form.get('customerName')?.touched && form.get('customerName')?.invalid) {
+              <mat-error class="alert error" >Jméno je povinné</mat-error>
+            }
+          </mat-form-field>
 
-    <h3>Položky</h3>
-    <table class="items">
-      <thead>
-        <tr>
-          <th>Název</th>
-          <th>Popis</th>
-          <th>Jednotka</th>
-          <th>Množství</th>
-          <th>Jedn. cena</th>
-          <th>Celkem bez daně</th>
-          <th>DPH</th>
-          <th>Celkem s daní</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (item of items.controls; track item; let i = $index) {
-          <tr [formGroup]="$any(item)">
-            <td>
-              <input formControlName="name" />
-              @if (item.get('name')?.touched && item.get('name')?.invalid) {
-                <small class="invalid">Název je povinný</small>
+          <mat-form-field appearance="outline">
+            <mat-label>Email</mat-label>
+            <input matInput formControlName="customerEmail" type="email" />
+            @if (form.get('customerEmail')?.hasError('email') && !form.get('customerEmail')?.hasError('required')) {
+              <mat-error class="alert error">Zadejte platný email</mat-error>
+            }
+            @if (form.get('customerEmail')?.hasError('required')) {
+              <mat-error class="alert error">Email je <strong>povinný</strong></mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Datum vystavení</mat-label>
+            <input matInput formControlName="issueDate" type="date" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Splatnost</mat-label>
+            <input matInput formControlName="dueDate" type="date" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Měna</mat-label>
+            <mat-select formControlName="currency">
+              @for (c of currencyOptions; track c) {
+                <mat-option [value]="c">{{ c }}</mat-option>
               }
-            </td>
-            <td>
-              <input formControlName="description" />
-              @if (item.get('description')?.touched && item.get('description')?.invalid) {
-                <small class="invalid">Popis je povinný</small>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Stav</mat-label>
+            <mat-select formControlName="status">
+              @for (s of statusOptions; track s) {
+                <mat-option [value]="s">{{ s }}</mat-option>
               }
-            </td>
-            <td>
-              <input formControlName="unit" />
-              @if (item.get('unit')?.touched && item.get('unit')?.invalid) {
-                <small class="invalid">Jednotka je povinná</small>
-              }
-            </td>
-            <td>
-              <input formControlName="quantity" type="number" min="0" (input)="recalcItemTotal(i)" />
-              @if (item.get('quantity')?.touched && item.get('quantity')?.invalid) {
-                <small class="invalid">Zadejte množství</small>
-              }
-            </td>
-            <td>
-              <input formControlName="unitPrice" type="number" step="0.01" min="0" (input)="recalcItemTotal(i)" />
-              @if (item.get('unitPrice')?.touched && item.get('unitPrice')?.invalid) {
-                <small class="invalid">Zadejte jednotkovou cenu</small>
-              }
-            </td>
-            <td>
-              <input formControlName="subTotalPrice" readonly />
-            </td>
-            <td>
-              <input formControlName="vat" type="number" min="0" (input)="recalcItemTotal(i)" />
-              @if (item.get('vat')?.touched && item.get('vat')?.invalid) {
-                <small class="invalid">Zadejte DPH</small>
-              }
-            </td>
-            <td>
-              <input formControlName="totalPrice" readonly />
-            </td>
-            <td>
-              <button type="button" (click)="removeItem(i)" [disabled]="items.length===1">✕</button>
-            </td>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Celková částka</mat-label>
+            <input matInput formControlName="amount" type="number" readonly />
+          </mat-form-field>
+        </div>
+
+        <h3>Položky</h3>
+
+        <table class="items">
+          <thead>
+          <tr>
+            <th>Popis</th>
+            <th>Množství</th>
+            <th>Jedn. cena</th>
+            <th>Celkem</th>
+            <th></th>
           </tr>
-        }
-      </tbody>
-    </table>
-    <button type="button" (click)="addItem()">+ Přidat položku</button>
+          </thead>
 
-    <div class="actions">
-      <button type="submit" [disabled]="submitting || form.invalid">Vytvořit</button>
-      <a routerLink="/invoices" class="btn-link">Zpět</a>
-    </div>
-  </form>
+          <tbody>
+            @for (item of items.controls; track item; let i = $index) {
+              <tr [formGroup]="$any(item)">
+                <td>
+                  <mat-form-field appearance="outline">
+                    <input matInput formControlName="description" (input)="recalcItemTotal(i)" />
+                  </mat-form-field>
+                </td>
+                <td>
+                  <mat-form-field appearance="outline">
+                    <input matInput formControlName="quantity" type="number" min="1" (input)="recalcItemTotal(i)" />
+                  </mat-form-field>
+                </td>
+                <td>
+                  <mat-form-field appearance="outline">
+                    <input matInput formControlName="unitPrice" type="number" step="0.01" min="0" (input)="recalcItemTotal(i)" />
+                  </mat-form-field>
+                </td>
+                <td>
+                  <mat-form-field appearance="outline">
+                    <input matInput formControlName="totalPrice" readonly />
+                  </mat-form-field>
+                </td>
+                <td>
+                  <button mat-icon-button color="warn" type="button" (click)="removeItem(i)" [disabled]="items.length===1">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+
+        <button mat-button color="primary" type="button" class="add-item" (click)="addItem()">  <mat-icon aria-label="add">add</mat-icon> Přidat položku</button>
+
+        <div class="actions">
+          <button mat-flat-button color="accent" type="submit" [disabled]="submitting || form.invalid">
+            Vytvořit
+          </button>
+          <a mat-button routerLink="/invoices">Zpět</a>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
 </section>

@@ -1,30 +1,36 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, inject, OnInit, signal} from '@angular/core';
 import { InvoicesServiceController } from '../controller/invoices.service';
 import { InvoiceApi } from '../../../api/generated';
+import {MatIconModule} from '@angular/material/icon';
+import {MatDividerModule} from '@angular/material/divider';
+import {MatButtonModule} from '@angular/material/button';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-invoices-page',
+  standalone: true,
   templateUrl: './invoices-page.component.html',
   styleUrl: './invoices-page.component.css',
-  standalone: false
+  imports: [MatButtonModule, MatDividerModule, MatIconModule],
 })
 export class InvoicesPageComponent implements OnInit {
-  invoices: InvoiceApi.Invoice[] = [];
-  loading = false;
-  error?: string;
-  page = 0;
-  size = 10;
-  totalPages = 0;
-  totalElements = 0;
+  private readonly invoicesService = inject( InvoicesServiceController);
+  protected readonly router = inject(Router);
 
-  constructor(private invoicesService: InvoicesServiceController) {}
+  protected invoices: InvoiceApi.Invoice[] = [];
+  protected loading = signal<boolean>(false);
+  protected error?: string;
+  protected page = 0;
+  protected size = 10;
+  protected totalPages = 0;
+  protected totalElements = 0;
 
   ngOnInit(): void {
     this.load();
   }
 
 load(page: number = this.page): void {
-  this.loading = true;
+  this.loading.set(true);
   this.error = undefined;
   this.invoicesService.getInvoices(page, this.size).subscribe({
     next: (resp: InvoiceApi.PagedModelInvoice) => {
@@ -33,11 +39,11 @@ load(page: number = this.page): void {
       this.size = resp.page?.size ?? 10;
       this.totalPages = resp.page?.totalPages ?? 0;
       this.totalElements = resp.page?.totalPages ?? 0;
-      this.loading = false;
+      this.loading.set(false);
     },
     error: (err) => {
       this.error = err.message || 'Nepodařilo se načíst faktury';
-      this.loading = false;
+      this.loading.set(false);
     }
   });
 }
