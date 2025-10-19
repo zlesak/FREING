@@ -12,7 +12,7 @@ import { InvoiceApi } from '../../../../api/generated';
 import { ExchangeRatesController } from '../../controller/exchange.service';
 import { distinctUntilChanged } from 'rxjs';
 import {
-  MatCard, MatCardContent, MatCardHeader, MatCardTitle
+  MatCard, MatCardContent, MatCardHeader
 } from '@angular/material/card';
 import { MatFormField, MatLabel, MatInput } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
@@ -21,6 +21,7 @@ import {
 } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatOptionModule } from '@angular/material/core';
+import {MatDatepicker, MatDatepickerInput, MatDatepickerToggle} from '@angular/material/datepicker';
 
 @Component({
   selector: 'app-invoice-create',
@@ -40,7 +41,10 @@ import { MatOptionModule } from '@angular/material/core';
     MatOptionModule,
     MatButton,
     MatIconModule,
-    MatIconButton
+    MatIconButton,
+    MatDatepickerInput,
+    MatDatepickerToggle,
+    MatDatepicker
   ]
 })
 export class InvoiceCreateComponent implements OnInit {
