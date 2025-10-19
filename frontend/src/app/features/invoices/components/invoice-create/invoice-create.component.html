@@ -15,7 +15,7 @@
 
       <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
         <div class="grid two-cols">
-          <mat-form-field appearance="outline">
+          <mat-form-field>
             <mat-label>Číslo faktury</mat-label>
             <input matInput formControlName="invoiceNumber" placeholder="20250001" />
             @if (form.get('invoiceNumber')?.touched && form.get('invoiceNumber')?.invalid) {
@@ -23,7 +23,7 @@
             }
           </mat-form-field>
 
-          <mat-form-field appearance="outline">
+          <mat-form-field>
             <mat-label>Zákazník</mat-label>
             <input matInput formControlName="customerName" />
             @if (form.get('customerName')?.touched && form.get('customerName')?.invalid) {
@@ -31,7 +31,7 @@
             }
           </mat-form-field>
 
-          <mat-form-field appearance="outline">
+          <mat-form-field>
             <mat-label>Email</mat-label>
             <input matInput formControlName="customerEmail" type="email" />
             @if (form.get('customerEmail')?.hasError('email') && !form.get('customerEmail')?.hasError('required')) {
@@ -41,40 +41,41 @@
               <mat-error class="alert error">Email je <strong>povinný</strong></mat-error>
             }
           </mat-form-field>
-
-          <mat-form-field appearance="outline">
+          <!-- TODO: fix - not rendering with this component
+          <mat-form-field>
             <mat-label>Datum vystavení</mat-label>
-            <input matInput formControlName="issueDate" type="date" />
+            <input matInput formControlName="issueDate" [matDatepicker]="picker">
+            <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
           </mat-form-field>
-
-          <mat-form-field appearance="outline">
+-->
+          <mat-form-field>
             <mat-label>Splatnost</mat-label>
             <input matInput formControlName="dueDate" type="date" />
           </mat-form-field>
 
-          <mat-form-field appearance="outline">
+          <mat-form-field>
             <mat-label>Měna</mat-label>
             <mat-select formControlName="currency">
               @for (c of currencyOptions; track c) {
-                <mat-option [value]="c">{{ c }}</mat-option>
+                <mat-option style="z-index: 999" [value]="c">{{ c }}</mat-option>
               }
             </mat-select>
           </mat-form-field>
 
-          <mat-form-field appearance="outline">
+          <mat-form-field>
             <mat-label>Stav</mat-label>
             <mat-select formControlName="status">
               @for (s of statusOptions; track s) {
-                <mat-option [value]="s">{{ s }}</mat-option>
+                <mat-option style="z-index: 999" [value]="s">{{ s }}</mat-option>
               }
             </mat-select>
           </mat-form-field>
 
-          <mat-form-field appearance="outline">
+          <mat-form-field>
             <mat-label>Celková částka</mat-label>
             <input matInput formControlName="amount" type="number" readonly />
           </mat-form-field>
-        </div>
 
         <h3>Položky</h3>
 
@@ -129,6 +130,7 @@
             Vytvořit
           </button>
           <a mat-button routerLink="/invoices">Zpět</a>
+        </div>
         </div>
       </form>
     </mat-card-content>
