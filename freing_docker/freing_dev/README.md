@@ -16,7 +16,7 @@ Otevřte `sudo nano /etc/hosts` a přidejte tento řádek: `127.0.0.1 auth.frein
 
 nebo použijte příkaz:
 ```bash
- echo "127.0.0.1 auth.freing.test freing.test service.freing.test pgadmin.freing.test" >> /etc/hosts
+ echo "127.0.0.1 auth.freing.test rabbitmq.freing.test freing.test service.freing.test pgadmin.freing.test" >> /etc/hosts
 ```
 Pro Windows upravte `C:\Windows\System32\drivers\etc\hosts` obdobně.
 
@@ -42,6 +42,8 @@ Poznámka: compose používá `start-dev --import-realm`, takže realm `freing` 
 
 - Keycloak (autentizace, autorizace):
   - `http://auth.freing.test`
+- RabbitMQ:
+  - `http://rabbitmq.freing.test` 
 - Frontend aplikace:
   - `http://freing.test`
 - Backend services:
@@ -80,3 +82,8 @@ V případě potřeby je možno se připojit k databázím pomocí těchto údaj
 - Přístup do PGAdmin: `http://pgadmin.freing.test`
 - Uživatelské jméno: `admin@example.com`
 - Heslo: `admin`
+
+## RabbitMQ
+Přístup k RabbitMQ: `http://rabbitmq.freing.test`
+- Uživatelské jméno: `rabbitmq`
+- Heslo: `rabbitmq_pass`
