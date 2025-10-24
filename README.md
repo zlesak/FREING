@@ -4,7 +4,7 @@ Zápočtový projekt týmu Endor předmětu MOIS ZS AR 2025/26
 ## Členové týmu
 - j.zlesak (Team leader)  
 - j.staša (Configuration manager)  
-- t.fogl (BackEnd develeper)  
+- j.fogl (BackEnd develeper)  
 - a.zamastil (FrontEnd developer)  
 
 ## Členění projektu
