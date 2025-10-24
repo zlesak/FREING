@@ -60,13 +60,8 @@ class InvoiceController (private val service: InvoiceService) {
     fun createInvoice(
         @Parameter(description = "Data pro vytvoření faktury")
         @RequestBody request: InvoiceCreateRequest
-    ): ResponseEntity<Any> {
-        return try {
-            val created = service.createInvoice(request)
-            ResponseEntity.ok(created)
-        } catch (e: IllegalArgumentException) {
-            ResponseEntity.status(409).body(mapOf("error" to e.message))
-        }
+    ):  Invoice {
+        return service.createInvoice(request)
     }
 
     @Operation(summary = "Aktualizovat fakturu", description = "Aktualizuje existující fakturu podle ID.")

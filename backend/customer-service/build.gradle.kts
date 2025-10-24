@@ -9,23 +9,13 @@ group = "com.example"
 version = "0.0.1-SNAPSHOT"
 description = "Demo project for Spring Boot"
 
-java {
-	toolchain {
-		languageVersion = JavaLanguageVersion.of(21)
-	}
-}
 
 repositories {
 	mavenCentral()
 }
 
 dependencies {
-	implementation("org.springframework.boot:spring-boot-starter")
-	implementation("org.jetbrains.kotlin:kotlin-reflect")
-	implementation("org.springframework.boot:spring-boot-starter-web")
-	implementation("org.springframework.boot:spring-boot-starter-actuator")
-	// Přidáno: RabbitMQ (AMQP) starter
-	implementation("org.springframework.boot:spring-boot-starter-amqp")
+	implementation(project(":common"))
 	// PostgreSQL JDBC driver for runtime
 	runtimeOnly("org.postgresql:postgresql:42.6.0")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")

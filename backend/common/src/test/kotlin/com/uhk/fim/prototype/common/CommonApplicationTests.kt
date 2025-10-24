@@ -1,13 +1,13 @@
-package rendering_service
+package com.uhk.fim.prototype.common
 
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
 
 @SpringBootTest
-class RenderingServiceApplicationTests {
+class CommonApplicationTests {
 
-	@Test
-	fun contextLoads() {
-	}
+    @Test
+    fun contextLoads() {
+    }
 
 }
