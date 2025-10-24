@@ -1,5 +1,7 @@
 package invoice_service.services
 
+import com.uhk.fim.prototype.common.exceptions.WrongDataException
+import com.uhk.fim.prototype.common.handlers.GlobalExceptionHandler
 import invoice_service.dtos.invoices.requests.InvoiceCreateRequest
 import invoice_service.dtos.invoices.requests.InvoiceUpdateRequest
 import invoice_service.dtos.invoices.responses.InvoicesPagedResponse
@@ -8,6 +10,7 @@ import invoice_service.models.invoices.InvoiceItem
 import invoice_service.repository.InvoiceRepository
 import jakarta.transaction.Transactional
 import org.apache.coyote.BadRequestException
+import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -17,10 +20,14 @@ import java.time.Instant
 class InvoiceService (
     private val repo: InvoiceRepository
 ) {
+    private val logger = LoggerFactory.getLogger(GlobalExceptionHandler::class.java)
 
     @Transactional
     fun createInvoice(request: InvoiceCreateRequest) : Invoice {
-        if (repo.existsByInvoiceNumber(request.invoiceNumber)) throw BadRequestException("Faktura s tímto číslem již existuje.")
+        if (repo.existsByInvoiceNumber(request.invoiceNumber)) {
+            logger.warn("Faktura s tímto číslem již existuje.")
+            throw WrongDataException("Faktura s tímto číslem již existuje.")
+        }
 
         val invoice = request.toInvoice()
         invoice.items.forEach {
