@@ -1,5 +1,5 @@
 @startuml
-left to right direction
+top to bottom direction
 
 :Accountant: as a
 :Customer: as c
