@@ -15,19 +15,15 @@
 
       <div class="grid two-cols">
         <mat-form-field>
-          <mat-label>Číslo faktury</mat-label>
+          <mat-label style="padding: 10px">Číslo faktury</mat-label>
           <input
             matInput
-            type="number"
+            type="text"
             [value]="invoiceNumber()"
-            name="invoiceNumber"
+            (input)="invoiceNumber.set($any($event.target).value)"
             placeholder="20250001"
             required
-            minlength="3"
           />
-          @if (!invoiceNumber() || invoiceNumber()!.toString().length < 3) {
-            <mat-error>Vyplňte číslo faktury (min. 3 znaky)</mat-error>
-          }
         </mat-form-field>
 
         <mat-form-field>
@@ -35,26 +31,20 @@
           <input
             matInput
             [value]="customerName()"
-            name="customerName"
+            (input)="customerName.set($any($event.target).value)"
             required
           />
-          @if (!customerName() || customerName()!.trim().length === 0) {
-            <mat-error>Jméno je povinné</mat-error>
-          }
         </mat-form-field>
 
         <mat-form-field>
           <mat-label>Email</mat-label>
           <input
             matInput
-            [value]="customerEmail()"
-            name="customerEmail"
             type="email"
+            [value]="customerEmail()"
+            (input)="customerEmail.set($any($event.target).value)"
             required
           />
-          @if (!customerEmail()) {
-            <mat-error>Email je <strong>povinný</strong></mat-error>
-          }
         </mat-form-field>
 
         <mat-form-field>
@@ -63,36 +53,32 @@
             matInput
             [matDatepicker]="IssueDatePicker"
             [value]="issueDate()"
-            name="issueDate"
+            (dateChange)="issueDate.set($event.value)"
             required
           />
           <mat-datepicker-toggle matIconSuffix [for]="IssueDatePicker"></mat-datepicker-toggle>
           <mat-datepicker #IssueDatePicker></mat-datepicker>
-          @if (!issueDate()) {
-            <mat-error>Datum vystavení je povinné</mat-error>
-          }
         </mat-form-field>
-
 
         <mat-form-field>
           <mat-label>Splatnost</mat-label>
           <input
             matInput
             [matDatepicker]="dueDatePicker"
-            [value]="issueDate()"
-            name="issueDate"
+            [value]="dueDate()"
+            (dateChange)="dueDate.set($event.value)"
             required
           />
           <mat-datepicker-toggle matIconSuffix [for]="dueDatePicker"></mat-datepicker-toggle>
           <mat-datepicker #dueDatePicker></mat-datepicker>
-          @if (!dueDate()) {
-            <mat-error>Splatnost je povinná</mat-error>
-          }
         </mat-form-field>
 
         <mat-form-field>
           <mat-label>Měna</mat-label>
-          <mat-select [value]="currency()">
+          <mat-select
+            [value]="currency()"
+            (selectionChange)="currency.set($event.value)"
+          >
             @for (c of currencyOptions; track c) {
               <mat-option [value]="c">{{ c }}</mat-option>
             }
@@ -101,17 +87,22 @@
 
         <mat-form-field>
           <mat-label>Stav</mat-label>
-          <mat-select [value]="status()">
+          <mat-select
+            [value]="status()"
+            (selectionChange)="status.set($event.value)"
+          >
             @for (s of statusOptions; track s) {
               <mat-option [value]="s">{{ s }}</mat-option>
             }
           </mat-select>
         </mat-form-field>
 
+
         <mat-form-field>
           <mat-label>Celková částka</mat-label>
           <input matInput type="number" [value]="totalAmount()" readonly />
         </mat-form-field>
+      </div>
         <h3>Položky</h3>
 
         <table class="items">
@@ -168,7 +159,7 @@
                     <input matInput [value]="item.totalPrice" readonly />
                   </mat-form-field>
                 </td>
-                <td>
+                <td style="width: 30px">
                   <button
                     mat-icon-button
                     color="warn"
@@ -183,7 +174,6 @@
             }
           </tbody>
         </table>
-      </div>
 
       <button
         mat-button
@@ -200,10 +190,8 @@
         <button
           mat-flat-button
           color="accent"
-          (click)="submit()">
-          <!--[disabled]="!readyToSubmit()"
-        >
-        -->
+          (click)="submit()"
+          [disabled]="!readyToSubmit()">
           Vytvořit
         </button>
         <a mat-button routerLink="/invoices">Zpět</a>
