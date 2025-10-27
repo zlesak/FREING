@@ -6,15 +6,51 @@
   box-shadow: 0 0 6px 0 rgba(0, 0, 0, 0.53);
   -webkit-box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.53);
   -moz-box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.53);
+  overflow-x: auto;
 }
 
 .add-item{
   background-color: #dddddd;
   cursor: pointer;
   border-radius:6px;
+  margin-left: 10px;
 }
 
 .error{
     background:#ffe5e5;
     color:#900;
 }
+
+ .items {
+   margin: 10px;
+   width: 90%;
+   border-collapse: collapse;
+   table-layout: fixed;
+   border: 1px solid #ccc;
+ }
+
+ .items th,
+ .items td {
+   border: 1px solid #ccc;
+   padding: 6px;
+   text-align: left;
+ }
+
+ .items mat-form-field {
+   width: 100%;
+ }
+
+ .items th:last-child,
+ .items td:last-child {
+   width: 30px;
+   text-align: center;
+ }
+
+ button[disabled],
+ button.mat-button-disabled {
+   color: #666666;
+   cursor: not-allowed;
+   border-radius:6px;
+   opacity: 0.8;
+ }
+

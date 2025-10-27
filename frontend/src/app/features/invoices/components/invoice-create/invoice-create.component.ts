@@ -66,7 +66,7 @@ export class InvoiceCreateComponent {
   protected invoiceNumber = signal <string | null> (null);
   protected customerName = signal <string | null> (null);
   protected customerEmail = signal <string | null> (null);
-  protected issueDate = signal <number | null> (null);
+  protected issueDate = signal <Date | null> (null);
   protected dueDate = signal <Date | null> (null);
   protected currency = signal<string>('CZK');
   protected status = signal <'DRAFT' | 'PENDING' | 'PAID' | 'CANCELLED' | 'OVERDUE'>('DRAFT');
@@ -87,7 +87,14 @@ export class InvoiceCreateComponent {
       /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.customerEmail()!);
     const validIssueDate = !!this.issueDate();
     const validDueDate = !!this.dueDate();
-    const hasItems = this.items.length > 0 && this.items.every(i => i.totalPrice > 0);
+    const hasItems =
+      this.items.length > 0 &&
+      this.items.every(i =>
+        i.description.trim().length > 0 &&
+        i.quantity > 0 &&
+        i.totalPrice > 0
+      );
+
 
     return (
       validInvoiceNumber &&
@@ -179,8 +186,8 @@ export class InvoiceCreateComponent {
       invoiceNumber: this.invoiceNumber()!,
       customerName: this.customerName()!,
       customerEmail: this.customerEmail()!,
-      issueDate: this.issueDate()?.toString()!,
-      dueDate: this.dueDate()?.toString()!,
+      issueDate: new Date(this.issueDate()!).toISOString().split('T')[0],
+      dueDate: new Date(this.dueDate()!).toISOString().split('T')[0],
       amount: this.totalAmount()!,
       currency: this.currency(),
       status: this.status(),
