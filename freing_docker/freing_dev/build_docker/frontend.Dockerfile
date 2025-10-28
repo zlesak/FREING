@@ -8,6 +8,9 @@ RUN npm ci
 
 COPY frontend/ ./
 
+COPY freing_docker/freing_dev/build_docker/frontend-start.sh /app/frontend-start.sh
+RUN chmod +x /app/frontend-start.sh
+
 EXPOSE 4100
 
-CMD ["npm", "run", "start:docker"]
+CMD ["/bin/sh", "/app/frontend-start.sh"]

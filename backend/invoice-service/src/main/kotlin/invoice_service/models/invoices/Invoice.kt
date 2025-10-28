@@ -1,5 +1,7 @@
 package invoice_service.models.invoices
 
+import com.fasterxml.jackson.core.type.TypeReference
+import com.fasterxml.jackson.databind.ObjectMapper
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.persistence.*
 import java.math.BigDecimal
@@ -67,4 +69,5 @@ data class Invoice(
     fun removeItem(item: InvoiceItem) {
         items.remove(item)
     }
+    fun toMap(objectMapper: ObjectMapper): Map<String, Any> = objectMapper.convertValue(this, object : TypeReference<Map<String, Any>>() {})
 }

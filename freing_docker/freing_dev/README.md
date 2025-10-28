@@ -12,23 +12,22 @@ Služby:
 ## Postup pro spuštění
 ### 1. Přidání testovacích domén do /etc/hosts (unix-based systémy)
 Aby fungovaly domény používané v konfiguraci (např. `auth.freing.test`, `freing.test`, `service.freing.test` a `pgadmin.freing.test`), je nutné přidat záznamy do `/etc/hosts`.  
-Otevřte `sudo nano /etc/hosts` a přidejte tento řádek: `127.0.0.1 auth.freing.test freing.test service.freing.test pgadmin.freing.test`  
+Otevřte `sudo nano /etc/hosts` a přidejte tento řádek: `127.0.0.1 auth.freing.test rabbitmq.freing.test freing.test service.freing.test pgadmin.freing.test`  
 
 nebo použijte příkaz:
 ```bash
- echo "127.0.0.1 auth.freing.test rabbitmq.freing.test freing.test service.freing.test pgadmin.freing.test" >> /etc/hosts
+     echo "127.0.0.1 auth.freing.test rabbitmq.freing.test freing.test service.freing.test pgadmin.freing.test" >> /etc/hosts
 ```
 Pro Windows upravte `C:\Windows\System32\drivers\etc\hosts` obdobně.
 
-
-### 2. Spuštění Docker Compose
-
-V IDE nebo terminálu přejděte do složky `freing_docker` a spusťte Docker Compose a spusťte `docker compose up -d` (nebo skrzer IDE).
+### 2. Spuštění pomocí skriptu build-all.sh
+V IDE nebo terminálu přejděte do složky `freing_docker/freing_dev` a spusťte build-all.sh.
 
 ```bash
-cd /{YOUR_PATH_TO_THE_PROJECT_DIRECTORY}/FREING/freing_docker
-docker compose up -d
+    cd /{YOUR_PATH_TO_THE_PROJECT_DIRECTORY}/FREING/freing_docker
+    ./build-all.sh
 ```
+
 
 ## Přístup do keycloak admin konzole
 - Otevřete v prohlížeči: `http://auth.freing.test/admin/` — mělo by vás přesměrodit do Keycloak (admin konzole). Admin přihlašovací údaje jsou nastaveny v compose (pro dev):

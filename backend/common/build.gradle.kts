@@ -20,15 +20,37 @@ repositories {
 }
 
 dependencies {
+    // Expose framework dependencies to consumers of the common module
+    api("org.springframework.boot:spring-boot-starter")
+    api("org.springframework.boot:spring-boot-starter-web")
+    api("org.springframework.boot:spring-boot-starter-data-jpa")
+    api("org.springframework.boot:spring-boot-starter-validation")
+    api("org.springframework.boot:spring-boot-starter-actuator")
+    api("com.fasterxml.jackson.module:jackson-module-kotlin")
+    api("org.jetbrains.kotlin:kotlin-reflect")
+
+    api("org.springframework.boot:spring-boot-starter-amqp")
+    api("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.13")
+    runtimeOnly("org.postgresql:postgresql")
+
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
+
 kotlin {
     compilerOptions {
         freeCompilerArgs.addAll("-Xjsr305=strict")
     }
+}
+
+// Disable Spring Boot's bootJar for shared/common module (it's a library)
+tasks.named("bootJar") {
+    enabled = false
+}
+tasks.named("jar") {
+    enabled = true
 }
 
 tasks.withType<Test> {
