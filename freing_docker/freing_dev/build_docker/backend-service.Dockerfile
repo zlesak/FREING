@@ -4,13 +4,13 @@ FROM freing-backend-builder:latest AS builder
 
 # Kopíruje pouze zdrojáky konkrétní svc dle poskytnutého ARG nebo defaultně customer-service
 ARG SERVICE_DIR=customer-service
-COPY backend/${SERVICE_DIR}/ /home/gradle/project/backend/${SERVICE_DIR}/
+#COPY backend/common /home/gradle/project/backend/common/
+COPY backend/${SERVICE_DIR} /home/gradle/project/backend/${SERVICE_DIR}
+COPY backend/${SERVICE_DIR}/settings.gradle.kts /home/gradle/project/backend/settings.gradle.kts
 
-WORKDIR /home/gradle/project/backend/${SERVICE_DIR}
+WORKDIR /home/gradle/project/backend/
 
-# Build pouze konkrétní službu, common už je zbuilděný a v cache
-RUN if [ -f ../gradlew ]; then chmod +x ../gradlew; fi
-RUN ../gradlew :${SERVICE_DIR}:bootJar --no-daemon -x test || ../gradlew :${SERVICE_DIR}:assemble --no-daemon -x test
+RUN gradle -p ${SERVICE_DIR} bootJar --no-daemon -x test || gradle -p ${SERVICE_DIR} assemble --no-daemon -x test
 
 # 2. stage: runtime
 FROM amazoncorretto:21
