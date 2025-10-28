@@ -9,7 +9,6 @@ import invoice_service.models.invoices.Invoice
 import invoice_service.models.invoices.InvoiceItem
 import invoice_service.repository.InvoiceRepository
 import jakarta.transaction.Transactional
-import org.apache.coyote.BadRequestException
 import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull

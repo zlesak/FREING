@@ -1,7 +1,7 @@
 package invoice_service.dtos.invoices.requests
 
-import io.swagger.v3.oas.annotations.media.Schema
 import invoice_service.models.invoices.InvoiceItem
+import io.swagger.v3.oas.annotations.media.Schema
 import java.math.BigDecimal
 
 @Schema(description = "Položka faktury")

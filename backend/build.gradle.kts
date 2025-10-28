@@ -1,4 +1,3 @@
-
 plugins {
 	id("java")
 	id("idea")
@@ -12,6 +11,15 @@ group = "com.example"
 version = "0.0.1-SNAPSHOT"
 description = "Demo project for Spring Boot"
 
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(21))
+    }
+}
+
+repositories {
+    mavenCentral()
+}
 
 subprojects {
 	plugins.apply("org.jetbrains.kotlin.jvm")
@@ -31,6 +39,10 @@ subprojects {
 		implementation("org.springframework.boot:spring-boot-starter-actuator")
 		implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 		implementation("org.jetbrains.kotlin:kotlin-reflect")
+
+        implementation("org.springframework.boot:spring-boot-starter-amqp")
+        implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.13")
+        runtimeOnly("org.postgresql:postgresql")
 
 		testImplementation("org.springframework.boot:spring-boot-starter-test")
 		testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")

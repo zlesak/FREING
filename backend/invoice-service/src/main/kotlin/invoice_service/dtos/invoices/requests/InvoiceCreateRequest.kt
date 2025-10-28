@@ -1,8 +1,8 @@
 package invoice_service.dtos.invoices.requests
 
-import io.swagger.v3.oas.annotations.media.Schema
 import invoice_service.models.invoices.Invoice
 import invoice_service.models.invoices.InvoiceStatusEnum
+import io.swagger.v3.oas.annotations.media.Schema
 import java.math.BigDecimal
 import java.time.LocalDate
 

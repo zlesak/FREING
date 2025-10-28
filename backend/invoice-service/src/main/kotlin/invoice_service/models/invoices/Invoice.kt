@@ -1,10 +1,10 @@
 package invoice_service.models.invoices
 
+import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.persistence.*
 import java.math.BigDecimal
-import java.time.LocalDate
-import io.swagger.v3.oas.annotations.media.Schema
 import java.time.Instant
+import java.time.LocalDate
 
 @Schema(description = "Faktura v systému")
 @Entity

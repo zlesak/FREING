@@ -13,3 +13,6 @@ Modul pro frontend projektu FREING
   - Script update, launch settings fix, env var fix.
 - version **0.0.3** (2025-10-11)
   - Přidán exchange rate přepočet při zadávání faktury. 
+- version **0.0.4** (2025-10-28)
+  - Oprava chyb v generování OpenAPI klienta
+  - Přidána podpora pro více služeb v generátoru OpenAPI klienta

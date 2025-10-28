@@ -1,5 +1,5 @@
 @startuml
-top to bottom direction
+left to right direction
 
 :Accountant: as a
 :Customer: as c
@@ -25,10 +25,17 @@ package "FREING" as freing {
         usecase (Generate report PDF) as grp
     }
     rectangle "Payment service" as payment_service {
+        usecase (See invoice) as si
         usecase (Pay invoice) as pi
         usecase (Download invoice) as doi
     }
 }
+
+
+
+
+payment_service <-[hidden]l-> render_service
+invoice_service <-[hidden]-> render_service
 
 a --> ci
 a --> ri
@@ -40,13 +47,11 @@ a --> uu
 a --> du
 
 pi <-- c
-ri <-- c
+si <-- c
 doi <-- c
-gip <-- c
 
 f --> ri
 f --> mr
 f --> er
-f --> grp
 
 @enduml

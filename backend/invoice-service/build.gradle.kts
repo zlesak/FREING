@@ -10,34 +10,29 @@ group = "cz.uhk.fim"
 version = "1.0.2"
 description = "Invoice Service"
 
-
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(21))
+    }
+}
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 dependencies {
-	implementation(project(":common"))
-	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0")
-	implementation("org.modelmapper:modelmapper:3.2.5")
-	implementation("org.springframework.boot:spring-boot-starter-amqp")
-
-	runtimeOnly("com.h2database:h2")
-	runtimeOnly("org.postgresql:postgresql:42.6.0")
-
-	testImplementation("org.springframework.boot:spring-boot-starter-test") {
-		exclude(group = "org.junit.vintage")
-	}
-	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
+    implementation(project(":common"))
+    implementation("org.modelmapper:modelmapper:3.2.5")
+    runtimeOnly("com.h2database:h2")
     testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
-	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
+
 kotlin {
-	compilerOptions {
-		freeCompilerArgs.addAll("-Xjsr305=strict")
-	}
+    compilerOptions {
+        freeCompilerArgs.addAll("-Xjsr305=strict")
+    }
 }
 
 tasks.withType<Test> {
-	useJUnitPlatform()
+    useJUnitPlatform()
 }
