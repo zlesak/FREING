@@ -5,9 +5,9 @@ plugins {
     id("io.spring.dependency-management") version "1.1.7"
 }
 
-group = "com.uhk.fim.prototype"
-version = "0.0.1-SNAPSHOT"
-description = "rendering-service"
+group = "cz.uhk.fim"
+version = "0.0.1"
+description = "Rendering Service"
 
 repositories {
     mavenCentral()

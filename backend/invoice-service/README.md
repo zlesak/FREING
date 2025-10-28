@@ -9,3 +9,5 @@ Tento modul poskytuje funkce pro správu faktur, včetně vytváření, aktualiz
   - CORS update, health a info endpoints.
 - version **v1.0.2** (2025-10-15)
   - Přidán exchange rate client a endpoint pro získání kurzu. (https://github.com/fawazahmed0/exchange-api)
+- version **v1.0.3** (2025-10-20)
+  - Messaging render-service->invoice-service->render-service.
