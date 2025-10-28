@@ -1,37 +1,26 @@
-# Multi-stage Dockerfile for building Kotlin/Spring Boot services using Gradle wrapper
-# Build stage: use local builder base from backend-builder.Dockerfile (inlined)
-FROM amazoncorretto:21 AS builder
+# Multi-stage Dockerfile, nejdříve build a pak se do nového fetchne jen výsledný jar
+# 1. stage: builder (použije backend-builder.Dockerfile)
+FROM freing-backend-builder:latest AS builder
 
-# Keep running as root so downstream builds can change file permissions and run gradle safely
-USER root
-# Metadata
-ENV FREING_BUILDER_IMAGE=1
-LABEL maintainer="FREING"
-
-RUN yum -y install curl && yum clean all
-
-# Copy repository backend sources into builder
-COPY backend/ /home/gradle/project/backend/
-# We'll build a specific subproject by passing SERVICE_DIR build-arg
+# Kopíruje pouze zdrojáky konkrétní svc dle poskytnutého ARG nebo defaultně customer-service
 ARG SERVICE_DIR=customer-service
+COPY backend/${SERVICE_DIR}/ /home/gradle/project/backend/${SERVICE_DIR}/
+
 WORKDIR /home/gradle/project/backend/${SERVICE_DIR}
 
-# Ensure wrapper is executable
-RUN if [ -f ./gradlew ]; then chmod +x ./gradlew; fi
+# Build pouze konkrétní službu, common už je zbuilděný a v cache
+RUN if [ -f ../gradlew ]; then chmod +x ../gradlew; fi
+RUN ../gradlew :${SERVICE_DIR}:bootJar --no-daemon -x test || ../gradlew :${SERVICE_DIR}:assemble --no-daemon -x test
 
-# Build the application (assemble jar)
-# Use --no-daemon to avoid background daemons in containers
-RUN ./gradlew clean bootJar --no-daemon -x test || ./gradlew clean assemble --no-daemon -x test
-
-# Runtime stage: use shared runtime base image
-FROM builder
+# 2. stage: runtime
+FROM amazoncorretto:21
 ARG SERVICE_DIR=customer-service
 WORKDIR /app
 
-# Copy the built jar from builder stage
+# Zkopíruje jar z builderu z předchozí stage
 COPY --from=builder /home/gradle/project/backend/${SERVICE_DIR}/build/libs/ /app/
 
-# Copy start script and make executable (start.sh moved into build/)
+# Start script kopiován z freing_docker
 COPY freing_docker/freing_dev/build_docker/start.sh /app/start.sh
 RUN chmod +x /app/start.sh
 
@@ -45,5 +34,4 @@ HEALTHCHECK --interval=15s --timeout=4s --retries=6 --start-period=60s \
     BODY=$(curl -sf http://127.0.0.1:$P/actuator/health 2>/dev/null || true); \
     echo "$BODY" | grep -q "\"status\":\"UP\"" || exit 1'
 
-# Use start.sh as entrypoint (JSON form is recommended)
 ENTRYPOINT ["/bin/sh", "/app/start.sh"]

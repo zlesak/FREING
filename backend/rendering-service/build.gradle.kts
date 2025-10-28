@@ -21,6 +21,7 @@ java {
 
 dependencies {
     implementation(project(":common"))
+    implementation("org.apache.pdfbox:pdfbox:2.0.30")
 }
 
 kotlin {

@@ -368,6 +368,17 @@ services:
     networks:
       - freing_network
 
+  backend_builder:
+    build:
+      context: ../..
+      dockerfile: freing_docker/freing_dev/build_docker/backend-builder.Dockerfile
+    image: freing-backend-builder:latest
+    container_name: backend-builder
+    restart: "no"
+    command: "true"
+    profiles: ["builder"]
+    # Tento kontejner se nespouští, pouze buildí image pro ostatní služby
+
 volumes:
   postgres_data_keycloak:
   postgres_data_customer:
