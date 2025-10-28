@@ -9,6 +9,12 @@ group = "com.uhk.fim.prototype"
 version = "0.0.1-SNAPSHOT"
 description = "common"
 
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(21))
+    }
+}
+
 repositories {
     mavenCentral()
 }

@@ -9,19 +9,17 @@ group = "com.example"
 version = "0.0.1-SNAPSHOT"
 description = "Demo project for Spring Boot"
 
-
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(21))
+    }
+}
 repositories {
 	mavenCentral()
 }
 
 dependencies {
 	implementation(project(":common"))
-	// PostgreSQL JDBC driver for runtime
-	runtimeOnly("org.postgresql:postgresql:42.6.0")
-	testImplementation("org.springframework.boot:spring-boot-starter-test")
-	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
-	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-    implementation("org.springframework.boot:spring-boot-starter-amqp")
 }
 
 kotlin {

@@ -1,9 +1,9 @@
 package invoice_service
 
+import invoice_service.config.ExchangeRatesProperties
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.runApplication
-import invoice_service.config.ExchangeRatesProperties
 
 @SpringBootApplication(
 	scanBasePackages = [

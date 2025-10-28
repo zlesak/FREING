@@ -2,62 +2,51 @@ import { environment } from '../../../../environments/environment';
 import { Injectable } from '@angular/core';
 import { from, Observable, throwError, map } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import {
-  InvoicesService as GenInvoicesService,
-  ReportingService as GenReportingService,
-  OpenAPI,
-  Invoice,
-  InvoiceCreateRequest,
-  InvoiceUpdateRequest,
-  InvoiceReportRequest,
-  AggregatedReportResponse,
-  InvoicesPagedResponse
-} from '../../../api/generated';
+import { InvoiceApi } from '../../../api/generated';
 
 @Injectable({ providedIn: 'root' })
 export class InvoicesServiceController {
   constructor() {
-    OpenAPI.BASE = environment.apiBase;
+    InvoiceApi.OpenAPI.BASE = environment.apiBase;
   }
 
-  getInvoices(page = 0, size = 10): Observable<InvoicesPagedResponse> {
-    return from(GenInvoicesService.getAllInvoices({ page, size })).pipe(
+  getInvoices(page = 0, size = 10): Observable<InvoiceApi.InvoicesPagedResponse> {
+    return from(InvoiceApi.InvoicesService.getAllInvoices({ page, size })).pipe(
       catchError(this.handleError)
     );
   }
 
-  getInvoice(id: number): Observable<Invoice> {
-    return from(GenInvoicesService.getInvoice({ id })).pipe(catchError(this.handleError));
+  getInvoice(id: number): Observable<InvoiceApi.Invoice> {
+    return from(InvoiceApi.InvoicesService.getInvoice({ id })).pipe(catchError(this.handleError));
   }
 
-  createInvoice(request: InvoiceCreateRequest): Observable<Invoice> {
-    return from(GenInvoicesService.createInvoice({ requestBody: request })).pipe(
+  createInvoice(request: InvoiceApi.InvoiceCreateRequest): Observable<InvoiceApi.Invoice> {
+    return from(InvoiceApi.InvoicesService.createInvoice({ requestBody: request })).pipe(
       catchError(this.handleError)
     );
   }
 
-  updateInvoice(id: number, request: InvoiceUpdateRequest): Observable<Invoice> {
-    return from(GenInvoicesService.updateInvoice({ id, requestBody: request })).pipe(
+  updateInvoice(id: number, request: InvoiceApi.InvoiceUpdateRequest): Observable<InvoiceApi.Invoice> {
+    return from(InvoiceApi.InvoicesService.updateInvoice({ id, requestBody: request })).pipe(
       catchError(this.handleError)
     );
   }
 
   deleteInvoice(id: number): Observable<void> {
-    return from(GenInvoicesService.deleteInvoice({ id })).pipe(
+    return from(InvoiceApi.InvoicesService.deleteInvoice({ id })).pipe(
       map(() => void 0),
       catchError(this.handleError)
     );
   }
 
-  generateAggregatedReport(request: InvoiceReportRequest): Observable<AggregatedReportResponse> {
-    return from(GenReportingService.makeAggregatedReport({ requestBody: request })).pipe(
+  generateAggregatedReport(request: InvoiceApi.InvoiceReportRequest): Observable<InvoiceApi.AggregatedReportResponse> {
+    return from(InvoiceApi.ReportingService.makeAggregatedReport({ requestBody: request })).pipe(
       catchError(this.handleError)
     );
   }
 
-// making blob from text returned from the API
-  exportReportCsv(request: InvoiceReportRequest): Observable<Blob> {
-    return from(GenReportingService.exportAggregatedReportCsv({ requestBody: request })).pipe(
+  exportReportCsv(request: InvoiceApi.InvoiceReportRequest): Observable<Blob> {
+    return from(InvoiceApi.ReportingService.exportAggregatedReportCsv({ requestBody: request })).pipe(
       map(text => new Blob([text], { type: 'text/csv;charset=utf-8' })),
       catchError(this.handleError)
     );

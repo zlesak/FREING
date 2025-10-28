@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
 import { Router } from '@angular/router';
 import { InvoicesServiceController } from '../../controller/invoices.service';
-import { InvoiceCreateRequest, InvoiceItemRequest } from '../../../../api/generated';
+import { InvoiceApi } from '../../../../api/generated';
 import { ExchangeRatesController } from '../../controller/exchange.service';
 import { distinctUntilChanged } from 'rxjs';
 
@@ -19,7 +19,7 @@ export class InvoiceCreateComponent implements OnInit {
   success?: string;
 
   currencyOptions = ['CZK', 'EUR', 'USD'];
-  statusOptions: InvoiceCreateRequest['status'][] = ['DRAFT','PENDING','PAID','CANCELLED','OVERDUE'];
+  statusOptions: InvoiceApi.InvoiceCreateRequest['status'][] = ['DRAFT','PENDING','PAID','CANCELLED','OVERDUE'];
 
   constructor(
     private fb: FormBuilder,
@@ -117,17 +117,17 @@ export class InvoiceCreateComponent implements OnInit {
     if (this.form.invalid) { this.form.markAllAsTouched(); return; }
     this.submitting = true;
 
-    const rawItems: InvoiceItemRequest[] = this.items.controls.map(c => {
+    const rawItems: InvoiceApi.InvoiceItemRequest[] = this.items.controls.map(c => {
       const val: any = (c as FormGroup).getRawValue();
       return {
         description: val['description'],
         quantity: val['quantity'],
         unitPrice: val['unitPrice'],
         totalPrice: val['totalPrice']
-      } as InvoiceItemRequest;
+      } as InvoiceApi.InvoiceItemRequest;
     });
 
-    const payload: InvoiceCreateRequest = {
+    const payload: InvoiceApi.InvoiceCreateRequest = {
       invoiceNumber: this.form.value.invoiceNumber,
       customerName: this.form.value.customerName,
       customerEmail: this.form.value.customerEmail,

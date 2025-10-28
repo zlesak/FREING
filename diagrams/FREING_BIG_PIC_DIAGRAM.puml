@@ -1,0 +1,25 @@
+@startuml
+left to right direction
+
+:Accountant: as a
+:Customer: as c
+:Finance: as f
+
+package "FREING" as freing {
+    rectangle "Invoice service" as invoice_service {
+    }
+    rectangle "Customer service" as customer_service {
+    }
+    rectangle "Render service" as render_service {
+    }
+    rectangle "Payment service" as payment_service {
+    }
+}
+
+a -l-> freing
+
+c -d-> freing
+
+freing <-d- f
+
+@enduml

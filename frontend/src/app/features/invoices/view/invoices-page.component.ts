@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { InvoicesServiceController } from '../controller/invoices.service';
-import { Invoice, InvoicesPagedResponse } from '../../../api/generated';
+import { InvoiceApi } from '../../../api/generated';
 
 @Component({
   selector: 'app-invoices-page',
@@ -9,7 +9,7 @@ import { Invoice, InvoicesPagedResponse } from '../../../api/generated';
   standalone: false
 })
 export class InvoicesPageComponent implements OnInit {
-  invoices: Invoice[] = [];
+  invoices: InvoiceApi.Invoice[] = [];
   loading = false;
   error?: string;
   page = 0;
@@ -27,7 +27,7 @@ export class InvoicesPageComponent implements OnInit {
     this.loading = true;
     this.error = undefined;
     this.invoicesService.getInvoices(page, this.size).subscribe({
-      next: (resp: InvoicesPagedResponse) => {
+      next: (resp: InvoiceApi.InvoicesPagedResponse) => {
         this.invoices = resp.content;
         this.page = resp.page;
         this.size = resp.size;

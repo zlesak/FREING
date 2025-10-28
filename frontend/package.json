@@ -1,20 +1,18 @@
 {
   "name": "frontend",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "scripts": {
     "ng": "ng",
-    "start:docker": "npm run openapi:check && ng serve --configuration docker --host 0.0.0.0 --port 4100",
-    "start": "npm run openapi:check && ng serve",
-    "build": "npm run openapi:check && ng build",
-    "watch": "npm run openapi:check && ng build --watch --configuration development",
+    "start:docker": "npm run openapi:multi && ng serve --configuration docker --host 0.0.0.0 --port 4100",
+    "start": "npm run openapi:multi && ng serve",
+    "build": "npm run openapi:multi && ng build",
+    "watch": "npm run openapi:multi && ng build --watch --configuration development",
     "test": "ng test",
-    "openapi:clean": "rimraf src/app/api/generated && rimraf .openapi.hash && rimraf openapi.json",
-    "openapi:download": "curl -s http://localhost:8082/v3/api-docs -o openapi.json",
-    "openapi:gen": "npm run openapi:download && npx openapi --input openapi.json --output src/app/api/generated --client fetch --useOptions --useUnionTypes",
-    "openapi:refresh": "npm run openapi:clean && npm run openapi:gen",
-    "openapi:check": "node scripts/openapi-check.js",
-    "openapi:ensure": "node -e \"const fs = require('fs'); const path = 'src/app/api/generated/index.ts'; if (fs.existsSync(path)) { console.log('OpenAPI client already present'); } else { console.log('Generating OpenAPI client...'); process.exit(1); }\" || npm run openapi:gen",
-    "postinstall": "npm run openapi:check || echo Postinstall completed"
+    "openapi:clean": "rimraf src/app/api/generated && rimraf .openapi.*.hash && rimraf openapi-*.json && rimraf openapi.json && rimraf .openapi.hash",
+    "openapi:refresh": "npm run openapi:clean && npm run openapi:multi",
+    "openapi:ensure": "node -e \"const fs = require('fs'); const path = 'src/app/api/generated/invoice/index.ts'; if (fs.existsSync(path)) { console.log('OpenAPI clients already present'); } else { console.log('Generating OpenAPI clients...'); process.exit(1); }\" || npm run openapi:multi",
+    "openapi:multi": "node scripts/openapi-multi-gen.js",
+    "postinstall": "npm run openapi:ensure || echo Postinstall completed"
   },
   "prettier": {
     "printWidth": 100,
