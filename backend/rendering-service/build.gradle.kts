@@ -23,6 +23,11 @@ dependencies {
     implementation(project(":common"))
     implementation("org.apache.pdfbox:pdfbox:2.0.30")
     implementation("org.xhtmlrenderer:flying-saucer-pdf-itext5:9.7.2")
+
+    // Spring Security and OAuth2 (added to match customer-service)
+    implementation("org.springframework.boot:spring-boot-starter-security")
+    implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
+    implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
 }
 
 kotlin {

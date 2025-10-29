@@ -740,6 +740,238 @@
     } ],
     "defaultClientScopes" : [ "web-origins", "acr", "roles", "profile", "email" ],
     "optionalClientScopes" : [ "address", "phone", "offline_access", "microprofile-jwt" ]
+  }, {
+    "id" : "cafa102c-b407-4cd5-8ea4-f952d3fd2f3b",
+    "clientId" : "customer-service",
+    "name" : "customer-service",
+    "secret" : "8QUtLqQvOPImtR1aX1ndGnMpwZ1yKEpj",
+    "rootUrl" : "",
+    "baseUrl" : "",
+    "surrogateAuthRequired" : false,
+    "enabled" : true,
+    "alwaysDisplayInConsole" : false,
+    "clientAuthenticatorType" : "client-secret",
+    "redirectUris" : [ ],
+    "webOrigins" : [ ],
+    "notBefore" : 0,
+    "bearerOnly" : false,
+    "consentRequired" : false,
+    "standardFlowEnabled" : false,
+    "implicitFlowEnabled" : false,
+    "directAccessGrantsEnabled" : false,
+    "serviceAccountsEnabled" : true,
+    "publicClient" : false,
+    "frontchannelLogout" : false,
+    "protocol" : "openid-connect",
+    "attributes" : {
+      "post.logout.redirect.uris" : "+"
+    },
+    "authenticationFlowBindingOverrides" : { },
+    "fullScopeAllowed" : false,
+    "nodeReRegistrationTimeout" : 0,
+    "protocolMappers" : [ {
+      "name" : "realm roles",
+      "protocol" : "openid-connect",
+      "protocolMapper" : "oidc-usermodel-realm-role-mapper",
+      "consentRequired" : false,
+      "config" : {
+        "multivalued" : "true",
+        "user.attribute" : "",
+        "access.token.claim" : "true",
+        "id.token.claim" : "false",
+        "claim.name" : "realm_access.roles",
+        "jsonType.label" : "String"
+      }
+    }, {
+      "name" : "client roles",
+      "protocol" : "openid-connect",
+      "protocolMapper" : "oidc-usermodel-client-role-mapper",
+      "consentRequired" : false,
+      "config" : {
+        "multivalued" : "true",
+        "user.attribute" : "",
+        "access.token.claim" : "true",
+        "id.token.claim" : "false",
+        "claim.name" : "resource_access",
+        "jsonType.label" : "String"
+      }
+    } ],
+    "defaultClientScopes" : [ "roles", "profile", "email", "service.call" ],
+    "optionalClientScopes" : [ "offline_access" ]
+  }, {
+    "id" : "8f1b6f8e-9b3d-4a2c-9f2a-1e2a9a1d1111",
+    "clientId" : "invoice-service",
+    "name" : "invoice-service",
+    "secret" : "8a7f3b2c9d4e5f6a7b8c9d0e1f2a3b4c",
+    "rootUrl" : "",
+    "baseUrl" : "",
+    "surrogateAuthRequired" : false,
+    "enabled" : true,
+    "alwaysDisplayInConsole" : false,
+    "clientAuthenticatorType" : "client-secret",
+    "redirectUris" : [ ],
+    "webOrigins" : [ ],
+    "notBefore" : 0,
+    "bearerOnly" : false,
+    "consentRequired" : false,
+    "standardFlowEnabled" : false,
+    "implicitFlowEnabled" : false,
+    "directAccessGrantsEnabled" : false,
+    "serviceAccountsEnabled" : true,
+    "publicClient" : false,
+    "frontchannelLogout" : false,
+    "protocol" : "openid-connect",
+    "attributes" : {
+      "post.logout.redirect.uris" : "+"
+    },
+    "authenticationFlowBindingOverrides" : { },
+    "fullScopeAllowed" : false,
+    "nodeReRegistrationTimeout" : 0,
+    "protocolMappers" : [ {
+      "name" : "realm roles",
+      "protocol" : "openid-connect",
+      "protocolMapper" : "oidc-usermodel-realm-role-mapper",
+      "consentRequired" : false,
+      "config" : {
+        "multivalued" : "true",
+        "user.attribute" : "",
+        "access.token.claim" : "true",
+        "id.token.claim" : "false",
+        "claim.name" : "realm_access.roles",
+        "jsonType.label" : "String"
+      }
+    }, {
+      "name" : "client roles",
+      "protocol" : "openid-connect",
+      "protocolMapper" : "oidc-usermodel-client-role-mapper",
+      "consentRequired" : false,
+      "config" : {
+        "multivalued" : "true",
+        "user.attribute" : "",
+        "access.token.claim" : "true",
+        "id.token.claim" : "false",
+        "claim.name" : "resource_access",
+        "jsonType.label" : "String"
+      }
+    } ],
+    "defaultClientScopes" : [ "roles", "profile", "email", "service.call" ],
+    "optionalClientScopes" : [ "offline_access" ]
+  }, {
+    "id" : "9a2c7ef1-6b5d-4e3f-8c2b-2d3e4f5a2222",
+    "clientId" : "payment-service",
+    "name" : "payment-service",
+    "secret" : "a1b2c3d4e5f60718293a4b5c6d7e8f90",
+    "rootUrl" : "",
+    "baseUrl" : "",
+    "surrogateAuthRequired" : false,
+    "enabled" : true,
+    "alwaysDisplayInConsole" : false,
+    "clientAuthenticatorType" : "client-secret",
+    "redirectUris" : [ ],
+    "webOrigins" : [ ],
+    "notBefore" : 0,
+    "bearerOnly" : false,
+    "consentRequired" : false,
+    "standardFlowEnabled" : false,
+    "implicitFlowEnabled" : false,
+    "directAccessGrantsEnabled" : false,
+    "serviceAccountsEnabled" : true,
+    "publicClient" : false,
+    "frontchannelLogout" : false,
+    "protocol" : "openid-connect",
+    "attributes" : {
+      "post.logout.redirect.uris" : "+"
+    },
+    "authenticationFlowBindingOverrides" : { },
+    "fullScopeAllowed" : false,
+    "nodeReRegistrationTimeout" : 0,
+    "protocolMappers" : [ {
+      "name" : "realm roles",
+      "protocol" : "openid-connect",
+      "protocolMapper" : "oidc-usermodel-realm-role-mapper",
+      "consentRequired" : false,
+      "config" : {
+        "multivalued" : "true",
+        "user.attribute" : "",
+        "access.token.claim" : "true",
+        "id.token.claim" : "false",
+        "claim.name" : "realm_access.roles",
+        "jsonType.label" : "String"
+      }
+    }, {
+      "name" : "client roles",
+      "protocol" : "openid-connect",
+      "protocolMapper" : "oidc-usermodel-client-role-mapper",
+      "consentRequired" : false,
+      "config" : {
+        "multivalued" : "true",
+        "user.attribute" : "",
+        "access.token.claim" : "true",
+        "id.token.claim" : "false",
+        "claim.name" : "resource_access",
+        "jsonType.label" : "String"
+      }
+    } ],
+    "defaultClientScopes" : [ "roles", "profile", "email", "service.call" ],
+    "optionalClientScopes" : [ "offline_access" ]
+  }, {
+    "id" : "b1c3d4e5-f6a7-48b9-8c3d-3e4f5a6b3333",
+    "clientId" : "rendering-service",
+    "name" : "rendering-service",
+    "secret" : "0f1e2d3c4b5a69788776655443322110",
+    "rootUrl" : "",
+    "baseUrl" : "",
+    "surrogateAuthRequired" : false,
+    "enabled" : true,
+    "alwaysDisplayInConsole" : false,
+    "clientAuthenticatorType" : "client-secret",
+    "redirectUris" : [ ],
+    "webOrigins" : [ ],
+    "notBefore" : 0,
+    "bearerOnly" : false,
+    "consentRequired" : false,
+    "standardFlowEnabled" : false,
+    "implicitFlowEnabled" : false,
+    "directAccessGrantsEnabled" : false,
+    "serviceAccountsEnabled" : true,
+    "publicClient" : false,
+    "frontchannelLogout" : false,
+    "protocol" : "openid-connect",
+    "attributes" : {
+      "post.logout.redirect.uris" : "+"
+    },
+    "authenticationFlowBindingOverrides" : { },
+    "fullScopeAllowed" : false,
+    "nodeReRegistrationTimeout" : 0,
+    "protocolMappers" : [ {
+      "name" : "realm roles",
+      "protocol" : "openid-connect",
+      "protocolMapper" : "oidc-usermodel-realm-role-mapper",
+      "consentRequired" : false,
+      "config" : {
+        "multivalued" : "true",
+        "user.attribute" : "",
+        "access.token.claim" : "true",
+        "id.token.claim" : "false",
+        "claim.name" : "realm_access.roles",
+        "jsonType.label" : "String"
+      }
+    }, {
+      "name" : "client roles",
+      "protocol" : "openid-connect",
+      "protocolMapper" : "oidc-usermodel-client-role-mapper",
+      "consentRequired" : false,
+      "config" : {
+        "multivalued" : "true",
+        "user.attribute" : "",
+        "access.token.claim" : "true",
+        "id.token.claim" : "false",
+        "claim.name" : "resource_access",
+        "jsonType.label" : "String"
+      }
+    } ],
+    "defaultClientScopes" : [ "roles", "profile", "email", "service.call" ],
+    "optionalClientScopes" : [ "offline_access" ]
   } ],
   "clientScopes" : [ {
     "id" : "fe754c06-39f0-46fe-adfd-8ca219dd9b60",
@@ -1233,6 +1465,13 @@
         "jsonType.label" : "String"
       }
     } ]
+  }, {
+    "id" : "db8a8313-df8e-44c5-9a88-b80aae5ab465",
+    "name" : "service.call",
+    "description" : "Scope for service-to-service calls",
+    "protocol" : "openid-connect",
+    "attributes" : { },
+    "protocolMappers" : [ ]
   } ],
   "defaultDefaultClientScopes" : [ "role_list", "profile", "email", "roles", "web-origins", "acr" ],
   "defaultOptionalClientScopes" : [ "offline_access", "address", "phone", "microprofile-jwt" ],

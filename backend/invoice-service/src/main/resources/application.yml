@@ -1,0 +1,54 @@
+server:
+  port: 8082
+spring:
+  application:
+    name: invoice-service
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:invoice}
+    username: ${DB_USER:invoice}
+    password: ${DB_PASSWORD:invoice_pass}
+    hikari:
+      maximum-pool-size: 10
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+  flyway:
+    enabled: ${FLYWAY_ENABLED:false}
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_HOST:http://auth.freing.test:8100}/realms/${KEYCLOAK_REALM:freing}
+      client:
+        provider:
+          keycloak:
+            token-uri: ${KEYCLOAK_HOST:http://auth.freing.test:8100}/realms/${KEYCLOAK_REALM:freing}/protocol/openid-connect/token
+        registration:
+          service-client:
+            provider: keycloak
+            client-id: ${INVOICE_CLIENT_ID:invoice-service}
+            client-secret: ${INVOICE_CLIENT_SECRET:invoice-secret-REPLACE_ME}
+            authorization-grant-type: client_credentials
+            scope: service.call
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+exchange:
+  rates:
+    base-url: ${EXCHANGE_RATES_BASE_URL:https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies}
+    cache-ttl-seconds: ${EXCHANGE_RATES_CACHE_TTL_SECONDS:3600}
