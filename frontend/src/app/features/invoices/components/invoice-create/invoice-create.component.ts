@@ -23,7 +23,6 @@ import {
   MatDatepickerModule,
   MatDatepickerToggle
 } from '@angular/material/datepicker';
-import {InvoiceCreateRequest, InvoiceItem} from '../../../../api/generated';
 
 @Component({
   selector: 'app-invoice-create',
@@ -71,7 +70,7 @@ export class InvoiceCreateComponent {
   protected currency = signal<string>('CZK');
   protected status = signal <'DRAFT' | 'PENDING' | 'PAID' | 'CANCELLED' | 'OVERDUE'>('DRAFT');
   protected totalAmount = signal <number | null>(null);
-  protected items: InvoiceItem[] = [{
+  protected items: InvoiceApi.InvoiceItem[] = [{
     description: '',
     quantity: 1,
     unitPrice: 0,
@@ -119,13 +118,13 @@ export class InvoiceCreateComponent {
     })
   }
 
-  newItem(): InvoiceItem{
+  newItem(): InvoiceApi.InvoiceItem{
    return {
      description: '',
      quantity: 1,
      unitPrice: 0,
      totalPrice: 0
-   } as InvoiceItem;
+   } as InvoiceApi.InvoiceItem;
   }
 
   addItem(): void {
@@ -182,7 +181,7 @@ export class InvoiceCreateComponent {
 
     this.submitting = true;
 
-    const request: InvoiceCreateRequest = ({
+    const request: InvoiceApi.InvoiceCreateRequest = ({
       invoiceNumber: this.invoiceNumber()!,
       customerName: this.customerName()!,
       customerEmail: this.customerEmail()!,
