@@ -20,13 +20,13 @@ data class Invoice(
     @Column(nullable = false, unique = true)
     var invoiceNumber: String = "",
 
-    @field:Schema(description = "Jméno zákazníka", example = "Jan Novák")
+    @field:Schema(description = "Referenční číslo faktury", example = "REF-2025-0001")
     @Column(nullable = false)
-    var customerName: String = "",
+    var referenceNumber: String? = null,
 
-    @field:Schema(description = "Email zákazníka", example = "jan.novak@email.cz")
+    @field:Schema(description = "ID zákazníka", example = "42")
     @Column(nullable = false)
-    var customerEmail: String = "",
+    var customerId: Long = 0,
 
     @field:Schema(description = "Datum vystavení faktury", example = "2025-10-05")
     @Column(nullable = false)
@@ -69,5 +69,4 @@ data class Invoice(
     fun removeItem(item: InvoiceItem) {
         items.remove(item)
     }
-    fun toMap(objectMapper: ObjectMapper): Map<String, Any> = objectMapper.convertValue(this, object : TypeReference<Map<String, Any>>() {})
 }

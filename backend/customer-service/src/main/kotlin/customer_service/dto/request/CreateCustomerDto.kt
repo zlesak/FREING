@@ -1,8 +1,7 @@
 package customer_service.dto.request
 
-import customer_service.dto.response.CustomerDto
 import customer_service.models.CustomerEntity
-import java.util.Date
+import java.util.*
 
 data class CreateCustomerDto(
     val name: String,
@@ -10,14 +9,34 @@ data class CreateCustomerDto(
     val email: String,
     val phoneNumber: String,
     val birthDate: Date,
-)
-
-fun CreateCustomerDto.toEntity(): CustomerEntity {
-    return CustomerEntity(
-        name = name,
-        surname = surname,
-        email = email,
-        phoneNumber = phoneNumber,
-        birthDate = birthDate,
-    )
+    val street: String,
+    val houseNumber: String,
+    val city: String,
+    val zip: String,
+    val country: String,
+    val ico: String? = null,
+    val dic: String? = null,
+    val bankCode: String? = null,
+    val bankAccount: String? = null,
+    val currency: String? = null,
+) {
+    fun toEntity(): CustomerEntity {
+        return CustomerEntity(
+            name = name,
+            surname = surname,
+            email = email,
+            phoneNumber = phoneNumber,
+            birthDate = birthDate,
+            street = street,
+            houseNumber = houseNumber,
+            city = city,
+            zip = zip,
+            country = country,
+            ico = ico,
+            dic = dic,
+            bankCode = bankCode,
+            bankAccount = bankAccount,
+            currency = currency,
+        )
+    }
 }

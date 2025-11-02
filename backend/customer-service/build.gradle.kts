@@ -20,6 +20,7 @@ repositories {
 
 dependencies {
 	implementation(project(":common"))
+    implementation("org.mustangproject:validator:2.20.0:shaded")
 }
 
 kotlin {

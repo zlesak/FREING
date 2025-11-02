@@ -24,6 +24,10 @@ dependencies {
     implementation("org.modelmapper:modelmapper:3.2.5")
     runtimeOnly("com.h2database:h2")
     testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
+    implementation("org.mustangproject:validator:2.20.0:shaded")
+
+    implementation("com.google.zxing:core:3.5.1")
+    implementation("com.google.zxing:javase:3.5.1")
 }
 
 

@@ -1,6 +1,8 @@
 package invoice_service.messaging
 
 import com.uhk.fim.prototype.common.messaging.dto.InvoiceResponse
+import com.uhk.fim.prototype.common.messaging.dto.CustomerRequest
+import com.uhk.fim.prototype.common.messaging.RabbitConfig
 import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.stereotype.Component
 import java.util.*
@@ -14,6 +16,19 @@ class MessageSender(private val rabbitTemplate: RabbitTemplate) {
         rabbitTemplate.execute { channel ->
             channel.queueDeclare(replyQueueName, true, false, false, null)
             null
+        }
+    }
+
+    fun sendCustomerRequest(request: CustomerRequest, correlationId: String = UUID.randomUUID().toString()) {
+        println("[invoice-service] Sending customer request: $request with correlationId=$correlationId")
+        rabbitTemplate.convertAndSend(
+            RabbitConfig.EXCHANGE,
+            RabbitConfig.CUSTOMER_REQUESTS,
+            request
+        ) { message ->
+            message.messageProperties.replyTo = replyQueueName
+            message.messageProperties.correlationId = correlationId
+            message
         }
     }
 
