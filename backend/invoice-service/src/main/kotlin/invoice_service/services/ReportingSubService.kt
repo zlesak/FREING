@@ -4,6 +4,7 @@ import invoice_service.dtos.reports.requests.InvoiceReportRequest
 import invoice_service.dtos.reports.responses.AggregatedReportResponse
 import invoice_service.dtos.reports.responses.AllInvoicesReportResponse
 import invoice_service.dtos.reports.responses.CustomerInvoicesReportResponse
+import invoice_service.messaging.servicesQueries.CustomerServiceQueries
 import invoice_service.models.invoices.Invoice
 import invoice_service.repository.InvoiceRepository
 import org.springframework.stereotype.Service
@@ -11,24 +12,23 @@ import java.math.BigDecimal
 import java.time.LocalDateTime
 
 @Service
-class ReportingSubService(private val repo: InvoiceRepository) {
+class ReportingSubService(private val repo: InvoiceRepository, private val customerServiceQueries: CustomerServiceQueries) {
 
     fun generateAggregatedReport(invoices: List<Invoice>): AggregatedReportResponse {
         val totalInvoices = invoices.size
         val totalAmount = invoices.fold(BigDecimal.ZERO) { acc, inv -> acc + inv.amount }
-        val perCustomer = invoices.groupBy { it.customerName }
-            .map { (name, list) ->
+        val perCustomer = invoices.groupBy { it.customerId }
+            .map { (id, list) ->
                 CustomerInvoicesReportResponse(
-                    customerName = name,
                     invoiceCount = list.size,
-                    totalAmount = list.fold(BigDecimal.ZERO) { acc, inv -> acc + inv.amount }
+                    totalAmount = list.fold(BigDecimal.ZERO) { acc, inv -> acc + inv.amount },
+                    customerName = customerServiceQueries.getCustomerNameById(id)
                 )
             }
         val invoiceSummaries = invoices.map { inv ->
             AllInvoicesReportResponse(
                 id = inv.id!!,
                 invoiceNumber = inv.invoiceNumber,
-                customerName = inv.customerName,
                 issueDate = inv.issueDate,
                 amount = inv.amount,
                 currency = inv.currency
@@ -48,7 +48,7 @@ class ReportingSubService(private val repo: InvoiceRepository) {
             repo.findAllById(request.invoiceIds).toList()
         } else {
             repo.findAll().filter { inv ->
-                val byCustomer = request.customerName?.let { inv.customerName.contains(it, ignoreCase = true) } ?: true
+                val byCustomer = request.customerId.let { inv.customerId == it }
                 val byFrom = request.issueDateFrom?.let { !inv.issueDate.isBefore(it) } ?: true
                 val byTo = request.issueDateTo?.let { !inv.issueDate.isAfter(it) } ?: true
                 val byMin = request.minAmount?.let { inv.amount >= it } ?: true
@@ -76,18 +76,17 @@ class ReportingSubService(private val repo: InvoiceRepository) {
 
         sb.append("customerName,invoiceCount,totalAmount\n")
         report.perCustomer.forEach { c ->
-            sb.append(csvEscape(c.customerName)).append(',')
+            sb.append(c.customerName).append(',')
                 .append(c.invoiceCount).append(',')
                 .append(c.totalAmount.toPlainString()).append('\n')
         }
 
         sb.append("\n")
 
-        sb.append("id,invoiceNumber,customerName,issueDate,amount,currency\n")
+        sb.append("id,invoiceNumber,issueDate,amount,currency\n")
         report.invoices.forEach { inv ->
             sb.append(inv.id).append(',')
                 .append(csvEscape(inv.invoiceNumber)).append(',')
-                .append(csvEscape(inv.customerName)).append(',')
                 .append(csvEscape(inv.issueDate.toString())).append(',')
                 .append(inv.amount.toPlainString()).append(',')
                 .append(csvEscape(inv.currency)).append('\n')

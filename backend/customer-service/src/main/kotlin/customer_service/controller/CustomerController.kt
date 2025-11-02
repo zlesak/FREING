@@ -1,7 +1,6 @@
 package customer_service.controller
 
 import customer_service.dto.request.CreateCustomerDto
-import customer_service.dto.request.toEntity
 import customer_service.dto.response.CustomerDto
 import customer_service.dto.response.toDto
 import customer_service.dto.response.toEntity

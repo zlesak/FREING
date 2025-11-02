@@ -61,8 +61,8 @@ class InvoiceService (
     fun updateInvoice(id: Long, request: InvoiceUpdateRequest): Invoice? {
         return repo.findById(id).map { existingInvoice ->
             existingInvoice.invoiceNumber = request.invoiceNumber
-            existingInvoice.customerName = request.customerName
-            existingInvoice.customerEmail = request.customerEmail
+            existingInvoice.customerId = request.customerId
+            existingInvoice.referenceNumber = request.referenceNumber
             existingInvoice.issueDate = request.issueDate
             existingInvoice.dueDate = request.dueDate
             existingInvoice.amount = request.amount

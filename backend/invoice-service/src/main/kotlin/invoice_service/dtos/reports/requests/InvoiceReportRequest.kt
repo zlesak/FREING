@@ -8,8 +8,8 @@ import java.time.LocalDate
 data class InvoiceReportRequest(
     @field:Schema(description = "Seznam ID faktur (pokud je zadán, použijí se pouze tyto)")
     val invoiceIds: List<Long>? = null,
-    @field:Schema(description = "Jméno zákazníka (částečné vyhledávání)")
-    val customerName: String? = null,
+    @field:Schema(description = "ID zákazníka")
+    val customerId: Long,
     @field:Schema(description = "Datum vystavení od (včetně)")
     val issueDateFrom: LocalDate? = null,
     @field:Schema(description = "Datum vystavení do (včetně)")

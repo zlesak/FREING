@@ -22,6 +22,7 @@ java {
 dependencies {
     implementation(project(":common"))
     implementation("org.apache.pdfbox:pdfbox:2.0.30")
+    implementation("org.xhtmlrenderer:flying-saucer-pdf-itext5:9.7.2")
 }
 
 kotlin {

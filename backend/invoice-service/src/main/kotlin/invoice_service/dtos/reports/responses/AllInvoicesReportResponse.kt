@@ -10,8 +10,6 @@ data class AllInvoicesReportResponse(
     val id: Long,
     @field:Schema(description = "Číslo faktury")
     val invoiceNumber: String,
-    @field:Schema(description = "Název zákazníka")
-    val customerName: String,
     @field:Schema(description = "Datum vystavení faktury")
     val issueDate: LocalDate,
     @field:Schema(description = "Částka faktury")

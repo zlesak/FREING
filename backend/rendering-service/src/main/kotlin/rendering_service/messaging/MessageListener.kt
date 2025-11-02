@@ -65,9 +65,8 @@ class MessageListener @Autowired constructor(
                 println("[rendering-service] No replyTo found in message for correlationId=$correlationId")
                 return
             }
-            println("[rendering-service] Received invoice response: $response, correlationId=$correlationId, replyTo=$origReplyTo")
+            println("[rendering-service] Received invoice response: correlationId=$correlationId, replyTo=$origReplyTo")
 
-            // pokud je response ok, renderuj PDF
             if (response.status == "ok" && response.payload != null) {
                 @Suppress("UNCHECKED_CAST")
                 val invoiceData = response.payload ?: emptyMap()

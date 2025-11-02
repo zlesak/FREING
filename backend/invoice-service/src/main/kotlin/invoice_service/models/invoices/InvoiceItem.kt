@@ -10,16 +10,25 @@ data class InvoiceItem(
     var id: Long? = null,
 
     @Column(nullable = false)
+    var name: String = "",
+
+    @Column(nullable = false)
     var description: String = "",
 
     @Column(nullable = false)
-    var quantity: Int = 1,
+    var unit: String = "",
+
+    @Column(nullable = false)
+    var quantity: BigDecimal = BigDecimal.ONE,
 
     @Column(nullable = false, precision = 10, scale = 2)
     var unitPrice: BigDecimal = BigDecimal.ZERO,
 
     @Column(nullable = false, precision = 10, scale = 2)
-    var totalPrice: BigDecimal = BigDecimal.ZERO
+    var totalPrice: BigDecimal = BigDecimal.ZERO,
+
+    @Column(nullable = false)
+    var vatRate: BigDecimal = BigDecimal.ZERO,
 ) {
-    constructor() : this(null, "", 1, BigDecimal.ZERO, BigDecimal.ZERO)
+    constructor() : this(null, "", "", "", BigDecimal.ONE, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO)
 }
