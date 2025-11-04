@@ -12,10 +12,10 @@
           <small class="invalid">Vyplňte číslo faktury (min. 3 znaky)</small>
         }
       </label>
-      <label>Zákazník
-        <input formControlName="customerName" />
-        @if (form.get('customerName')?.touched && form.get('customerName')?.invalid) {
-          <small class="invalid">Jméno je povinné</small>
+      <label>Zákazník (ID)
+        <input formControlName="customerId" type="number" />
+        @if (form.get('customerId')?.touched && form.get('customerId')?.invalid) {
+          <small class="invalid">ID zákazníka je povinné</small>
         }
       </label>
       <label>Email

@@ -33,7 +33,7 @@ export class InvoiceCreateComponent implements OnInit {
     const due = new Date(Date.now()).toISOString().substring(0,10);
     this.form = this.fb.group({
       invoiceNumber: ['', [Validators.required, Validators.minLength(3)]],
-      customerName: ['', Validators.required],
+      customerId: [null, [Validators.required]],
       customerEmail: ['', [Validators.required, Validators.email]],
       issueDate: [today, Validators.required],
       dueDate: [due, Validators.required],
@@ -129,8 +129,7 @@ export class InvoiceCreateComponent implements OnInit {
 
     const payload: InvoiceApi.InvoiceCreateRequest = {
       invoiceNumber: this.form.value.invoiceNumber,
-      customerName: this.form.value.customerName,
-      customerEmail: this.form.value.customerEmail,
+      customerId: this.form.value.customerId,
       issueDate: this.form.value.issueDate,
       dueDate: this.form.value.dueDate,
       amount: this.form.value.amount,
