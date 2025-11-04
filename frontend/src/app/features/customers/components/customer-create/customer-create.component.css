@@ -1,0 +1,8 @@
+/* minimal styles */
+.customer-create { max-width: 640px; margin: 0 auto; }
+.actions { margin-top: 16px; }
+.invalid { color: #b00020; }
+.alert { padding: 8px; margin-bottom: 8px; }
+.alert.success { background: #e6ffed; }
+.alert.error { background: #ffe6e6; }
+

@@ -65,7 +65,7 @@
     } ],
     "disableableCredentialTypes" : [ ],
     "requiredActions" : [ ],
-    "realmRoles" : [ "default-roles-freing" ],
+    "realmRoles" : [ "default-roles-freing", "accountant" ],
     "notBefore" : 0,
     "groups" : [ "/employees/accountants" ]
   }, {

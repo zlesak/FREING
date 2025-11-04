@@ -6,6 +6,8 @@ import org.springframework.core.convert.converter.Converter
 import org.springframework.security.authentication.AbstractAuthenticationToken
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
+import org.springframework.http.HttpMethod
+import org.springframework.security.config.Customizer
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.oauth2.jwt.Jwt
@@ -18,9 +20,11 @@ class SecurityConfig {
 
     @Bean
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
+        http.cors(Customizer.withDefaults())
         http
             .authorizeHttpRequests { auth ->
                 auth
+                    .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                     .requestMatchers("/actuator/health", "/actuator/info").permitAll()
                     // Allow OpenAPI/Swagger UI and docs to be accessed without auth
                     .requestMatchers(
@@ -32,7 +36,7 @@ class SecurityConfig {
                         "/swagger-resources/**",
                         "/webjars/**"
                     ).permitAll()
-                    .requestMatchers("/api/customers/**").hasAuthority("SCOPE_service.call")
+                    .requestMatchers("/api/customers/**").hasAnyAuthority("SCOPE_service.call", "ROLE_manager", "ROLE_accountant")
                     .anyRequest().authenticated()
             }
             .oauth2ResourceServer { oauth2 ->

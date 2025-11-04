@@ -1,0 +1,27 @@
+<section class="customer-create">
+  <h2>Nový zákazník</h2>
+
+  @if (error) { <div class="alert error">{{ error }}</div> }
+  @if (success) { <div class="alert success">{{ success }}</div> }
+
+  <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <label>Jméno
+      <input formControlName="name" />
+      @if (form.get('name')?.touched && form.get('name')?.invalid) {
+        <small class="invalid">Jméno je povinné</small>
+      }
+    </label>
+    <label>Email
+      <input formControlName="email" type="email" />
+      @if (form.get('email')?.touched && form.get('email')?.invalid) {
+        <small class="invalid">Platný email je povinný</small>
+      }
+    </label>
+
+    <div class="actions">
+      <button type="submit" [disabled]="submitting || form.invalid">Vytvořit</button>
+      <a routerLink="/customers" class="btn-link">Zpět</a>
+    </div>
+  </form>
+</section>
+
