@@ -75,21 +75,20 @@ class InvoiceService (
             itemsToRemove.forEach { existingInvoice.removeItem(it) }
 
             request.items.forEach { itemRequest ->
-                if (itemRequest.id != null) {
-                    val existingItem = existingInvoice.items.find { it.id == itemRequest.id }
-                    if (existingItem != null) {
-                        existingItem.description = itemRequest.description
-                        existingItem.quantity = itemRequest.quantity
-                        existingItem.unitPrice = itemRequest.unitPrice
-                        existingItem.totalPrice = itemRequest.totalPrice
-                    }
+                val item = if (itemRequest.id != null) {
+                    existingInvoice.items.find { it.id == itemRequest.id } ?: InvoiceItem()
                 } else {
-                    val newItem = InvoiceItem()
-                    newItem.description = itemRequest.description
-                    newItem.quantity = itemRequest.quantity
-                    newItem.unitPrice = itemRequest.unitPrice
-                    newItem.totalPrice = itemRequest.totalPrice
-                    existingInvoice.addItem(newItem)
+                    InvoiceItem()
+                }
+                item.name = itemRequest.name
+                item.description = itemRequest.description
+                item.unit = itemRequest.unit
+                item.quantity = itemRequest.quantity
+                item.unitPrice = itemRequest.unitPrice
+                item.totalPrice = itemRequest.totalPrice
+                item.vatRate = itemRequest.vat
+                if (item.id == null || !existingInvoice.items.contains(item)) {
+                    existingInvoice.addItem(item)
                 }
             }
             repo.save(existingInvoice)

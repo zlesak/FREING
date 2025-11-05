@@ -34,6 +34,16 @@ class CustomerService(
             if (customer.phoneNumber.isNotBlank()) phoneNumber = customer.phoneNumber
             if (customer.email.isNotBlank()) email = customer.email
             birthDate = customer.birthDate
+            street = customer.street
+            houseNumber = customer.houseNumber
+            city = customer.city
+            zip = customer.zip
+            country = customer.country
+            ico = customer.ico
+            dic = customer.dic
+            bankCode = customer.bankCode
+            bankAccount = customer.bankAccount
+            currency = customer.currency
         }
 
         return customerRepo.save(updatedCustomer)

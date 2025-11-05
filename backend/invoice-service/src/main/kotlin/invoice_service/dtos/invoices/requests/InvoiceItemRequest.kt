@@ -8,10 +8,10 @@ import java.math.BigDecimal
 data class InvoiceItemRequest(
     @field:Schema(description = "ID položky", example = "1")
     val id: Long? = null,
-    @field:Schema(description = "Popis položky", example = "Konzultace")
+    @field:Schema(description = "Popis položky", example = "Konzultace programování")
     val description: String,
-    @field:Schema(description = "Kód položky", example = "K001")
-    val code: String,
+    @field:Schema(description = "Jméno položky", example = "Schůzka")
+    val name: String,
     @field:Schema(description = "Jednotka", example = "hod")
     val unit: String,
     @field:Schema(description = "Množství", example = "2")
@@ -26,7 +26,7 @@ data class InvoiceItemRequest(
     fun toInvoiceItem(): InvoiceItem {
         return InvoiceItem(
             id = this.id,
-            name = this.code,
+            name = this.name,
             description = this.description,
             unit = this.unit,
             quantity = this.quantity,
