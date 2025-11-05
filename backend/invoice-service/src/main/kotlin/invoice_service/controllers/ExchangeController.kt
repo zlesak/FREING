@@ -17,7 +17,7 @@ import java.math.RoundingMode
 
 @Tag(name = "Exchange", description = "Externí směnné kurzy - převod částek")
 @RestController
-@RequestMapping("/api/exchange")
+@RequestMapping("/api/invoices/exchange")
 class ExchangeController(private val exchangeRateService: ExchangeRateService) {
 
     @Operation(summary = "Převést částku", description = "Převede částku z jedné měny do druhé podle nejnovějšího kurzu.")

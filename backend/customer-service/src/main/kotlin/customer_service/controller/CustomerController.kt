@@ -37,7 +37,7 @@ class CustomerController(
         return customerService.getCustomerById(id)
     }
 
-    @GetMapping
+    @GetMapping("/get-customers-paged")
     fun getAll(
         @Parameter(description = "Číslo stránky", example = "0")
         @RequestParam(defaultValue = "0") page: Int,

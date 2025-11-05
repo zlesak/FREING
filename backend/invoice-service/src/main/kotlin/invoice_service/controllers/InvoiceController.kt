@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.*
 class InvoiceController (private val service: InvoiceService) {
 
     @Operation(summary = "Získat všechny faktury", description = "Vrací stránkovaný seznam všech faktur.")
-    @GetMapping
+    @GetMapping("/get-invoices-pages")
     fun getAllInvoices(
         @Parameter(description = "Číslo stránky", example = "0")
         @RequestParam(defaultValue = "0") page: Int,
@@ -34,7 +34,7 @@ class InvoiceController (private val service: InvoiceService) {
     }
 
     @Operation(summary = "Získat fakturu podle ID", description = "Vrací detail faktury podle jejího ID.")
-    @GetMapping("/{id}")
+    @GetMapping("/get-by-id/{id}")
     fun getInvoice(
         @Parameter(description = "ID faktury", example = "1")
         @PathVariable id: Long
@@ -48,7 +48,7 @@ class InvoiceController (private val service: InvoiceService) {
             ApiResponse(responseCode = "409", description = "Faktura s tímto číslem již existuje", content = [Content(schema = Schema(example = "{\"error\": \"Faktura s tímto číslem již existuje.\"}"))])
         ]
     )
-    @PostMapping
+    @PostMapping("/create")
     fun createInvoice(
         @Parameter(description = "Data pro vytvoření faktury")
         @RequestBody request: InvoiceCreateRequest
@@ -57,7 +57,7 @@ class InvoiceController (private val service: InvoiceService) {
     }
 
     @Operation(summary = "Aktualizovat fakturu", description = "Aktualizuje existující fakturu podle ID.")
-    @PutMapping("/{id}")
+    @PutMapping("/update/{id}")
     fun updateInvoice(
         @Parameter(description = "ID faktury", example = "1")
         @PathVariable id: Long,
@@ -69,7 +69,7 @@ class InvoiceController (private val service: InvoiceService) {
     }
 
     @Operation(summary = "Smazat fakturu", description = "Smaže fakturu podle ID.")
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     fun deleteInvoice(
         @Parameter(description = "ID faktury", example = "1")
         @PathVariable id: Long

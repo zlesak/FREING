@@ -12,7 +12,10 @@ import java.math.BigDecimal
 import java.time.LocalDateTime
 
 @Service
-class ReportingSubService(private val repo: InvoiceRepository, private val customerServiceQueries: CustomerServiceQueries) {
+class ReportingSubService(
+    private val repo: InvoiceRepository,
+    private val customerServiceQueries: CustomerServiceQueries
+) {
 
     fun generateAggregatedReport(invoices: List<Invoice>): AggregatedReportResponse {
         val totalInvoices = invoices.size
@@ -48,7 +51,7 @@ class ReportingSubService(private val repo: InvoiceRepository, private val custo
             repo.findAllById(request.invoiceIds).toList()
         } else {
             repo.findAll().filter { inv ->
-                val byCustomer = request.customerId.let { inv.customerId == it }
+                val byCustomer = if (request.customerId > 0) inv.customerId == request.customerId else true
                 val byFrom = request.issueDateFrom?.let { !inv.issueDate.isBefore(it) } ?: true
                 val byTo = request.issueDateTo?.let { !inv.issueDate.isAfter(it) } ?: true
                 val byMin = request.minAmount?.let { inv.amount >= it } ?: true
