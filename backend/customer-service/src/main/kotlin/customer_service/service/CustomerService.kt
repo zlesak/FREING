@@ -2,8 +2,10 @@ package customer_service.service
 
 import com.uhk.fim.prototype.common.exceptions.NotFoundException
 import com.uhk.fim.prototype.common.exceptions.WrongDataException
+import customer_service.dto.response.CustomersPagedResponse
 import customer_service.models.CustomerEntity
 import customer_service.repo.CustomerRepo
+import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 
@@ -48,5 +50,25 @@ class CustomerService(
 
     private fun getCustomerByEmailOrPhoneNumber(email: String, phoneNumber: String): CustomerEntity? {
        return customerRepo.findByEmailOrPhoneNumber(email, phoneNumber)
+    }
+
+    fun getAllCustomers(pageable: Pageable): CustomersPagedResponse<CustomerEntity> {
+        val allCustomers = customerRepo.findAll()
+
+        val startIndex = pageable.pageNumber * pageable.pageSize
+        val endIndex = minOf(startIndex + pageable.pageSize, allCustomers.size)
+        val pageContent = if (startIndex < allCustomers.size) {
+            allCustomers.subList(startIndex, endIndex)
+        } else {
+            emptyList<CustomerEntity>()
+        }
+
+        return CustomersPagedResponse(
+            content = pageContent,
+            totalElements = allCustomers.size.toLong(),
+            totalPages = (allCustomers.size + pageable.pageSize - 1) / pageable.pageSize,
+            page = pageable.pageNumber,
+            size = pageable.pageSize
+        )
     }
 }

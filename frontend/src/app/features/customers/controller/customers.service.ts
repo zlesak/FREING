@@ -33,6 +33,12 @@ export class CustomersServiceController {
     );
   }
 
+  getCustomers(page = 0, size = 10): Observable<CustomerApi.CustomersPagedResponse> {
+    return from(CustomerApi.CustomerControllerService.getAll({ page, size })).pipe(
+      catchError(this.handleError)
+    );
+  }
+
   private handleError = (err: any) => {
     let message = 'Neznámá chyba';
     if (err && typeof err === 'object') {
@@ -40,9 +46,10 @@ export class CustomersServiceController {
         message = (err.body as any).message || JSON.stringify(err.body);
       } else if ('message' in err) {
         message = (err as any).message;
+      } else if ('status' in err) {
+        message = `HTTP ${err.status} ${err.statusText}`;
       }
     }
     return throwError(() => new Error(message));
   };
 }
-

@@ -2,10 +2,13 @@ package customer_service.controller
 
 import customer_service.dto.request.CreateCustomerDto
 import customer_service.dto.response.CustomerDto
+import customer_service.dto.response.CustomersPagedResponse
 import customer_service.dto.response.toDto
 import customer_service.dto.response.toEntity
 import customer_service.models.CustomerEntity
 import customer_service.service.CustomerService
+import io.swagger.v3.oas.annotations.Parameter
+import org.springframework.data.domain.PageRequest
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -16,7 +19,7 @@ class CustomerController(
 
     @PostMapping("/create")
     fun create(@RequestBody customer: CreateCustomerDto): CustomerDto {
-      return customerService.create(customer.toEntity()).toDto()
+        return customerService.create(customer.toEntity()).toDto()
     }
 
     @PostMapping("/update")
@@ -32,5 +35,16 @@ class CustomerController(
     @GetMapping("/get-by-id/{id}")
     fun getById(@PathVariable("id") id: Long): CustomerEntity {
         return customerService.getCustomerById(id)
+    }
+
+    @GetMapping
+    fun getAll(
+        @Parameter(description = "Číslo stránky", example = "0")
+        @RequestParam(defaultValue = "0") page: Int,
+        @Parameter(description = "Velikost stránky", example = "10")
+        @RequestParam(defaultValue = "10") size: Int
+    ): CustomersPagedResponse<CustomerEntity> {
+        val pageable = PageRequest.of(page, size)
+        return customerService.getAllCustomers(pageable)
     }
 }
