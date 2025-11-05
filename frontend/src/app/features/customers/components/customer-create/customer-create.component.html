@@ -11,11 +11,64 @@
         <small class="invalid">Jméno je povinné</small>
       }
     </label>
+
+    <label>Příjmení
+      <input formControlName="surname" />
+    </label>
+
     <label>Email
       <input formControlName="email" type="email" />
       @if (form.get('email')?.touched && form.get('email')?.invalid) {
         <small class="invalid">Platný email je povinný</small>
       }
+    </label>
+
+    <label>Telefon
+      <input formControlName="phoneNumber" />
+    </label>
+
+    <label>Datum narození
+      <input formControlName="birthDate" type="date" />
+    </label>
+
+    <label>Ulice
+      <input formControlName="street" />
+    </label>
+
+    <label>Číslo domu
+      <input formControlName="houseNumber" />
+    </label>
+
+    <label>Město
+      <input formControlName="city" />
+    </label>
+
+    <label>PSČ
+      <input formControlName="zip" />
+    </label>
+
+    <label>Země
+      <input formControlName="country" />
+    </label>
+
+    <label>IČO
+      <input formControlName="ico" />
+    </label>
+
+    <label>DIČ
+      <input formControlName="dic" />
+    </label>
+
+    <label>Kód banky
+      <input formControlName="bankCode" />
+    </label>
+
+    <label>Číslo účtu
+      <input formControlName="bankAccount" />
+    </label>
+
+    <label>Měna
+      <input formControlName="currency" />
     </label>
 
     <div class="actions">
@@ -24,4 +77,3 @@
     </div>
   </form>
 </section>
-

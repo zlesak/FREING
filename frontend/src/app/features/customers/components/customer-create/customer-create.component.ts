@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { CustomerControllerService } from '../../../../api/generated/customer/services/CustomerControllerService';
+import { CustomersServiceController } from '../../controller/customers.service';
 import { CreateCustomerDto } from '../../../../api/generated/customer/models/CreateCustomerDto';
 import { Router } from '@angular/router';
 
@@ -16,10 +16,23 @@ export class CustomerCreateComponent {
   error?: string;
   success?: string;
 
-  constructor(private fb: FormBuilder, private router: Router) {
+  constructor(private fb: FormBuilder, private router: Router, private customersService: CustomersServiceController) {
     this.form = this.fb.group({
       name: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]]
+      surname: [''],
+      email: ['', [Validators.required, Validators.email]],
+      phoneNumber: [''],
+      birthDate: [''],
+      street: [''],
+      houseNumber: [''],
+      city: [''],
+      zip: [''],
+      country: [''],
+      ico: [''],
+      dic: [''],
+      bankCode: [''],
+      bankAccount: [''],
+      currency: ['']
     });
   }
 
@@ -29,24 +42,32 @@ export class CustomerCreateComponent {
     this.submitting = true;
     const payload: CreateCustomerDto = {
       name: this.form.value.name,
-      surname: '',
+      surname: this.form.value.surname,
       email: this.form.value.email,
-      phoneNumber: '',
-      birthDate: '',
-      street: '',
-      houseNumber: '',
-      city: '',
-      zip: '',
-      country: ''
+      phoneNumber: this.form.value.phoneNumber,
+      birthDate: this.form.value.birthDate,
+      street: this.form.value.street,
+      houseNumber: this.form.value.houseNumber,
+      city: this.form.value.city,
+      zip: this.form.value.zip,
+      country: this.form.value.country,
+      ico: this.form.value.ico,
+      dic: this.form.value.dic,
+      bankCode: this.form.value.bankCode,
+      bankAccount: this.form.value.bankAccount,
+      currency: this.form.value.currency
     };
 
-    CustomerControllerService.create({ requestBody: payload }).then(resp => {
-      this.submitting = false;
-      this.success = 'Zákazník vytvořen: ' + (resp.id ?? '');
-      setTimeout(() => this.router.navigate(['/customers']), 800);
-    }).catch(err => {
-      this.submitting = false;
-      this.error = err?.message || 'Chyba při vytváření zákazníka';
+    this.customersService.createCustomer(payload).subscribe({
+      next: (resp) => {
+        this.submitting = false;
+        this.success = 'Zákazník vytvořen: ' + (resp.id ?? '');
+        setTimeout(() => this.router.navigate(['/customers']), 800);
+      },
+      error: (err) => {
+        this.submitting = false;
+        this.error = err?.message || 'Chyba při vytváření zákazníka';
+      }
     });
   }
 }
