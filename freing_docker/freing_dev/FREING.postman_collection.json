@@ -530,51 +530,51 @@
 	"variable": [
 		{
 			"key": "baseURL",
-			"value": ""
+			"value": "http://service.freing.test/api"
 		},
 		{
 			"key": "customersEndpoint",
-			"value": ""
+			"value": "/customers"
 		},
 		{
 			"key": "invoicesEndpoint",
-			"value": ""
+			"value": "/invoices"
 		},
 		{
 			"key": "paymentsEndpoint",
-			"value": ""
+			"value": "/payments"
 		},
 		{
 			"key": "renderingEndpoint",
-			"value": ""
+			"value": "/rendering"
 		},
 		{
 			"key": "customerId",
-			"value": ""
+			"value": "1"
 		},
 		{
 			"key": "invoiceId",
-			"value": ""
+			"value": "1"
 		},
 		{
 			"key": "clientId",
-			"value": ""
+			"value": "frontend"
 		},
 		{
 			"key": "tokenName",
-			"value": ""
+			"value": "FreingToken"
 		},
 		{
 			"key": "AuthURL",
-			"value": ""
+			"value": "http://auth.freing.test/realms/freing/protocol/openid-connect/auth"
 		},
 		{
 			"key": "AccessTokenURL",
-			"value": ""
+			"value": "http://auth.freing.test/realms/freing/protocol/openid-connect/token"
 		},
 		{
 			"key": "CallbackURL",
-			"value": ""
+			"value": "http://freing.test/"
 		}
 	]
 }
