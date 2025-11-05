@@ -1,6 +1,7 @@
 package payment_service.controllers
 
 import com.uhk.fim.prototype.common.messaging.dto.RenderingResponse
+import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RestController
@@ -8,14 +9,17 @@ import payment_service.messaging.MessageSender
 import payment_service.messaging.MessageListener
 import java.util.concurrent.TimeUnit
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.RequestMapping
 import java.util.Base64
 
+@Tag(name = "Payments", description = "API pro správu platebních činností")
 @RestController
+@RequestMapping("/api/payments")
 class PaymentInvoiceController(
     private val messageSender: MessageSender,
     private val messageListener: MessageListener
 ) {
-    @GetMapping("/invoice/{id}") //TODO: vyměnit za pořádný endpoint, tohle je jen testovací teď
+    @GetMapping("/invoice/{id}/render") //TODO: vyměnit za pořádný endpoint, tohle je jen testovací teď
     fun renderInvoice(@PathVariable id: Long): ResponseEntity<Any> {
         val future = messageListener.registerFuture()
         val correlationId = future.first
