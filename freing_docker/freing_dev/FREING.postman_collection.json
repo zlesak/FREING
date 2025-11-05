@@ -1,0 +1,580 @@
+{
+	"info": {
+		"_postman_id": "28319eb8-62c8-4bda-b700-8e26e4bfbced",
+		"name": "FREING",
+		"description": "# Postman collection for MOIS project FREING\n\n## Team Endor\n\n### AR 2025/26 ZS\n\n#### Description\n\nCollection is divided per service and should have all endpoints set up with default data and schema for those, where data are passed as a request body.\n\n### Authentication\n\n- The collection has set global authentication via the OAuth2, we are using the **frontend** ClientID as it is the only client able to send the requests to service after some client logs in.\n    \n- For you to acquire a new token, refer to the Authorization tab here in Postman collection root and scroll to button **Get New Authentication Token**. Use the returned token and continue in sending your requests.\n    \n- Tokens are set to autorefresh, if this is not the desired behaviour for your case, turn this feature of.\n    \n- In order to sign in, use any of the user credential, you will then have the ROLES and RIGHTS of the signed in user. Use Alice in most of the times, if there is some functionality for Bob or Customer, sign as them instead.\n    \n\n** Note to team devs: Make sure tu update this collection and push it to the repository when endpoints change, as we are not currently versioning the API!\n\n** Disclaimer: some example data may or may not be valid at some point of development, update them if the is some issue with them.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "45887735"
+	},
+	"item": [
+		{
+			"name": "Service APIs",
+			"item": [
+				{
+					"name": "Customers",
+					"item": [
+						{
+							"name": "Create customer",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"// uloží id do environment proměnné",
+											"const json = pm.response.json();",
+											"pm.collectionVariables.set(\"customerId\", json.id);"
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"Jan\",\n  \"surname\": \"Novák\",\n  \"email\": \"jan.novak@example.com\",\n  \"phoneNumber\": \"+420123456789\",\n  \"birthDate\": \"1990-01-01\",\n  \"street\": \"Hlavní\",\n  \"houseNumber\": \"123\",\n  \"city\": \"Praha\",\n  \"zip\": \"11000\",\n  \"country\": \"CZ\",\n  \"ico\": \"12345678\",\n  \"dic\": \"CZ12345678\",\n  \"bankCode\": \"0100\",\n  \"bankAccount\": \"1234567890\",\n  \"currency\": \"CZK\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseURL}}{{customersEndpoint}}/create",
+									"host": [
+										"{{baseURL}}{{customersEndpoint}}"
+									],
+									"path": [
+										"create"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update customer",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"id\": 1,\n    \"name\": \"Jan\",\n    \"surname\": \"Novák\",\n    \"email\": \"jan.novak@example.com\",\n    \"phoneNumber\": \"+420123456789\",\n    \"birthDate\": \"1990-01-01T00:00:00.000+00:00\",\n    \"street\": \"Hlavní ulice\",\n    \"houseNumber\": \"123\",\n    \"city\": \"Praha\",\n    \"zip\": \"11000\",\n    \"country\": \"CZ\",\n    \"ico\": \"12345678\",\n    \"dic\": \"CZ12345678\",\n    \"bankCode\": \"0100\",\n    \"bankAccount\": \"1234567890\",\n    \"currency\": \"CZK\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseURL}}{{customersEndpoint}}/update",
+									"host": [
+										"{{baseURL}}{{customersEndpoint}}"
+									],
+									"path": [
+										"update"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete customer",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{baseURL}}{{customersEndpoint}}/delete/:Id",
+									"host": [
+										"{{baseURL}}{{customersEndpoint}}"
+									],
+									"path": [
+										"delete",
+										":Id"
+									],
+									"variable": [
+										{
+											"key": "Id",
+											"value": "{{customerId}}",
+											"description": "Id of the customer"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get customer by ID",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseURL}}{{customersEndpoint}}/get-by-id/:Id",
+									"host": [
+										"{{baseURL}}{{customersEndpoint}}"
+									],
+									"path": [
+										"get-by-id",
+										":Id"
+									],
+									"variable": [
+										{
+											"key": "Id",
+											"value": "{{customerId}}",
+											"description": "Customer Id"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get customers paged",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseURL}}{{customersEndpoint}}/get-customers-paged?page=0&size=10",
+									"host": [
+										"{{baseURL}}{{customersEndpoint}}"
+									],
+									"path": [
+										"get-customers-paged"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "0",
+											"description": "Number of customer page"
+										},
+										{
+											"key": "size",
+											"value": "10",
+											"description": "Size of the customer page"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"description": "API endpoints with example data to call them with. Calls the customer service and provides its functionality\n\nWhen customer created its id is set to collection variable for faster move between endpoints needing the customer id."
+				},
+				{
+					"name": "Invoices",
+					"item": [
+						{
+							"name": "Report",
+							"item": [
+								{
+									"name": "Get report - JSON",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"invoiceIds\": [],\n    \"customerId\": 0,\n    \"issueDateFrom\": \"2025-10-04\",\n    \"issueDateTo\": \"2025-10-07\",\n    \"minAmount\": 0,\n    \"maxAmount\": 15000\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseURL}}{{invoicesEndpoint}}/report",
+											"host": [
+												"{{baseURL}}{{invoicesEndpoint}}"
+											],
+											"path": [
+												"report"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get report - CSV file",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"invoiceIds\": [],\n    \"customerId\": 0,\n    \"issueDateFrom\": \"2025-10-01\",\n    \"issueDateTo\": \"2025-10-07\",\n    \"minAmount\": 1,\n    \"maxAmount\": 15000\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseURL}}{{invoicesEndpoint}}/report/csv",
+											"host": [
+												"{{baseURL}}{{invoicesEndpoint}}"
+											],
+											"path": [
+												"report",
+												"csv"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"description": "API endpoints with example data to call them with. Calls the customer reporting sub service and provides its functionality"
+						},
+						{
+							"name": "Exchange",
+							"item": [
+								{
+									"name": "Convert amount",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseURL}}{{invoicesEndpoint}}/exchange/convert?from=CZK&to=EUR&amount=150",
+											"host": [
+												"{{baseURL}}{{invoicesEndpoint}}"
+											],
+											"path": [
+												"exchange",
+												"convert"
+											],
+											"query": [
+												{
+													"key": "from",
+													"value": "CZK",
+													"description": "Původní měna"
+												},
+												{
+													"key": "to",
+													"value": "EUR",
+													"description": "Cílová měna"
+												},
+												{
+													"key": "amount",
+													"value": "150",
+													"description": "Částka"
+												}
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"description": "API endpoints with example data to call them with. Calls the customer exchange rates subservice and provides its functionality"
+						},
+						{
+							"name": "Create invoice",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"// uloží id do environment proměnné",
+											"const json = pm.response.json();",
+											"pm.collectionVariables.set(\"invoiceId\", json.id);"
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"invoiceNumber\": \"INV-20250001\",\n    \"referenceNumber\": \"REF-2025-0001\",\n    \"customerId\": {{customerId}},\n    \"issueDate\": \"2025-10-05\",\n    \"dueDate\": \"2025-11-05\",\n    \"amount\": 1210.00,\n    \"currency\": \"CZK\",\n    \"status\": \"DRAFT\",\n    \"items\": [\n        {\n            \"name\": \"Schůzka\",\n            \"description\": \"Konzultace ohledně FREING\",\n            \"code\": \"K001\",\n            \"unit\": \"hour\",\n            \"quantity\": 1,\n            \"unitPrice\": 1000.00,\n            \"vat\": 21,\n            \"totalPrice\": 1210.00\n        }\n    ]\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseURL}}{{invoicesEndpoint}}/create",
+									"host": [
+										"{{baseURL}}{{invoicesEndpoint}}"
+									],
+									"path": [
+										"create"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update invoice",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"invoiceNumber\": \"INV-20250001\",\n    \"referenceNumber\": \"REF-2025-0001\",\n    \"customerId\": {{customerId}},\n    \"issueDate\": \"2025-10-05\",\n    \"dueDate\": \"2025-11-05\",\n    \"amount\": 2420.00,\n    \"currency\": \"CZK\",\n    \"status\": \"DRAFT\",\n    \"items\": [\n        {\n            \"id\": 1,\n            \"name\": \"Schůzka\",\n            \"description\": \"Konzultace ohledně FREING\",\n            \"code\": \"K001\",\n            \"unit\": \"hour\",\n            \"quantity\": 1,\n            \"unitPrice\": 1000.00,\n            \"vat\": 21,\n            \"totalPrice\": 1210.00\n        },\n        {\n            \"name\": \"Schůzka 2\",\n            \"description\": \"Konzultace ohledně FREING\",\n            \"code\": \"K001\",\n            \"unit\": \"hour\",\n            \"quantity\": 1,\n            \"unitPrice\": 1000.00,\n            \"vat\": 21,\n            \"totalPrice\": 1210.00\n        }\n    ]\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseURL}}{{invoicesEndpoint}}/update/:Id",
+									"host": [
+										"{{baseURL}}{{invoicesEndpoint}}"
+									],
+									"path": [
+										"update",
+										":Id"
+									],
+									"variable": [
+										{
+											"key": "Id",
+											"value": "{{invoiceId}}",
+											"description": "Invoice Id"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get invoice by ID",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseURL}}{{invoicesEndpoint}}/get-by-id/:Id",
+									"host": [
+										"{{baseURL}}{{invoicesEndpoint}}"
+									],
+									"path": [
+										"get-by-id",
+										":Id"
+									],
+									"variable": [
+										{
+											"key": "Id",
+											"value": "{{invoiceId}}",
+											"description": "Invoice Id"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete invoice",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{baseURL}}{{invoicesEndpoint}}/delete/:Id",
+									"host": [
+										"{{baseURL}}{{invoicesEndpoint}}"
+									],
+									"path": [
+										"delete",
+										":Id"
+									],
+									"variable": [
+										{
+											"key": "Id",
+											"value": "{{invoiceId}}",
+											"description": "Invoice Id"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get invoices paged",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseURL}}{{invoicesEndpoint}}/get-invoices-pages?page=0&size=10",
+									"host": [
+										"{{baseURL}}{{invoicesEndpoint}}"
+									],
+									"path": [
+										"get-invoices-pages"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "0",
+											"description": "Invoice page number"
+										},
+										{
+											"key": "size",
+											"value": "10",
+											"description": "Invoice page size"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"description": "API endpoints with example data to call them with. Calls the invoice service and provides its functionality"
+				},
+				{
+					"name": "Payments",
+					"item": [
+						{
+							"name": "Get invoice PDF",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseURL}}{{paymentsEndpoint}}/invoice/:Id/render",
+									"host": [
+										"{{baseURL}}{{paymentsEndpoint}}"
+									],
+									"path": [
+										"invoice",
+										":Id",
+										"render"
+									],
+									"variable": [
+										{
+											"key": "Id",
+											"value": "{{invoiceId}}",
+											"description": "Invoice number"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"description": "API endpoints with example data to call them with. Calls the payment service and provides its functionality"
+				}
+			],
+			"description": "Constains folders with respective services and theirs API endpoints"
+		}
+	],
+	"auth": {
+		"type": "oauth2",
+		"oauth2": [
+			{
+				"key": "tokenName",
+				"value": "{{tokenName}}",
+				"type": "string"
+			},
+			{
+				"key": "redirect_uri",
+				"value": "{{CallbackURL}}",
+				"type": "string"
+			},
+			{
+				"key": "accessTokenUrl",
+				"value": "{{AccessTokenURL}}",
+				"type": "string"
+			},
+			{
+				"key": "authUrl",
+				"value": "{{AuthURL}}",
+				"type": "string"
+			},
+			{
+				"key": "clientId",
+				"value": "{{clientId}}",
+				"type": "string"
+			},
+			{
+				"key": "useBrowser",
+				"value": false,
+				"type": "boolean"
+			},
+			{
+				"key": "grant_type",
+				"value": "authorization_code",
+				"type": "string"
+			},
+			{
+				"key": "addTokenTo",
+				"value": "header",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseURL",
+			"value": "http://service.freing.test/api"
+		},
+		{
+			"key": "customersEndpoint",
+			"value": "/customers"
+		},
+		{
+			"key": "invoicesEndpoint",
+			"value": "/invoices"
+		},
+		{
+			"key": "paymentsEndpoint",
+			"value": "/payments"
+		},
+		{
+			"key": "renderingEndpoint",
+			"value": "/rendering"
+		},
+		{
+			"key": "customerId",
+			"value": "1"
+		},
+		{
+			"key": "invoiceId",
+			"value": "1"
+		},
+		{
+			"key": "clientId",
+			"value": "frontend"
+		},
+		{
+			"key": "tokenName",
+			"value": "FreingToken"
+		},
+		{
+			"key": "AuthURL",
+			"value": "http://auth.freing.test/realms/freing/protocol/openid-connect/auth"
+		},
+		{
+			"key": "AccessTokenURL",
+			"value": "http://auth.freing.test/realms/freing/protocol/openid-connect/token"
+		},
+		{
+			"key": "CallbackURL",
+			"value": "http://freing.test/"
+		}
+	]
+}
