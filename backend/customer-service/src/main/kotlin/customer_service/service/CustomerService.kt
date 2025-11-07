@@ -1,8 +1,9 @@
 package customer_service.service
 
+import customer_service.external.AresClient
 import com.uhk.fim.prototype.common.exceptions.NotFoundException
 import com.uhk.fim.prototype.common.exceptions.WrongDataException
-import customer_service.dto.response.CustomersPagedResponse
+import customer_service.dto.customer.response.CustomersPagedResponse
 import customer_service.models.CustomerEntity
 import customer_service.repo.CustomerRepo
 import org.springframework.data.domain.Pageable
@@ -11,14 +12,19 @@ import org.springframework.stereotype.Service
 
 @Service
 class CustomerService(
-    private val customerRepo: CustomerRepo
+    private val customerRepo: CustomerRepo,
+    private val aresClient: AresClient
 ) {
 
     fun create(customer: CustomerEntity): CustomerEntity {
         getCustomerByEmailOrPhoneNumber(customer.email, customer.phoneNumber)?.let { throw WrongDataException("Customer already exists!") }
 
-        if (customer.name.isBlank()) throw WrongDataException("Customer name must be fill!")
-        if (customer.surname.isBlank()) throw WrongDataException("Customer surname must be fill!")
+        if (customer.tradeName.isBlank() && (customer.name.isBlank() || customer.surname.isBlank())) {
+            throw WrongDataException("Musíte vyplnit buď jméno a příjmení, nebo obchodní jméno!")
+        }
+        if (customer.tradeName.isNotBlank() && (customer.name.isNotBlank() || customer.surname.isNotBlank())) {
+            throw WrongDataException("Vyplňte buď jméno a příjmení, nebo obchodní jméno, ne obojí!")
+        }
         if (customer.phoneNumber.isBlank()) throw WrongDataException("Customer phone must be fill!")
         if (customer.email.isBlank()) throw WrongDataException("Customer email must be fill!")
         return customerRepo.save(customer)
@@ -80,5 +86,17 @@ class CustomerService(
             page = pageable.pageNumber,
             size = pageable.pageSize
         )
+    }
+    fun getCustomerFromAres(ico: String): CustomerEntity {
+        try {
+            val subject = aresClient.getSubjectByIcoARES(ico)
+            if (subject != null) {
+                return subject.toCustomerEntity()
+            } else {
+                throw NotFoundException("Nepodařilo se najít subjekt v ARES s IČO: $ico")
+            }
+        } catch (e: Exception) {
+            throw NotFoundException("Chyba při komunikaci s ARES: ${e.message}")
+        }
     }
 }

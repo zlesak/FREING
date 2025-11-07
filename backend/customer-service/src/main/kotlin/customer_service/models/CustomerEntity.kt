@@ -1,5 +1,6 @@
 package customer_service.models
 
+import customer_service.dto.customer.response.CustomerDto
 import jakarta.persistence.*
 import java.util.*
 
@@ -16,14 +17,17 @@ data class CustomerEntity(
     @Column(nullable = false)
     var surname: String = "",
 
+    @Column(nullable = false)
+    var tradeName: String = "",
+
     @Column(nullable = false, unique = true)
     var email: String = "",
 
     @Column(nullable = false, unique = true)
     var phoneNumber: String = "",
 
-    @Column(nullable = false)
-    var birthDate: Date = Date(),
+    @Column(nullable = true)
+    var birthDate: Date? = Date(),
 
     @Column(nullable = false)
     var street: String = "",
@@ -72,4 +76,26 @@ data class CustomerEntity(
         "bankAccount" to bankAccount,
         "currency" to currency
     )
+    fun toDto(): CustomerDto {
+        return CustomerDto(
+            id = id,
+            name = name,
+            surname = surname,
+            tradeName = tradeName,
+            email = email,
+            phoneNumber = phoneNumber,
+            birthDate = birthDate,
+            street = street,
+            houseNumber = houseNumber,
+            city = city,
+            zip = zip,
+            country = country,
+            ico = ico,
+            dic = dic,
+            bankCode = bankCode,
+            bankAccount = bankAccount,
+            currency = currency
+        )
+    }
+
 }

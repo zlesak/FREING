@@ -1,4 +1,4 @@
-package customer_service.dto.response
+package customer_service.dto.customer.response
 
 import io.swagger.v3.oas.annotations.media.Schema
 
