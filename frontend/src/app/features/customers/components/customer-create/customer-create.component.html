@@ -5,17 +5,32 @@
   @if (success) { <div class="alert success">{{ success }}</div> }
 
   <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
-    <label>Jméno
-      <input formControlName="name" />
-      @if (form.get('name')?.touched && form.get('name')?.invalid) {
-        <small class="invalid">Jméno je povinné</small>
-      }
-    </label>
+  <label>Jméno
+    <input formControlName="name" [disabled]="form.get('tradeName')?.value" />
+    @if (
+      (form.get('name')?.touched && form.get('surname')?.touched && form.get('name')?.invalid && !form.get('tradeName')?.value)
+    ) {
+      <small class="invalid">Jméno je povinné (pokud není vyplněno obchodní jméno)</small>
+    }
+  </label>
 
-    <label>Příjmení
-      <input formControlName="surname" />
-    </label>
+  <label>Příjmení
+    <input formControlName="surname" [disabled]="form.get('tradeName')?.value" />
+    @if (
+      (form.get('surname')?.touched && form.get('name')?.touched && form.get('surname')?.invalid && !form.get('tradeName')?.value)
+    ) {
+      <small class="invalid">Příjmení je povinné (pokud není vyplněno obchodní jméno)</small>
+    }
+  </label>
 
+  <label>Obchodní jméno
+    <input formControlName="tradeName" [disabled]="form.get('name')?.value || form.get('surname')?.value" />
+    @if (
+      (form.get('tradeName')?.touched && form.get('tradeName')?.invalid && !form.get('name')?.value && !form.get('surname')?.value)
+    ) {
+      <small class="invalid">Obchodní jméno je povinné (pokud není vyplněno jméno a příjmení)</small>
+    }
+  </label>
     <label>Email
       <input formControlName="email" type="email" />
       @if (form.get('email')?.touched && form.get('email')?.invalid) {
@@ -52,7 +67,14 @@
     </label>
 
     <label>IČO
-      <input formControlName="ico" />
+      <div style="display:flex; gap:0.5rem; align-items:center;">
+        <input formControlName="ico" />
+        <button type="button" (click)="fetchFromAres()" [disabled]="aresLoading || !form.get('ico')?.value">
+          @if(aresLoading) { Načítám... } @else { Načíst }
+        </button>
+      </div>
+      @if (aresError) { <small class="invalid">{{ aresError }}</small> }
+      @if (aresSuccess) { <small style="color:green">{{ aresSuccess }}</small> }
     </label>
 
     <label>DIČ

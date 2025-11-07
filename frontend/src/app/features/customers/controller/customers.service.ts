@@ -39,6 +39,12 @@ export class CustomersServiceController {
     );
   }
 
+  getCustomerInfoFromAres(ico: string): Observable<CustomerApi.CustomerEntity> {
+    return from(CustomerApi.CustomerControllerService.getCustomerInfoFromAresByIco({ ico })).pipe(
+      catchError(this.handleError)
+    );
+  }
+
   private handleError = (err: any) => {
     let message = 'Neznámá chyba';
     if (err && typeof err === 'object') {

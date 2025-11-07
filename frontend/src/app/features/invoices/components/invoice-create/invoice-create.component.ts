@@ -33,11 +33,12 @@ export class InvoiceCreateComponent implements OnInit {
     const due = new Date(Date.now()).toISOString().substring(0,10);
     this.form = this.fb.group({
       invoiceNumber: ['', [Validators.required, Validators.minLength(3)]],
+      referenceNumber: [''],
       customerId: [null, [Validators.required]],
-      customerEmail: ['', [Validators.required, Validators.email]],
       issueDate: [today, Validators.required],
       dueDate: [due, Validators.required],
       amount: [0, [Validators.required, Validators.min(0)]],
+      subAmount: [0, [Validators.min(0)]],
       currency: ['CZK', Validators.required],
       status: ['DRAFT', Validators.required],
       items: this.fb.array([])
@@ -61,10 +62,13 @@ export class InvoiceCreateComponent implements OnInit {
           const grp = this.items.at(i) as FormGroup;
           const unit = grp.get('unitPrice')?.value || 0;
           const qty = grp.get('quantity')?.value || 0;
+          const vat = grp.get('vat')?.value || 0;
           const newUnit = +(unit * factor).toFixed(2);
+          const newSubTotal = +(newUnit * qty).toFixed(2);
+          const newTotal = +(newSubTotal * (1 + vat / 100)).toFixed(2);
           grp.get('unitPrice')?.setValue(newUnit);
-          const newTotal = +(newUnit * qty).toFixed(2);
-            grp.get('totalPrice')?.setValue(newTotal);
+          grp.get('totalPrice')?.setValue(newTotal);
+          grp.get('subTotalPrice')?.setValue(newSubTotal);
         }
         this.recalcInvoiceAmount();
         this.lastCurrency = to;
@@ -78,14 +82,18 @@ export class InvoiceCreateComponent implements OnInit {
 
   get items(): FormArray<FormGroup> { return this.form.get('items') as FormArray<FormGroup>; }
 
-  newItem(): FormGroup {
-    return this.fb.group({
-      description: this.fb.control<string>('', { validators: [Validators.required], nonNullable: true }),
-      quantity: this.fb.control<number>(1, { validators: [Validators.required, Validators.min(1)], nonNullable: true }),
-      unitPrice: this.fb.control<number>(0, { validators: [Validators.required, Validators.min(0)], nonNullable: true }),
-      totalPrice: this.fb.control<number>({ value: 0, disabled: true } as any)
-    });
-  }
+newItem(): FormGroup {
+  return this.fb.group({
+    name: this.fb.control<string>('', { validators: [Validators.required], nonNullable: true }),
+    description: this.fb.control<string>('', { validators: [Validators.required], nonNullable: true }),
+    unit: this.fb.control<string>('', { validators: [Validators.required], nonNullable: true }),
+    quantity: this.fb.control<number>(1, { validators: [Validators.required, Validators.min(1)], nonNullable: true }),
+    unitPrice: this.fb.control<number>(0, { validators: [Validators.required, Validators.min(0)], nonNullable: true }),
+    vat: this.fb.control<number>(0, { validators: [Validators.required, Validators.min(0)], nonNullable: true }),
+    subTotalPrice: this.fb.control<number>({ value: 0, disabled: true } as any),
+    totalPrice: this.fb.control<number>({ value: 0, disabled: true } as any)
+  });
+}
 
   addItem(): void {
     this.items.push(this.newItem());
@@ -99,7 +107,10 @@ export class InvoiceCreateComponent implements OnInit {
     const group = this.items.at(index) as FormGroup;
     const qty = group.get('quantity')?.value || 0;
     const unit = group.get('unitPrice')?.value || 0;
-    const total = +(qty * unit).toFixed(2);
+    const vat = group.get('vat')?.value || 0;
+    const subtotal = qty * unit;
+    const total = +(subtotal * (1 + vat / 100)).toFixed(2);
+    group.get('subTotalPrice')?.setValue(subtotal);
     group.get('totalPrice')?.setValue(total);
     this.recalcInvoiceAmount();
   }
@@ -109,6 +120,11 @@ export class InvoiceCreateComponent implements OnInit {
       const v = (ctrl as FormGroup).get('totalPrice')?.value || 0;
       return acc + (typeof v === 'number' ? v : parseFloat(v));
     }, 0);
+    const subAmount = this.items.controls.reduce((acc, ctrl) => {
+      const v = (ctrl as FormGroup).get('subTotalPrice')?.value || 0;
+      return acc + (typeof v === 'number' ? v : parseFloat(v));
+    }, 0);
+    this.form.get('subAmount')?.setValue(+subAmount.toFixed(2));
     this.form.get('amount')?.setValue(+sum.toFixed(2));
   }
 
@@ -120,15 +136,19 @@ export class InvoiceCreateComponent implements OnInit {
     const rawItems: InvoiceApi.InvoiceItemRequest[] = this.items.controls.map(c => {
       const val: any = (c as FormGroup).getRawValue();
       return {
+        name: val['name'],
         description: val['description'],
+        unit: val['unit'],
         quantity: val['quantity'],
         unitPrice: val['unitPrice'],
-        totalPrice: val['totalPrice']
+        totalPrice: val['totalPrice'],
+        vat: val['vat']
       } as InvoiceApi.InvoiceItemRequest;
     });
 
     const payload: InvoiceApi.InvoiceCreateRequest = {
       invoiceNumber: this.form.value.invoiceNumber,
+      referenceNumber: this.form.value.referenceNumber? this.form.value.referenceNumber : undefined,
       customerId: this.form.value.customerId,
       issueDate: this.form.value.issueDate,
       dueDate: this.form.value.dueDate,

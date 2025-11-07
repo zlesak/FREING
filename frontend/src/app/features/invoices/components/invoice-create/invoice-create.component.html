@@ -7,21 +7,20 @@
   <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
     <div class="grid two-cols">
       <label>Číslo faktury
-        <input formControlName="invoiceNumber" placeholder="20250001" />
+        <input formControlName="invoiceNumber" placeholder="20251107" />
         @if (form.get('invoiceNumber')?.touched && form.get('invoiceNumber')?.invalid) {
           <small class="invalid">Vyplňte číslo faktury (min. 3 znaky)</small>
         }
       </label>
+
+      <label>Referenční číslo faktury
+        <input formControlName="referenceNumber" placeholder="INV-2025-11-07" />
+      </label>
+
       <label>Zákazník (ID)
         <input formControlName="customerId" type="number" />
         @if (form.get('customerId')?.touched && form.get('customerId')?.invalid) {
           <small class="invalid">ID zákazníka je povinné</small>
-        }
-      </label>
-      <label>Email
-        <input formControlName="customerEmail" type="email" />
-        @if (form.get('customerEmail')?.touched && form.get('customerEmail')?.invalid) {
-          <small class="invalid">Platný email je povinný</small>
         }
       </label>
       <label>Datum vystavení
@@ -40,7 +39,10 @@
           @for (s of statusOptions; track s) { <option [value]="s">{{ s }}</option> }
         </select>
       </label>
-      <label>Celková částka
+      <label>Celková částka bez daně
+        <input formControlName="subAmount" type="number" step="0.01" readonly />
+      </label>
+      <label>Celková částka s daní
         <input formControlName="amount" type="number" step="0.01" readonly />
       </label>
     </div>
@@ -49,17 +51,65 @@
     <table class="items">
       <thead>
         <tr>
-          <th>Popis</th><th>Množství</th><th>Jedn. cena</th><th>Celkem</th><th></th>
+          <th>Název</th>
+          <th>Popis</th>
+          <th>Jednotka</th>
+          <th>Množství</th>
+          <th>Jedn. cena</th>
+          <th>Celkem bez daně</th>
+          <th>DPH</th>
+          <th>Celkem s daní</th>
+          <th></th>
         </tr>
       </thead>
       <tbody>
         @for (item of items.controls; track item; let i = $index) {
           <tr [formGroup]="$any(item)">
-            <td><input formControlName="description" (change)="recalcItemTotal(i)" /></td>
-            <td><input formControlName="quantity" type="number" min="1" (input)="recalcItemTotal(i)" /></td>
-            <td><input formControlName="unitPrice" type="number" step="0.01" min="0" (input)="recalcItemTotal(i)" /></td>
-            <td><input formControlName="totalPrice" readonly /></td>
-            <td><button type="button" (click)="removeItem(i)" [disabled]="items.length===1">✕</button></td>
+            <td>
+              <input formControlName="name" />
+              @if (item.get('name')?.touched && item.get('name')?.invalid) {
+                <small class="invalid">Název je povinný</small>
+              }
+            </td>
+            <td>
+              <input formControlName="description" />
+              @if (item.get('description')?.touched && item.get('description')?.invalid) {
+                <small class="invalid">Popis je povinný</small>
+              }
+            </td>
+            <td>
+              <input formControlName="unit" />
+              @if (item.get('unit')?.touched && item.get('unit')?.invalid) {
+                <small class="invalid">Jednotka je povinná</small>
+              }
+            </td>
+            <td>
+              <input formControlName="quantity" type="number" min="0" (input)="recalcItemTotal(i)" />
+              @if (item.get('quantity')?.touched && item.get('quantity')?.invalid) {
+                <small class="invalid">Zadejte množství</small>
+              }
+            </td>
+            <td>
+              <input formControlName="unitPrice" type="number" step="0.01" min="0" (input)="recalcItemTotal(i)" />
+              @if (item.get('unitPrice')?.touched && item.get('unitPrice')?.invalid) {
+                <small class="invalid">Zadejte jednotkovou cenu</small>
+              }
+            </td>
+            <td>
+              <input formControlName="subTotalPrice" readonly />
+            </td>
+            <td>
+              <input formControlName="vat" type="number" min="0" (input)="recalcItemTotal(i)" />
+              @if (item.get('vat')?.touched && item.get('vat')?.invalid) {
+                <small class="invalid">Zadejte DPH</small>
+              }
+            </td>
+            <td>
+              <input formControlName="totalPrice" readonly />
+            </td>
+            <td>
+              <button type="button" (click)="removeItem(i)" [disabled]="items.length===1">✕</button>
+            </td>
           </tr>
         }
       </tbody>
