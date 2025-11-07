@@ -28,11 +28,6 @@ dependencies {
 
     implementation("com.google.zxing:core:3.5.1")
     implementation("com.google.zxing:javase:3.5.1")
-
-    // Spring Security and OAuth2 (added to match customer-service)
-    implementation("org.springframework.boot:spring-boot-starter-security")
-    implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
-    implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
 }
 
 
