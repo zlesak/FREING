@@ -10,9 +10,8 @@
     "test": "ng test",
     "openapi:clean": "rimraf src/app/api/generated && rimraf .openapi.*.hash && rimraf openapi-*.json && rimraf openapi.json && rimraf .openapi.hash",
     "openapi:refresh": "npm run openapi:clean && npm run openapi:multi",
-    "openapi:ensure": "node -e \"const fs = require('fs'); const path = 'src/app/api/generated/invoice/index.ts'; if (fs.existsSync(path)) { console.log('OpenAPI clients already present'); } else { console.log('Generating OpenAPI clients...'); process.exit(1); }\" || npm run openapi:multi",
     "openapi:multi": "node scripts/openapi-multi-gen.js",
-    "postinstall": "npm run openapi:ensure || echo Postinstall completed"
+    "postinstall": "npm run openapi:multi || echo Postinstall completed"
   },
   "prettier": {
     "printWidth": 100,
