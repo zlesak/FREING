@@ -5,6 +5,8 @@ import Keycloak, { KeycloakInstance, KeycloakInitOptions } from 'keycloak-js';
 @Injectable({ providedIn: 'root' })
 export class KeycloakService {
   private keycloakAuth!: KeycloakInstance;
+  private refreshTimeoutId: number | null = null;
+  private readonly refreshMinValidity = 30;
 
   public async init(): Promise<void> {
     this.keycloakAuth = new Keycloak({
@@ -22,6 +24,11 @@ export class KeycloakService {
     return new Promise((resolve, reject) => {
       this.keycloakAuth.init(initOptions).then((authenticated) => {
         if (authenticated) {
+          try {
+            this.scheduleTokenRefresh();
+          } catch (e) {
+            console.warn('Nepodařilo se naplánovat automatické obnovení tokenu', e);
+          }
           resolve();
         } else {
           reject('Neautentizováno');
@@ -43,6 +50,7 @@ export class KeycloakService {
   }
 
   public logout(): void {
+    this.clearRefreshTimer();
     this.keycloakAuth.logout();
   }
 
@@ -68,5 +76,67 @@ export class KeycloakService {
     }
 
     return requiredRoles.some(r => rolesSet.has(r));
+  }
+
+  private scheduleTokenRefresh(): void {
+    this.clearRefreshTimer();
+
+    if (!this.keycloakAuth || !this.keycloakAuth.tokenParsed) {
+      this.refreshTimeoutId = window.setTimeout(() => this.callUpdateToken(), 60 * 1000);
+      return;
+    }
+
+    try {
+      const tokenParsed: any = this.keycloakAuth.tokenParsed;
+      const exp = typeof tokenParsed.exp === 'number' ? tokenParsed.exp * 1000 : null;
+      const now = Date.now();
+
+      if (!exp) {
+        this.refreshTimeoutId = window.setTimeout(() => this.callUpdateToken(), 60 * 1000);
+        return;
+      }
+
+      const refreshAt = exp - (this.refreshMinValidity * 1000);
+      const msUntilRefresh = Math.max(refreshAt - now, 0);
+
+      if (msUntilRefresh <= 2000) {
+        this.refreshTimeoutId = window.setTimeout(() => this.callUpdateToken(), 500);
+      } else {
+        this.refreshTimeoutId = window.setTimeout(() => this.callUpdateToken(), msUntilRefresh);
+      }
+    } catch (e) {
+      console.warn('Chyba při plánování obnovení tokenu', e);
+      this.refreshTimeoutId = window.setTimeout(() => this.callUpdateToken(), 60 * 1000);
+    }
+  }
+
+  private clearRefreshTimer(): void {
+    if (this.refreshTimeoutId != null) {
+      try {
+        clearTimeout(this.refreshTimeoutId);
+      } catch (e) {
+        // ignore
+      }
+      this.refreshTimeoutId = null;
+    }
+  }
+
+  private callUpdateToken(): void {
+    if (!this.keycloakAuth) {
+      return;
+    }
+
+    this.keycloakAuth.updateToken(this.refreshMinValidity)
+      .then((refreshed) => {
+        this.scheduleTokenRefresh();
+      })
+      .catch((err) => {
+        console.warn('Nezdařené obnovení tokenu, přesměrování na přihlášení', err);
+        try {
+          this.login();
+        } catch (e) {
+          console.error('Chyba při volání login() po neúspěšném updateToken', e);
+        }
+      });
   }
 }

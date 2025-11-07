@@ -2,8 +2,10 @@ package invoice_service.models.invoices
 
 enum class InvoiceStatusEnum {
     DRAFT,
+    SENT,
     PENDING,
     PAID,
     CANCELLED,
-    OVERDUE
+    OVERDUE,
+    PAID_OVERDUE
 }
