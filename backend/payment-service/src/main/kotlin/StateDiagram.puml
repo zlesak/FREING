@@ -1,0 +1,54 @@
+@startuml
+'https://plantuml.com/state-diagram
+skinparam linetype ortho
+
+state "DRAFT\n(koncept)" as DRAFT
+state "SENT\n(odesláno zákazníkovi)" as SENT
+state "PENDING\n(čeká se na akce zákazníka)" as PENDING
+state "PAID\n(zapalceno včas)" as PAID
+state "OVERDUE\n(faktura po splatnosti)" as OVERDUE
+state "PAID_OVERDUE\n(zaplaceno po splatnosti)" as PAID_OVERDUE
+state "CANCELLED\n(zrušeno)" as CANCELLED
+
+DRAFT : IN REQ -  Vyvtořen draft faktury
+SENT : IN REQ -  Accountant odešle
+PENDING : IN REQ -  Uživatel zobrazí
+PAID : IN REQ -  Uživatel zaplatí včas
+OVERDUE : IN REQ -  Uživatel nezaplatí včas
+OVERDUE : IN REQ -  Uplyne splatnost bez zobrazení
+CANCELLED : IN REQ -  Accountant zruší
+CANCELLED : IN REQ -  Zruší se ještě před zobrazením
+CANCELLED : IN REQ -  Je zrušena před tím, než se zaplatí
+PAID_OVERDUE : IN REQ -  Uživatel zaplatí po splatnosti
+
+
+[*] -d-> DRAFT
+
+DRAFT -d-> SENT
+
+SENT -d-> PENDING 
+SENT -d-> CANCELLED 
+SENT -d> OVERDUE 
+
+PENDING -d-> PAID 
+PENDING -d-> CANCELLED
+PENDING -d-> OVERDUE
+
+OVERDUE -d-> PAID_OVERDUE 
+
+PAID -d-> [*]
+PAID_OVERDUE -l-> [*]
+
+CANCELLED -r-> [*]
+CANCELLED <-l[hidden]- [*]
+
+
+
+[*] -[hidden]-> DRAFT
+DRAFT -[hidden]d-> SENT
+SENT -[hidden]r-> PENDING
+PENDING -[hidden]r-> PAID
+PAID -[hidden]-> [*]
+
+
+@enduml
