@@ -31,6 +31,7 @@ class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception::class)
     fun handleAccessDenied(ex: Exception): ResponseEntity<String> {
+        logger.error(ex.message, ex)
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.message)
     }
 
