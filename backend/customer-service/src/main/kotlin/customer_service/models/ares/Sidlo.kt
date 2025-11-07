@@ -1,0 +1,33 @@
+package customer_service.models.ares
+
+data class Sidlo(
+    val kodStatu: String? = null,
+    val nazevStatu: String? = null,
+    val kodKraje: Int? = null,
+    val nazevKraje: String? = null,
+    val kodOkresu: Int? = null,
+    val nazevOkresu: String? = null,
+    val kodObce: Int? = null,
+    val nazevObce: String? = null,
+    val kodSpravnihoObvodu: Int? = null,
+    val nazevSpravnihoObvodu: String? = null,
+    val kodMestskehoObvodu: Int? = null,
+    val nazevMestskehoObvodu: String? = null,
+    val kodMestskeCastiObvodu: Int? = null,
+    val kodUlice: Int? = null,
+    val nazevMestskeCastiObvodu: String? = null,
+    val nazevUlice: String? = null,
+    val cisloDomovni: Int? = null,
+    val doplnekAdresy: String? = null,
+    val kodCastiObce: Int? = null,
+    val cisloOrientacni: Int? = null,
+    val cisloOrientacniPismeno: String? = null,
+    val nazevCastiObce: String? = null,
+    val kodAdresnihoMista: Int? = null,
+    val psc: Int? = null,
+    val textovaAdresa: String? = null,
+    val cisloDoAdresy: String? = null,
+    val standardizaceAdresy: Boolean? = null,
+    val pscTxt: String? = null,
+    val typCisloDomovni: Int? = null
+)
