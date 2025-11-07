@@ -1,6 +1,6 @@
 {
   "name": "frontend",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "scripts": {
     "ng": "ng",
     "start:docker": "npm run openapi:multi && ng serve --configuration docker --host 0.0.0.0 --port 4100",

@@ -2,6 +2,8 @@
 
 Tento modul poskytuje funkce pro správu faktur, včetně vytváření, aktualizace, mazání a načítání faktur.
 
+<hr>
+
 ## Changelog
 - version **v1.0.0** (2025-10-06)
   - Inicializace svc s funkcemi pro správu faktur.
@@ -11,3 +13,7 @@ Tento modul poskytuje funkce pro správu faktur, včetně vytváření, aktualiz
   - Přidán exchange rate client a endpoint pro získání kurzu. (https://github.com/fawazahmed0/exchange-api)
 - version **v1.0.3** (2025-10-20)
   - Messaging render-service->invoice-service->render-service.
+- version **v1.0.4** (2025-11-07)
+  - Úprava modelu Invoice a InvoiceItem, přidání nových polí a změna datových typů.
+  - Nové stavy InvoiceStatus.
+  - Refaktor API pro práci s fakturami.
