@@ -4,21 +4,22 @@ import com.google.zxing.BarcodeFormat
 import com.google.zxing.EncodeHintType
 import com.google.zxing.common.BitMatrix
 import com.google.zxing.qrcode.QRCodeWriter
+import com.uhk.fim.prototype.common.exceptions.invoice.ZugfredInvoiceServiceException
 import org.mustangproject.*
 import org.mustangproject.ZUGFeRD.Profiles
 import org.mustangproject.ZUGFeRD.ZUGFeRD2PullProvider
 import org.springframework.stereotype.Service
+import java.awt.Graphics2D
+import java.awt.image.BufferedImage
 import java.io.ByteArrayOutputStream
 import java.time.ZoneId
 import java.util.*
 import javax.imageio.ImageIO
-import java.awt.image.BufferedImage
-import java.awt.Graphics2D
 
 @Service
 class ZugferdService {
 
-    fun creteInvoice(invoice: invoice_service.models.invoices.Invoice, customer : Map<String, Any>): String {
+    fun createInvoice(invoice: invoice_service.models.invoices.Invoice, customer: Map<String, Any>): String {
 
         val i = Invoice()
 
@@ -61,14 +62,15 @@ class ZugferdService {
                 i.addNote(logoString)
             }
 
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
 
-        val zf2p = ZUGFeRD2PullProvider()
-        zf2p.setProfile(Profiles.getByName("BASIC"))
-        zf2p.generateXML(i)
-        return String(zf2p.xml)
+            val zf2p = ZUGFeRD2PullProvider()
+            zf2p.setProfile(Profiles.getByName("BASIC"))
+            zf2p.generateXML(i)
+            return String(zf2p.xml)
+
+        } catch (e: Exception) {
+            throw ZugfredInvoiceServiceException("Zugferd invoice processing failed: ${e.message ?: "Unknown error"}")
+        }
     }
 
     private fun getSupplierTradeParty(): TradeParty {
@@ -122,7 +124,7 @@ class ZugferdService {
         }
     }
 
-    fun toTradeParty(customer : Map<String, Any>): TradeParty {
+    fun toTradeParty(customer: Map<String, Any>): TradeParty {
         val name = customer["name"] as? String ?: ""
         val surname = customer["surname"] as? String ?: ""
         val email = customer["email"] as? String ?: ""
@@ -137,7 +139,9 @@ class ZugferdService {
         val bankCode = customer["bankCode"] as? String
         val bankAccount = customer["bankAccount"] as? String
         val currency = customer["currency"] as? String
-        val fullName = listOfNotNull(name.takeIf { it.isNotBlank() }, surname.takeIf { it.isNotBlank() }).joinToString(" ").ifBlank { name }
+        val fullName =
+            listOfNotNull(name.takeIf { it.isNotBlank() }, surname.takeIf { it.isNotBlank() }).joinToString(" ")
+                .ifBlank { name }
         val streetWithNumber = ("$street $houseNumber").trim()
 
         val tp = TradeParty(

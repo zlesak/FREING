@@ -10,17 +10,17 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener
 import org.springframework.amqp.support.converter.MessageConverter
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
-import rendering_service.PdfRenderingService
+import rendering_service.services.PdfRenderingService
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
 @Component
 class MessageListener @Autowired constructor(
     private val messageSender: MessageSender,
-    private val messageConverter: MessageConverter
+    private val messageConverter: MessageConverter,
+    private val pdfRenderingService: PdfRenderingService
 ) {
     private val renderingRequests = ConcurrentHashMap<String, Message>()
-    private val pdfRenderingService = PdfRenderingService()
 
     @RabbitListener(queues = [RabbitConfig.RENDERING_REQUESTS])
     fun receiveRenderingRequest(message: Message) {
@@ -35,7 +35,7 @@ class MessageListener @Autowired constructor(
             val invoiceRequest = InvoiceRequest(
                 requestId = request.requestId,
                 invoiceId = request.documentId,
-                action = "getById",
+                action = "renderInvoice",
                 payload = null
             )
             messageSender.sendInvoiceRequest(invoiceRequest, correlationId)

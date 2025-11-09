@@ -12,28 +12,42 @@
   }
 
   @if (!loading && !error && customers.length) {
-    <table class="customers-table">
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Jméno</th>
-          <th>Příjmení</th>
-          <th>Email</th>
-          <th>Telefon</th>
-          <th>Město</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let c of customers; index as i">
-          <td>{{ i + 1 }}</td>
-          <td>{{ c.name }}</td>
-          <td>{{ c.surname }}</td>
-          <td>{{ c.email }}</td>
-          <td>{{ c.phoneNumber }}</td>
-          <td>{{ c.city }}</td>
-        </tr>
-      </tbody>
-    </table>
+   <table class="customers-table">
+     <thead>
+       <tr>
+         <th>#</th>
+         <th>Jméno</th>
+         <th>Příjmení</th>
+         <th>Obchodní jméno</th>
+         <th>Email</th>
+         <th>Telefon</th>
+         <th>Město</th>
+         <th>Ulice</th>
+         <th>Číslo domu</th>
+         <th>PSČ</th>
+         <th>Země</th>
+         <th>IČO</th>
+         <th>DIČ</th>
+       </tr>
+     </thead>
+     <tbody>
+       <tr *ngFor="let c of customers; index as i">
+         <td>{{ i + 1 }}</td>
+         <td>{{ c.name }}</td>
+         <td>{{ c.surname }}</td>
+         <td>{{ c.tradeName }}</td>
+         <td>{{ c.email }}</td>
+         <td>{{ c.phoneNumber }}</td>
+         <td>{{ c.city }}</td>
+         <td>{{ c.street }}</td>
+         <td>{{ c.houseNumber }}</td>
+         <td>{{ c.zip }}</td>
+         <td>{{ c.country }}</td>
+         <td>{{ c.ico }}</td>
+         <td>{{ c.dic }}</td>
+       </tr>
+     </tbody>
+   </table>
   }
 
   @if (!loading && !error && !customers.length) {

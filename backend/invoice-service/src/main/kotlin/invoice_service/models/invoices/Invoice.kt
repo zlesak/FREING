@@ -1,7 +1,5 @@
 package invoice_service.models.invoices
 
-import com.fasterxml.jackson.core.type.TypeReference
-import com.fasterxml.jackson.databind.ObjectMapper
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.persistence.*
 import java.math.BigDecimal
@@ -21,7 +19,7 @@ data class Invoice(
     var invoiceNumber: String = "",
 
     @field:Schema(description = "Referenční číslo faktury", example = "REF-2025-0001")
-    @Column(nullable = false)
+    @Column(nullable = true)
     var referenceNumber: String? = null,
 
     @field:Schema(description = "ID zákazníka", example = "42")

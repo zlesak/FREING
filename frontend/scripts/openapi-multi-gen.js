@@ -59,6 +59,9 @@ function generate(service) {
   const outDir = `src/app/api/generated/${service.name}`;
   console.log(`[${service.name}] Generating client...`);
   try {
+    if (fs.existsSync(outDir)) {
+      fs.rmSync(outDir, { recursive: true, force: true });
+    }
     execSync(`npx openapi --input ${specFile} --output ${outDir} --client fetch --useOptions --useUnionTypes`, { stdio: 'inherit' });
     const hash = sha(fs.readFileSync(specFile, 'utf8'));
     fs.writeFileSync(`.openapi-${service.name}.hash`, hash);

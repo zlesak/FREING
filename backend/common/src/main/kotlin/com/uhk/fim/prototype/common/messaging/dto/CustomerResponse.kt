@@ -4,6 +4,6 @@ data class CustomerResponse(
     val requestId: String,
     val customerId: Long? = null,
     val status: String, // např. "ok", "not_found", "error"
-    val payload: Map<String, Any>? = null,
+    val payload: Map<String, Any?> = emptyMap(),
     val error: String? = null
 )

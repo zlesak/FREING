@@ -7,6 +7,7 @@ import invoice_service.dtos.invoices.requests.InvoiceUpdateRequest
 import invoice_service.dtos.invoices.responses.InvoicesPagedResponse
 import invoice_service.models.invoices.Invoice
 import invoice_service.models.invoices.InvoiceItem
+import invoice_service.models.invoices.InvoiceStatusEnum
 import invoice_service.repository.InvoiceRepository
 import jakarta.transaction.Transactional
 import org.slf4j.LoggerFactory
@@ -16,13 +17,13 @@ import org.springframework.stereotype.Service
 import java.time.Instant
 
 @Service
-class InvoiceService (
+class InvoiceService(
     private val repo: InvoiceRepository
 ) {
     private val logger = LoggerFactory.getLogger(GlobalExceptionHandler::class.java)
 
     @Transactional
-    fun createInvoice(request: InvoiceCreateRequest) : Invoice {
+    fun createInvoice(request: InvoiceCreateRequest): Invoice {
         if (repo.existsByInvoiceNumber(request.invoiceNumber)) {
             logger.warn("Faktura s tímto číslem již existuje.")
             throw WrongDataException("Faktura s tímto číslem již existuje.")
@@ -35,9 +36,11 @@ class InvoiceService (
         return repo.save(invoice)
     }
 
-    fun getInvoice(id: Long): Invoice? = repo.findByIdOrNull(id)
-
-    fun getAllInvoices(pageable: Pageable) : InvoicesPagedResponse<Invoice> {
+fun getInvoice(id: Long, fromMessaging: Boolean = false): Invoice? {
+        val invoice = repo.findByIdOrNull(id)
+        return if (fromMessaging && invoice?.status == InvoiceStatusEnum.DRAFT) null else invoice
+    }
+    fun getAllInvoices(pageable: Pageable): InvoicesPagedResponse<Invoice> {
         val allInvoices = repo.findAll()
 
         val startIndex = pageable.pageNumber * pageable.pageSize
@@ -59,7 +62,7 @@ class InvoiceService (
 
     @Transactional
     fun updateInvoice(id: Long, request: InvoiceUpdateRequest): Invoice? {
-        return repo.findById(id).map { existingInvoice ->
+        return repo.findById(id).filter { it.status == InvoiceStatusEnum.DRAFT }.map { existingInvoice ->
             existingInvoice.invoiceNumber = request.invoiceNumber
             existingInvoice.customerId = request.customerId
             existingInvoice.referenceNumber = request.referenceNumber
@@ -96,9 +99,12 @@ class InvoiceService (
     }
 
     @Transactional
-    fun deleteInvoice(id: Long) {
-        if (repo.existsById(id)) {
+    fun deleteInvoice(id: Long) : Boolean {
+        val invoice = repo.findByIdOrNull(id)
+        if (invoice != null && invoice.status == InvoiceStatusEnum.DRAFT) {
             repo.deleteById(id)
+            return true
         }
+        return false
     }
 }

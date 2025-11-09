@@ -1,10 +1,8 @@
 package customer_service.controller
 
-import customer_service.dto.request.CreateCustomerDto
-import customer_service.dto.response.CustomerDto
-import customer_service.dto.response.CustomersPagedResponse
-import customer_service.dto.response.toDto
-import customer_service.dto.response.toEntity
+import customer_service.dto.customer.request.CreateCustomerDto
+import customer_service.dto.customer.response.CustomerDto
+import customer_service.dto.customer.response.CustomersPagedResponse
 import customer_service.models.CustomerEntity
 import customer_service.service.CustomerService
 import io.swagger.v3.oas.annotations.Parameter
@@ -46,5 +44,10 @@ class CustomerController(
     ): CustomersPagedResponse<CustomerEntity> {
         val pageable = PageRequest.of(page, size)
         return customerService.getAllCustomers(pageable)
+    }
+    @GetMapping("/get-customers-info-from-ares/{ico}")
+
+    fun getCustomerInfoFromAresByIco(@PathVariable ico: String): CustomerEntity {
+        return customerService.getCustomerFromAres(ico)
     }
 }

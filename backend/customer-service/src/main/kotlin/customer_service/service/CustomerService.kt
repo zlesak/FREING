@@ -2,7 +2,9 @@ package customer_service.service
 
 import com.uhk.fim.prototype.common.exceptions.NotFoundException
 import com.uhk.fim.prototype.common.exceptions.WrongDataException
-import customer_service.dto.response.CustomersPagedResponse
+import com.uhk.fim.prototype.common.exceptions.customer.CustomerNotFoundException
+import customer_service.dto.customer.response.CustomersPagedResponse
+import customer_service.external.AresClient
 import customer_service.models.CustomerEntity
 import customer_service.repo.CustomerRepo
 import org.springframework.data.domain.Pageable
@@ -11,22 +13,29 @@ import org.springframework.stereotype.Service
 
 @Service
 class CustomerService(
-    private val customerRepo: CustomerRepo
+    private val customerRepo: CustomerRepo,
+    private val aresClient: AresClient
 ) {
 
     fun create(customer: CustomerEntity): CustomerEntity {
-        getCustomerByEmailOrPhoneNumber(customer.email, customer.phoneNumber)?.let { throw WrongDataException("Customer already exists!") }
+        getCustomerByEmailOrPhoneNumber(
+            customer.email,
+            customer.phoneNumber
+        )?.let { throw WrongDataException("Customer already exists!") }
 
-        if (customer.name.isBlank()) throw WrongDataException("Customer name must be fill!")
-        if (customer.surname.isBlank()) throw WrongDataException("Customer surname must be fill!")
+        if (customer.tradeName.isBlank() && (customer.name.isBlank() || customer.surname.isBlank())) {
+            throw WrongDataException("Musíte vyplnit buď jméno a příjmení, nebo obchodní jméno!")
+        }
+        if (customer.tradeName.isNotBlank() && (customer.name.isNotBlank() || customer.surname.isNotBlank())) {
+            throw WrongDataException("Vyplňte buď jméno a příjmení, nebo obchodní jméno, ne obojí!")
+        }
         if (customer.phoneNumber.isBlank()) throw WrongDataException("Customer phone must be fill!")
         if (customer.email.isBlank()) throw WrongDataException("Customer email must be fill!")
         return customerRepo.save(customer)
     }
 
     fun update(customer: CustomerEntity): CustomerEntity {
-        val existedCustomer = getCustomerByEmailOrPhoneNumber(customer.email, customer.phoneNumber) ?: throw NotFoundException("Customer not found!")
-
+        val existedCustomer = getCustomerById(customer.id!!, false)
 
         val updatedCustomer = existedCustomer.apply {
             if (customer.name.isNotBlank()) name = customer.name
@@ -50,20 +59,24 @@ class CustomerService(
     }
 
     fun deleteCustomer(id: Long) {
-        customerRepo.deleteById(id)
+        val customer = customerRepo.findByIdOrNull(id) ?: throw NotFoundException("Customer not found!")
+        customer.deleted = true
+        customerRepo.save(customer)
     }
 
-    fun getCustomerById(id: Long): CustomerEntity {
-        return customerRepo.findByIdOrNull(id) ?: throw NotFoundException("Customer not found!")
+    fun getCustomerById(id: Long, fromMessaging: Boolean = false): CustomerEntity {
+        val customer = customerRepo.findByIdOrNull(id) ?: throw CustomerNotFoundException("Customer not found!")
+        if (!fromMessaging && customer.deleted) throw CustomerNotFoundException("Customer not found!")
+        return customer
     }
 
 
     private fun getCustomerByEmailOrPhoneNumber(email: String, phoneNumber: String): CustomerEntity? {
-       return customerRepo.findByEmailOrPhoneNumber(email, phoneNumber)
+        return customerRepo.findByEmailOrPhoneNumber(email, phoneNumber)?.takeIf { !it.deleted }
     }
 
     fun getAllCustomers(pageable: Pageable): CustomersPagedResponse<CustomerEntity> {
-        val allCustomers = customerRepo.findAll()
+        val allCustomers = customerRepo.findAll().filter { !it.deleted }
 
         val startIndex = pageable.pageNumber * pageable.pageSize
         val endIndex = minOf(startIndex + pageable.pageSize, allCustomers.size)
@@ -80,5 +93,18 @@ class CustomerService(
             page = pageable.pageNumber,
             size = pageable.pageSize
         )
+    }
+
+    fun getCustomerFromAres(ico: String): CustomerEntity {
+        try {
+            val subject = aresClient.getSubjectByIcoARES(ico)
+            if (subject != null) {
+                return subject.toCustomerEntity()
+            } else {
+                throw NotFoundException("Nepodařilo se najít subjekt v ARES s IČO: $ico")
+            }
+        } catch (e: Exception) {
+            throw NotFoundException("Chyba při komunikaci s ARES: ${e.message}")
+        }
     }
 }

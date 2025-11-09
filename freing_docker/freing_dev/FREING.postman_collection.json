@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "28319eb8-62c8-4bda-b700-8e26e4bfbced",
+		"_postman_id": "fd3cf93a-acd5-4d7f-9aba-469cd2dbf6e3",
 		"name": "FREING",
 		"description": "# Postman collection for MOIS project FREING\n\n## Team Endor\n\n### AR 2025/26 ZS\n\n#### Description\n\nCollection is divided per service and should have all endpoints set up with default data and schema for those, where data are passed as a request body.\n\n### Authentication\n\n- The collection has set global authentication via the OAuth2, we are using the **frontend** ClientID as it is the only client able to send the requests to service after some client logs in.\n    \n- For you to acquire a new token, refer to the Authorization tab here in Postman collection root and scroll to button **Get New Authentication Token**. Use the returned token and continue in sending your requests.\n    \n- Tokens are set to autorefresh, if this is not the desired behaviour for your case, turn this feature of.\n    \n- In order to sign in, use any of the user credential, you will then have the ROLES and RIGHTS of the signed in user. Use Alice in most of the times, if there is some functionality for Bob or Customer, sign as them instead.\n    \n\n** Note to team devs: Make sure tu update this collection and push it to the repository when endpoints change, as we are not currently versioning the API!\n\n** Disclaimer: some example data may or may not be valid at some point of development, update them if the is some issue with them.",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
@@ -61,7 +61,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"id\": 1,\n    \"name\": \"Jan\",\n    \"surname\": \"Novák\",\n    \"email\": \"jan.novak@example.com\",\n    \"phoneNumber\": \"+420123456789\",\n    \"birthDate\": \"1990-01-01T00:00:00.000+00:00\",\n    \"street\": \"Hlavní ulice\",\n    \"houseNumber\": \"123\",\n    \"city\": \"Praha\",\n    \"zip\": \"11000\",\n    \"country\": \"CZ\",\n    \"ico\": \"12345678\",\n    \"dic\": \"CZ12345678\",\n    \"bankCode\": \"0100\",\n    \"bankAccount\": \"1234567890\",\n    \"currency\": \"CZK\"\n}",
+									"raw": "{\n    \"id\": {{customerId}},\n    \"name\": \"Jan\",\n    \"surname\": \"Novák\",\n    \"tradeName\": \"\",\n    \"email\": \"jan.novak@example.com\",\n    \"phoneNumber\": \"+420123456789\",\n    \"birthDate\": \"1990-01-01T00:00:00.000+00:00\",\n    \"street\": \"Hlavní ulice\",\n    \"houseNumber\": \"123\",\n    \"city\": \"Praha\",\n    \"zip\": \"11000\",\n    \"country\": \"CZ\",\n    \"ico\": \"12345678\",\n    \"dic\": \"CZ12345678\",\n    \"bankCode\": \"0100\",\n    \"bankAccount\": \"1234567890\",\n    \"currency\": \"CZK\"\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -153,6 +153,31 @@
 											"key": "size",
 											"value": "10",
 											"description": "Size of the customer page"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get customer info via ICO from ARES",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseURL}}{{customersEndpoint}}/get-customers-info-from-ares/:Ico",
+									"host": [
+										"{{baseURL}}{{customersEndpoint}}"
+									],
+									"path": [
+										"get-customers-info-from-ares",
+										":Ico"
+									],
+									"variable": [
+										{
+											"key": "Ico",
+											"value": "00022985",
+											"description": "Ico"
 										}
 									]
 								}
@@ -287,7 +312,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"invoiceNumber\": \"INV-20250001\",\n    \"referenceNumber\": \"REF-2025-0001\",\n    \"customerId\": {{customerId}},\n    \"issueDate\": \"2025-10-05\",\n    \"dueDate\": \"2025-11-05\",\n    \"amount\": 1210.00,\n    \"currency\": \"CZK\",\n    \"status\": \"DRAFT\",\n    \"items\": [\n        {\n            \"name\": \"Schůzka\",\n            \"description\": \"Konzultace ohledně FREING\",\n            \"code\": \"K001\",\n            \"unit\": \"hour\",\n            \"quantity\": 1,\n            \"unitPrice\": 1000.00,\n            \"vat\": 21,\n            \"totalPrice\": 1210.00\n        }\n    ]\n}",
+									"raw": "{\n    \"invoiceNumber\": \"INV-2025000212\",\n    \"referenceNumber\": \"REF-2025-0001\",\n    \"customerId\": {{customerId}},\n    \"issueDate\": \"2025-10-05\",\n    \"dueDate\": \"2025-11-05\",\n    \"amount\": 1210.00,\n    \"currency\": \"CZK\",\n    \"status\": \"DRAFT\",\n    \"items\": [\n        {\n            \"name\": \"Schůzka\",\n            \"description\": \"Konzultace ohledně FREING\",\n            \"unit\": \"hour\",\n            \"quantity\": 1,\n            \"unitPrice\": 1000.00,\n            \"vat\": 21,\n            \"totalPrice\": 1210.00\n        }\n    ]\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -313,7 +338,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"invoiceNumber\": \"INV-20250001\",\n    \"referenceNumber\": \"REF-2025-0001\",\n    \"customerId\": {{customerId}},\n    \"issueDate\": \"2025-10-05\",\n    \"dueDate\": \"2025-11-05\",\n    \"amount\": 2420.00,\n    \"currency\": \"CZK\",\n    \"status\": \"DRAFT\",\n    \"items\": [\n        {\n            \"id\": 1,\n            \"name\": \"Schůzka\",\n            \"description\": \"Konzultace ohledně FREING\",\n            \"code\": \"K001\",\n            \"unit\": \"hour\",\n            \"quantity\": 1,\n            \"unitPrice\": 1000.00,\n            \"vat\": 21,\n            \"totalPrice\": 1210.00\n        },\n        {\n            \"name\": \"Schůzka 2\",\n            \"description\": \"Konzultace ohledně FREING\",\n            \"code\": \"K001\",\n            \"unit\": \"hour\",\n            \"quantity\": 1,\n            \"unitPrice\": 1000.00,\n            \"vat\": 21,\n            \"totalPrice\": 1210.00\n        }\n    ]\n}",
+									"raw": "{\n    \"invoiceNumber\": \"INV-20250001\",\n    \"referenceNumber\": \"REF-2025-0001\",\n    \"customerId\": {{customerId}},\n    \"issueDate\": \"2025-10-05\",\n    \"dueDate\": \"2025-11-05\",\n    \"amount\": 2420.00,\n    \"currency\": \"CZK\",\n    \"status\": \"SENT\",\n    \"items\": [\n        {\n            \"id\": 1,\n            \"name\": \"Schůzka\",\n            \"description\": \"Konzultace ohledně FREING\",\n            \"code\": \"K001\",\n            \"unit\": \"hour\",\n            \"quantity\": 1,\n            \"unitPrice\": 1000.00,\n            \"vat\": 21,\n            \"totalPrice\": 1210.00\n        },\n        {\n            \"name\": \"Schůzka 2\",\n            \"description\": \"Konzultace ohledně FREING\",\n            \"code\": \"K001\",\n            \"unit\": \"hour\",\n            \"quantity\": 1,\n            \"unitPrice\": 1000.00,\n            \"vat\": 21,\n            \"totalPrice\": 1210.00\n        }\n    ]\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -413,6 +438,32 @@
 											"key": "size",
 											"value": "10",
 											"description": "Invoice page size"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get invoice by ID - XML",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseURL}}{{invoicesEndpoint}}/get-by-id/:Id/xml",
+									"host": [
+										"{{baseURL}}{{invoicesEndpoint}}"
+									],
+									"path": [
+										"get-by-id",
+										":Id",
+										"xml"
+									],
+									"variable": [
+										{
+											"key": "Id",
+											"value": "{{invoiceId}}",
+											"description": "Invoice Id"
 										}
 									]
 								}

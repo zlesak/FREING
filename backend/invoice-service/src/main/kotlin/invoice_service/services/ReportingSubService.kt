@@ -4,7 +4,7 @@ import invoice_service.dtos.reports.requests.InvoiceReportRequest
 import invoice_service.dtos.reports.responses.AggregatedReportResponse
 import invoice_service.dtos.reports.responses.AllInvoicesReportResponse
 import invoice_service.dtos.reports.responses.CustomerInvoicesReportResponse
-import invoice_service.messaging.servicesQueries.CustomerServiceQueries
+import invoice_service.messaging.handlers.CustomerServiceHandler
 import invoice_service.models.invoices.Invoice
 import invoice_service.repository.InvoiceRepository
 import org.springframework.stereotype.Service
@@ -14,7 +14,7 @@ import java.time.LocalDateTime
 @Service
 class ReportingSubService(
     private val repo: InvoiceRepository,
-    private val customerServiceQueries: CustomerServiceQueries
+    private val customerServiceHandler: CustomerServiceHandler
 ) {
 
     fun generateAggregatedReport(invoices: List<Invoice>): AggregatedReportResponse {
@@ -25,7 +25,7 @@ class ReportingSubService(
                 CustomerInvoicesReportResponse(
                     invoiceCount = list.size,
                     totalAmount = list.fold(BigDecimal.ZERO) { acc, inv -> acc + inv.amount },
-                    customerName = customerServiceQueries.getCustomerNameById(id)
+                    customerName = customerServiceHandler.getCustomerNameById(id)
                 )
             }
         val invoiceSummaries = invoices.map { inv ->
