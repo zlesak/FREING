@@ -1,15 +1,23 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, inject, OnInit} from '@angular/core';
 import { CustomersServiceController } from '../controller/customers.service';
 import { CustomerApi } from '../../../api/generated';
+import {Router} from '@angular/router';
+import {MatButton} from '@angular/material/button';
+import {MatIcon} from '@angular/material/icon';
 
 @Component({
   selector: 'app-customers-page',
   templateUrl: './customers-page.component.html',
   styleUrl: './customers-page.component.css',
-  standalone: false
+  imports: [
+    MatButton,
+    MatIcon
+  ],
+  standalone: true
 })
 
 export class CustomersPageComponent implements OnInit {
+  protected readonly router = inject(Router);
   customers: CustomerApi.CustomerDto[] = [];
   loading = false;
   error?: string;

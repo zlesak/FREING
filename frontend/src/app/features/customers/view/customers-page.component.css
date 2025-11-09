@@ -1,7 +1,7 @@
 /* ...existing code... */
 
 .page.customers {
-  max-width: 900px;
+  width: 100%;
   margin: 0 auto;
 }
 
@@ -29,3 +29,12 @@
   color: #b30000;
   margin-bottom: 0.5rem;
 }
+.add-button {
+  background-color: #99fb9f;
+
+  cursor: pointer;
+  border-radius: 10px;
+  margin: 10px;
+  color: white;
+}
+

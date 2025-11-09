@@ -1,40 +1,42 @@
 import { environment } from '../../../../environments/environment';
-import { Injectable } from '@angular/core';
+import {inject, Injectable} from '@angular/core';
 import { from, Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { CustomerApi } from '../../../api/generated';
+import {CustomerControllerService} from '../../../api/generated/customer';
 
 @Injectable({ providedIn: 'root' })
 export class CustomersServiceController {
+  private readonly customerControllerService = inject(CustomerControllerService);
   constructor() {
     CustomerApi.OpenAPI.BASE = environment.apiBase;
   }
 
   createCustomer(request: CustomerApi.CreateCustomerDto): Observable<CustomerApi.CustomerDto> {
-    return from(CustomerApi.CustomerControllerService.create({ requestBody: request })).pipe(
+    return from(this.customerControllerService.create({ requestBody: request })).pipe(
       catchError(this.handleError)
     );
   }
 
   updateCustomer(request: CustomerApi.CustomerDto): Observable<CustomerApi.CustomerDto> {
-    return from(CustomerApi.CustomerControllerService.update({ requestBody: request })).pipe(
+    return from(this.customerControllerService.update({ requestBody: request })).pipe(
       catchError(this.handleError)
     );
   }
 
   getCustomer(id: number): Observable<CustomerApi.Customer> {
-    return from(CustomerApi.CustomerControllerService.getById({ id })).pipe(catchError(this.handleError));
+    return from(this.customerControllerService.getById({ id })).pipe(catchError(this.handleError));
   }
 
   deleteCustomer(id: number): Observable<void> {
-    return from(CustomerApi.CustomerControllerService.delete({ id })).pipe(
+    return from(this.customerControllerService.delete({ id })).pipe(
       map(() => void 0),
       catchError(this.handleError)
     );
   }
 
   getCustomers(page = 0, size = 10): Observable<CustomerApi.PagedModelCustomerDto> {
-    return from(CustomerApi.CustomerControllerService.getAll({ page, size })).pipe(
+    return from(this.customerControllerService.getAll({ page, size })).pipe(
       catchError(this.handleError)
     );
   }
