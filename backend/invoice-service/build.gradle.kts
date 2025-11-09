@@ -22,12 +22,18 @@ repositories {
 dependencies {
     implementation(project(":common"))
     implementation("org.modelmapper:modelmapper:3.2.5")
-    runtimeOnly("com.h2database:h2")
-    testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
     implementation("org.mustangproject:validator:2.20.0:shaded")
-
     implementation("com.google.zxing:core:3.5.1")
     implementation("com.google.zxing:javase:3.5.1")
+
+    runtimeOnly("com.h2database:h2")
+
+    testImplementation("org.mockito.kotlin:mockito-kotlin:4.1.0")
+    testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
+    testImplementation("org.mockito:mockito-core:5.2.0")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
+
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 
