@@ -1,8 +1,12 @@
 package invoice_service.controllers
 
+import com.uhk.fim.prototype.common.messaging.dto.InvoiceRequest
+import com.uhk.fim.prototype.common.messaging.dto.InvoiceResponse
 import invoice_service.dtos.invoices.requests.InvoiceCreateRequest
 import invoice_service.dtos.invoices.requests.InvoiceUpdateRequest
 import invoice_service.dtos.invoices.responses.InvoicesPagedResponse
+import invoice_service.messaging.MessageSender
+import invoice_service.messaging.pendingMessages.PendingInvoiceMessages
 import invoice_service.models.invoices.Invoice
 import invoice_service.services.InvoiceService
 import io.swagger.v3.oas.annotations.Operation
@@ -15,11 +19,18 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.data.domain.PageRequest
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import java.util.*
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.TimeUnit
 
 @Tag(name = "Invoices", description = "API pro správu faktur")
 @RestController
 @RequestMapping("/api/invoices")
-class InvoiceController (private val service: InvoiceService) {
+class InvoiceController(
+    private val service: InvoiceService,
+    private val pendingInvoiceMessages: PendingInvoiceMessages,
+    private val messageSender: MessageSender
+) {
 
     @Operation(summary = "Získat všechny faktury", description = "Vrací stránkovaný seznam všech faktur.")
     @GetMapping("/get-invoices-pages")
@@ -39,20 +50,52 @@ class InvoiceController (private val service: InvoiceService) {
         @Parameter(description = "ID faktury", example = "1")
         @PathVariable id: Long
     ): ResponseEntity<Invoice> =
-        service.getInvoice(id)?.let{ ResponseEntity.ok(it) }?:(ResponseEntity.notFound().build())
+        service.getInvoice(id)?.let { ResponseEntity.ok(it) } ?: (ResponseEntity.notFound().build())
+
+    @Operation(summary = "Získat fakturu podle ID", description = "Vrací detail faktury podle jejího ID.")
+
+    @GetMapping("/get-by-id/{id}/xml")
+    fun getInvoiceXml(
+        @Parameter(description = "ID faktury", example = "1")
+        @PathVariable id: Long
+    ): ResponseEntity<String> {
+        val correlationId = UUID.randomUUID().toString()
+        val future = CompletableFuture<InvoiceResponse>()
+        pendingInvoiceMessages.registerInvoiceResponseFuture(correlationId, future)
+        messageSender.sendInvoiceRequest(
+            InvoiceRequest(
+                requestId = correlationId,
+                invoiceId = id,
+                payload = null,
+                action = "renderInvoice"
+            ),
+            correlationId
+        )
+        val response = future.get(10, TimeUnit.SECONDS)
+        return response.payload?.get("xml")?.let { ResponseEntity.ok(it.toString()) } ?: ResponseEntity.notFound()
+            .build()
+    }
 
     @Operation(summary = "Vytvořit novou fakturu", description = "Vytvoří novou fakturu na základě požadavku.")
     @ApiResponses(
         value = [
-            ApiResponse(responseCode = "200", description = "Faktura úspěšně vytvořena", content = [Content(schema = Schema(implementation = Invoice::class))]),
-            ApiResponse(responseCode = "409", description = "Faktura s tímto číslem již existuje", content = [Content(schema = Schema(example = "{\"error\": \"Faktura s tímto číslem již existuje.\"}"))])
+            ApiResponse(
+                responseCode = "200",
+                description = "Faktura úspěšně vytvořena",
+                content = [Content(schema = Schema(implementation = Invoice::class))]
+            ),
+            ApiResponse(
+                responseCode = "409",
+                description = "Faktura s tímto číslem již existuje",
+                content = [Content(schema = Schema(example = "{\"error\": \"Faktura s tímto číslem již existuje.\"}"))]
+            )
         ]
     )
     @PostMapping("/create")
     fun createInvoice(
         @Parameter(description = "Data pro vytvoření faktury")
         @RequestBody request: InvoiceCreateRequest
-    ):  Invoice {
+    ): Invoice {
         return service.createInvoice(request)
     }
 

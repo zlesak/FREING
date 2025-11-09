@@ -16,13 +16,13 @@ import org.springframework.stereotype.Service
 import java.time.Instant
 
 @Service
-class InvoiceService (
+class InvoiceService(
     private val repo: InvoiceRepository
 ) {
     private val logger = LoggerFactory.getLogger(GlobalExceptionHandler::class.java)
 
     @Transactional
-    fun createInvoice(request: InvoiceCreateRequest) : Invoice {
+    fun createInvoice(request: InvoiceCreateRequest): Invoice {
         if (repo.existsByInvoiceNumber(request.invoiceNumber)) {
             logger.warn("Faktura s tímto číslem již existuje.")
             throw WrongDataException("Faktura s tímto číslem již existuje.")
@@ -37,7 +37,7 @@ class InvoiceService (
 
     fun getInvoice(id: Long): Invoice? = repo.findByIdOrNull(id)
 
-    fun getAllInvoices(pageable: Pageable) : InvoicesPagedResponse<Invoice> {
+    fun getAllInvoices(pageable: Pageable): InvoicesPagedResponse<Invoice> {
         val allInvoices = repo.findAll()
 
         val startIndex = pageable.pageNumber * pageable.pageSize

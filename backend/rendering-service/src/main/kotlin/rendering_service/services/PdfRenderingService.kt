@@ -1,8 +1,13 @@
-package rendering_service
+package rendering_service.services
 
 import com.itextpdf.text.pdf.BaseFont
+import org.springframework.stereotype.Service
 import org.xhtmlrenderer.pdf.ITextRenderer
-import java.io.*
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
+import java.io.IOException
+import java.io.StringReader
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
@@ -12,7 +17,7 @@ import javax.xml.transform.TransformerFactory
 import javax.xml.transform.stream.StreamResult
 import javax.xml.transform.stream.StreamSource
 
-
+@Service
 class PdfRenderingService {
     fun renderInvoicePdf(invoiceData: Map<String, Any>): ByteArray {
         val xml = invoiceData["xml"] as? String
