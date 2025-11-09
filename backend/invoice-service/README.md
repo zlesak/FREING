@@ -17,3 +17,7 @@ Tento modul poskytuje funkce pro správu faktur, včetně vytváření, aktualiz
   - Úprava modelu Invoice a InvoiceItem, přidání nových polí a změna datových typů.
   - Nové stavy InvoiceStatus.
   - Refaktor API pro práci s fakturami.
+- version **v1.0.5** (2025-11-09)
+  - Logika pro mazání faktur.
+  - Rozdělení messega handlingu do samostatných souborů.
+  - Unit testy

@@ -7,3 +7,7 @@ Je napojeno na ARES pro získáváníé informací o firmách na základě IČO.
 - version **v1.0.0** (2025-11-07)
  - Implementována základní funkcionalita pro správu zákazníků.
  - Napojení na ARES pro získávání informací o firmách.
+- version **v1.0.1** (2025-11-09)
+  - Rozdělení message handlingu do samostatných souborů
+  - Soft delete zákazníků místo fyzického mazání
+  - Lepší error handling
