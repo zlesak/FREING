@@ -16,6 +16,7 @@ class CustomerServiceHandler @Autowired constructor(
     private val messageSender: MessageSender,
     private val pendingCustomerMessages: PendingCustomerMessages
 ) {
+    @Throws(CustomerNotFoundException::class)
     fun getCustomerNameById(
         customerId: Long,
         timeoutSeconds: Long = 5
@@ -31,7 +32,7 @@ class CustomerServiceHandler @Autowired constructor(
             throw CustomerNotFoundException("Failed to get customer: ${response.error ?: "Unknown error"}")
         }
     }
-
+    @Throws(CustomerNotFoundException::class)
     fun getCustomerById(
         customerId: Long,
         timeoutSeconds: Long = 5

@@ -14,10 +14,10 @@ import java.util.concurrent.ConcurrentHashMap
 
 @Component
 class ExchangeRatesClient(
-    private val props: ExchangeRatesProperties
+    private val props: ExchangeRatesProperties,
+    private val restTemplate: RestTemplate = RestTemplate()
 ) : IExchangeRatesClient {
 
-    private val restTemplate = RestTemplate()
     private val logger = LoggerFactory.getLogger(javaClass)
 
     data class CacheEntry(val rate: BigDecimal, val expiresAt: Instant)
@@ -50,6 +50,3 @@ class ExchangeRatesClient(
         }
     }
 }
-
-
-
