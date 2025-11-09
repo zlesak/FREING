@@ -20,10 +20,10 @@ data class CustomerEntity(
     @Column(nullable = false)
     var tradeName: String = "",
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     var email: String = "",
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     var phoneNumber: String = "",
 
     @Column(nullable = true)
@@ -58,6 +58,9 @@ data class CustomerEntity(
 
     @Column(nullable = true)
     var currency: String? = null,
+
+    @Column(nullable = false)
+    var deleted: Boolean = false
 ) {
     fun toMap(): Map<String, Any?> = mapOf(
         "name" to name,
@@ -78,7 +81,7 @@ data class CustomerEntity(
     )
     fun toDto(): CustomerDto {
         return CustomerDto(
-            id = id,
+            id = id ?: -1,
             name = name,
             surname = surname,
             tradeName = tradeName,

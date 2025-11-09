@@ -1,4 +1,4 @@
-package invoice_service.messaging.servicesHandlers
+package invoice_service.messaging.handlers
 
 import com.uhk.fim.prototype.common.exceptions.customer.CustomerNotFoundException
 import com.uhk.fim.prototype.common.messaging.dto.CustomerResponse
@@ -69,7 +69,7 @@ class CustomerServiceHandlerTest {
                 requestId = "r1",
                 customerId = 42L,
                 status = "error",
-                payload = null,
+                payload = emptyMap(),
                 error = "Not found"
             )
             fut.complete(resp)

@@ -1,4 +1,4 @@
-package invoice_service.messaging.servicesHandlers
+package invoice_service.messaging.handlers
 
 import com.uhk.fim.prototype.common.messaging.dto.InvoiceRequest
 import com.uhk.fim.prototype.common.messaging.dto.InvoiceResponse

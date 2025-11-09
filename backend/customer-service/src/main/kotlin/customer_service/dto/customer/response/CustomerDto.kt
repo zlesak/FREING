@@ -4,7 +4,7 @@ import customer_service.models.CustomerEntity
 import java.util.Date
 
 data class CustomerDto(
-    val id: Long? = null,
+    val id: Long,
     val name: String,
     val surname: String,
     val tradeName: String,

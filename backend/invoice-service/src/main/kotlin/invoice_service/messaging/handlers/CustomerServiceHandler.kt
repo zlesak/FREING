@@ -1,4 +1,4 @@
-package invoice_service.messaging.servicesHandlers
+package invoice_service.messaging.handlers
 
 import com.uhk.fim.prototype.common.exceptions.customer.CustomerNotFoundException
 import com.uhk.fim.prototype.common.messaging.dto.CustomerRequest
@@ -22,7 +22,7 @@ class CustomerServiceHandler @Autowired constructor(
         timeoutSeconds: Long = 5
     ): String {
         val response = sendCustomerRequestAndReturnResponse(customerId, timeoutSeconds)
-        if (response.status == "ok" && response.payload != null) {
+        if (response.status == "ok") {
             @Suppress("UNCHECKED_CAST")
             val payload = response.payload as Map<String, Any>
             val name = payload["name"] as? String
@@ -38,7 +38,7 @@ class CustomerServiceHandler @Autowired constructor(
         timeoutSeconds: Long = 5
     ): Map<String, Any> {
         val response = sendCustomerRequestAndReturnResponse(customerId, timeoutSeconds)
-        if (response.status == "ok" && response.payload != null) {
+        if (response.status == "ok") {
             @Suppress("UNCHECKED_CAST")
             return response.payload as Map<String, Any>
         } else {

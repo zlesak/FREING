@@ -6,8 +6,8 @@ import com.uhk.fim.prototype.common.messaging.dto.InvoiceRequest
 import com.uhk.fim.prototype.common.messaging.dto.InvoiceResponse
 import invoice_service.messaging.pendingMessages.PendingCustomerMessages
 import invoice_service.messaging.pendingMessages.PendingInvoiceMessages
-import invoice_service.messaging.servicesHandlers.InvalidMessageActionHandler
-import invoice_service.messaging.servicesHandlers.InvoiceServiceHandler
+import invoice_service.messaging.handlers.InvalidMessageActionHandler
+import invoice_service.messaging.handlers.InvoiceServiceHandler
 import org.springframework.amqp.core.Message
 import org.springframework.amqp.rabbit.annotation.RabbitListener
 import org.springframework.amqp.support.converter.MessageConverter

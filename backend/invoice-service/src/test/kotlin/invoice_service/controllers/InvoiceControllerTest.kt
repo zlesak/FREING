@@ -117,11 +117,25 @@ class InvoiceControllerTest {
         val service: InvoiceService = Mockito.mock()
         val pending: PendingInvoiceMessages = Mockito.mock()
         val sender: MessageSender = Mockito.mock()
+        whenever(service.deleteInvoice(11L)).thenReturn(true)
 
         val controller = InvoiceController(service, pending, sender)
         val resp = controller.deleteInvoice(11L)
         assertTrue(resp.statusCode.is2xxSuccessful || resp.statusCode.value() == 204)
         Mockito.verify(service).deleteInvoice(11L)
+    }
+
+    @Test
+    fun `deleteInvoice returns 409 when service delete returns false`() {
+        val service: InvoiceService = Mockito.mock()
+        val pending: PendingInvoiceMessages = Mockito.mock()
+        val sender: MessageSender = Mockito.mock()
+        whenever(service.deleteInvoice(12L)).thenReturn(false)
+
+        val controller = InvoiceController(service, pending, sender)
+        val resp = controller.deleteInvoice(12L)
+        assertTrue(resp.statusCode.value() == 409)
+        Mockito.verify(service).deleteInvoice(12L)
     }
 
     @Test

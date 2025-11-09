@@ -4,7 +4,7 @@ import invoice_service.dtos.reports.requests.InvoiceReportRequest
 import invoice_service.dtos.reports.responses.AggregatedReportResponse
 import invoice_service.dtos.reports.responses.AllInvoicesReportResponse
 import invoice_service.dtos.reports.responses.CustomerInvoicesReportResponse
-import invoice_service.messaging.servicesHandlers.CustomerServiceHandler
+import invoice_service.messaging.handlers.CustomerServiceHandler
 import invoice_service.models.invoices.Invoice
 import invoice_service.repository.InvoiceRepository
 import org.springframework.stereotype.Service

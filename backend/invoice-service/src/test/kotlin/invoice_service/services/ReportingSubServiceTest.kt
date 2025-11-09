@@ -2,7 +2,7 @@ package invoice_service.services
 
 import invoice_service.InvoiceGenerator
 import invoice_service.dtos.reports.requests.InvoiceReportRequest
-import invoice_service.messaging.servicesHandlers.CustomerServiceHandler
+import invoice_service.messaging.handlers.CustomerServiceHandler
 import invoice_service.repository.InvoiceRepository
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue

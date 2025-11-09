@@ -108,7 +108,7 @@ class InvoiceController(
         @RequestBody request: InvoiceUpdateRequest
     ): ResponseEntity<Invoice> {
         val updated = service.updateInvoice(id, request)
-        return if (updated != null) ResponseEntity.ok(updated) else ResponseEntity.notFound().build()
+        return if (updated != null) ResponseEntity.ok(updated) else ResponseEntity.status(403).build()
     }
 
     @Operation(summary = "Smazat fakturu", description = "Smaže fakturu podle ID.")
@@ -116,8 +116,12 @@ class InvoiceController(
     fun deleteInvoice(
         @Parameter(description = "ID faktury", example = "1")
         @PathVariable id: Long
-    ): ResponseEntity<Void> {
-        service.deleteInvoice(id)
-        return ResponseEntity.noContent().build()
+    ): ResponseEntity<String> {
+        val deleted = service.deleteInvoice(id)
+        return if (deleted) {
+            ResponseEntity.noContent().build()
+        } else {
+            ResponseEntity.status(409).body("Nelze smazat fakturu")
+        }
     }
 }

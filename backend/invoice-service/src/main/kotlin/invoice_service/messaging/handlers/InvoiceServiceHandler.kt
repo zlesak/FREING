@@ -1,4 +1,4 @@
-package invoice_service.messaging.servicesHandlers
+package invoice_service.messaging.handlers
 
 import com.uhk.fim.prototype.common.exceptions.customer.CustomerNotFoundException
 import com.uhk.fim.prototype.common.exceptions.invoice.InvoiceServiceException
@@ -24,7 +24,7 @@ class InvoiceServiceHandler(
         var response: InvoiceResponse? = null
 
         try {
-            val invoice = invoiceService.getInvoice(request.invoiceId ?: -1)
+            val invoice = invoiceService.getInvoice(request.invoiceId ?: -1, true)
             if (invoice == null) {
                 throw InvoiceServiceException("Invoice with id ${request.invoiceId} not found")
             }
@@ -69,7 +69,7 @@ class InvoiceServiceHandler(
                 invoiceId = request.invoiceId,
                 status = "error",
                 payload = null,
-                error = "Unexpected exception in invoiceServiceQueries: ${ex.message}"
+                error = "Unexpected exception in InvoiceServiceHandler: ${ex.message}"
             )
         } finally {
             if (response != null) {

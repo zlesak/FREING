@@ -105,10 +105,21 @@ class InvoiceServiceTest {
     }
 
     @Test
-    fun `DeleteInvoice deletes when exists`() {
-        doReturn(true).`when`(repo).existsById(1L)
-        service.deleteInvoice(1L)
+    fun `DeleteInvoice deletes when invoice exists and is DRAFT`() {
+        val invoice = Optional.of(Invoice().apply { id = 1L; status = InvoiceStatusEnum.DRAFT })
+        doReturn(invoice).`when`(repo).findById(1L)
+
+        val deleted = service.deleteInvoice(1L)
+        assertEquals(true, deleted)
         verify(repo).deleteById(1L)
     }
-}
 
+    @Test
+    fun `DeleteInvoice does not delete when invoice not DRAFT or missing`() {
+        val invoice = Optional.of(Invoice().apply { id = 2L; status = InvoiceStatusEnum.PAID })
+        doReturn(invoice).`when`(repo).findById(2L)
+
+        val deleted = service.deleteInvoice(2L)
+        assertEquals(false, deleted)
+    }
+}
