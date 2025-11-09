@@ -8,101 +8,108 @@
       @if (error) {
         <div class="alert error">{{ error }}</div>
       }
-
       @if (success) {
         <div class="alert success">{{ success }}</div>
       }
 
-      <div class="grid two-cols">
-        <mat-form-field>
-          <mat-label style="padding: 10px">Číslo faktury</mat-label>
-          <input
-            matInput
-            type="text"
-            [value]="invoiceNumber()"
-            (input)="invoiceNumber.set($any($event.target).value)"
-            placeholder="20250001"
-            required
-          />
-        </mat-form-field>
-
-        <mat-form-field>
-          <mat-label>Zákazník</mat-label>
-          <input
-            matInput
-            [value]="customerName()"
-            (input)="customerName.set($any($event.target).value)"
-            required
-          />
-        </mat-form-field>
-
-        <mat-form-field>
-          <mat-label>Email</mat-label>
-          <input
-            matInput
-            type="email"
-            [value]="customerEmail()"
-            (input)="customerEmail.set($any($event.target).value)"
-            required
-          />
-        </mat-form-field>
-
-        <mat-form-field>
-          <mat-label>Datum vystavení</mat-label>
-          <input
-            matInput
-            [matDatepicker]="IssueDatePicker"
-            [value]="issueDate()"
-            (dateChange)="issueDate.set($event.value)"
-            required
-          />
-          <mat-datepicker-toggle matIconSuffix [for]="IssueDatePicker"></mat-datepicker-toggle>
-          <mat-datepicker #IssueDatePicker></mat-datepicker>
-        </mat-form-field>
-
-        <mat-form-field>
-          <mat-label>Splatnost</mat-label>
-          <input
-            matInput
-            [matDatepicker]="dueDatePicker"
-            [value]="dueDate()"
-            (dateChange)="dueDate.set($event.value)"
-            required
-          />
-          <mat-datepicker-toggle matIconSuffix [for]="dueDatePicker"></mat-datepicker-toggle>
-          <mat-datepicker #dueDatePicker></mat-datepicker>
-        </mat-form-field>
-
-        <mat-form-field>
-          <mat-label>Měna</mat-label>
-          <mat-select
-            [value]="currency()"
-            (selectionChange)="currency.set($event.value)"
-          >
-            @for (c of currencyOptions; track c) {
-              <mat-option [value]="c">{{ c }}</mat-option>
+      <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        <div class="grid">
+          <mat-form-field>
+            <mat-label>Číslo faktury</mat-label>
+            <input
+              matInput
+              type="text"
+              formControlName="invoiceNumber"
+              placeholder="20250001"
+              required
+            />
+            @if (form.get('invoiceNumber')?.touched && form.get('invoiceNumber')?.hasError('required')) {
+              <mat-error>Číslo faktury je povinné</mat-error>
             }
-          </mat-select>
-        </mat-form-field>
+          </mat-form-field>
 
-        <mat-form-field>
-          <mat-label>Stav</mat-label>
-          <mat-select
-            [value]="status()"
-            (selectionChange)="status.set($event.value)"
-          >
-            @for (s of statusOptions; track s) {
-              <mat-option [value]="s">{{ s }}</mat-option>
+          <mat-form-field>
+            <mat-label>Zákazník</mat-label>
+            <input
+              matInput
+              formControlName="customerName"
+              required
+            />
+            @if (form.get('customerName')?.touched && form.get('customerName')?.hasError('required')) {
+              <mat-error>Zákazník je povinný</mat-error>
             }
-          </mat-select>
-        </mat-form-field>
+          </mat-form-field>
+
+          <mat-form-field>
+            <mat-label>Email</mat-label>
+            <input
+              matInput
+              type="email"
+              formControlName="customerEmail"
+              required
+            />
+            @if (form.get('customerEmail')?.touched && form.get('customerEmail')?.hasError('required')) {
+              <mat-error>Email je povinný</mat-error>
+            }
+            @if (form.get('customerEmail')?.touched && form.get('customerEmail')?.hasError('email')) {
+              <mat-error>Prosím zadejte platný email</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field>
+            <mat-label>Datum vystavení</mat-label>
+            <input
+              matInput
+              [matDatepicker]="IssueDatePicker"
+              formControlName="issueDate"
+              required
+            />
+            <mat-datepicker-toggle matIconSuffix [for]="IssueDatePicker"></mat-datepicker-toggle>
+            <mat-datepicker #IssueDatePicker></mat-datepicker>
+            @if (form.get('issueDate')?.touched && form.get('issueDate')?.hasError('required')) {
+              <mat-error>Datum vystavení je povinné</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field>
+            <mat-label>Splatnost</mat-label>
+            <input
+              matInput
+              [matDatepicker]="dueDatePicker"
+              formControlName="dueDate"
+              required
+            />
+            <mat-datepicker-toggle matIconSuffix [for]="dueDatePicker"></mat-datepicker-toggle>
+            <mat-datepicker #dueDatePicker></mat-datepicker>
+            @if (form.get('dueDate')?.touched && form.get('dueDate')?.hasError('required')) {
+              <mat-error>Datum splatnosti je povinné</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field>
+            <mat-label>Měna</mat-label>
+            <mat-select formControlName="currency">
+              @for (c of currencyOptions; track c) {
+                <mat-option [value]="c">{{ c }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field>
+            <mat-label>Stav</mat-label>
+            <mat-select formControlName="status">
+              @for (s of statusOptions; track s) {
+                <mat-option [value]="s">{{ s }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
 
 
-        <mat-form-field>
-          <mat-label>Celková částka</mat-label>
-          <input matInput type="number" [value]="totalAmount()" readonly />
-        </mat-form-field>
-      </div>
+          <mat-form-field>
+            <mat-label>Celková částka</mat-label>
+            <input matInput type="number" formControlName="totalAmount" readonly />
+          </mat-form-field>
+        </div>
         <h3>Položky</h3>
 
         <table class="items">
@@ -116,16 +123,15 @@
           </tr>
           </thead>
 
-          <tbody>
-            @for (item of items; track item; let i = $index) {
-              <tr>
+          <tbody formArrayName="items">
+            @for (item of items.controls; track item; let i = $index) {
+              <tr [formGroupName]="i">
                 <td>
                   <mat-form-field>
                     <input
                       matInput
-                      [(ngModel)]="item.description"
-                      name="desc{{i}}"
-                      (input)="recalcItemTotal(i)"
+                      formControlName="description"
+                      required
                     />
                   </mat-form-field>
                 </td>
@@ -135,9 +141,8 @@
                       matInput
                       type="number"
                       min="1"
-                      [(ngModel)]="item.quantity"
-                      name="qty{{i}}"
-                      (input)="recalcItemTotal(i)"
+                      formControlName="quantity"
+                      required
                     />
                   </mat-form-field>
                 </td>
@@ -148,15 +153,14 @@
                       type="number"
                       step="0.01"
                       min="0"
-                      [(ngModel)]="item.unitPrice"
-                      name="price{{i}}"
-                      (input)="recalcItemTotal(i)"
+                      formControlName="unitPrice"
+                      required
                     />
                   </mat-form-field>
                 </td>
                 <td>
                   <mat-form-field>
-                    <input matInput [value]="item.totalPrice" readonly />
+                    <input matInput formControlName="totalPrice" readonly />
                   </mat-form-field>
                 </td>
                 <td style="width: 30px">
@@ -165,7 +169,7 @@
                     color="warn"
                     type="button"
                     (click)="removeItem(i)"
-                    [disabled]="items.length === 1"
+                    [disabled]="items.controls.length === 1"
                   >
                     <mat-icon>delete</mat-icon>
                   </button>
@@ -175,27 +179,26 @@
           </tbody>
         </table>
 
-      <button
-        mat-button
-        color="primary"
-        type="button"
-        class="add-item"
-        (click)="addItem()"
-      >
-        <mat-icon aria-label="add">add</mat-icon>
-        Přidat položku
-      </button>
-
-      <div class="actions">
         <button
-          mat-flat-button
-          color="accent"
-          (click)="submit()"
-          [disabled]="!readyToSubmit()">
-          Vytvořit
+          mat-button
+          color="primary"
+          type="button"
+          class="add-item"
+          (click)="addItem()"
+        >
+          <mat-icon aria-label="add">add</mat-icon>
+          Přidat položku
         </button>
-        <a mat-button routerLink="/invoices">Zpět</a>
-      </div>
-    </mat-card-content>
+
+        <div class="actions">
+          <button
+            mat-flat-button
+            type="submit"
+            [disabled]="submitting || form.invalid">
+            Vytvořit
+          </button>
+          <a mat-button routerLink="/invoices">Zpět</a>
+        </div>
+      </form> </mat-card-content>
   </mat-card>
 </section>

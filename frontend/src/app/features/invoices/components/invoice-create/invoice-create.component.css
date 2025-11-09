@@ -1,12 +1,13 @@
- .grid.two-cols { display: grid; grid-template-columns: repeat(auto-fit,minmax(240px,1fr)); gap: 1rem; }
+ .grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(240px,1fr)); gap: 1rem; }
 
 .card{
-  max-width: 900px; margin: 0 auto;
+  max-width: 65vw; margin: 0 auto;
   border-radius: 10px;
   box-shadow: 0 0 6px 0 rgba(0, 0, 0, 0.53);
   -webkit-box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.53);
   -moz-box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.53);
   overflow-x: auto;
+  z-index: 10;
 }
 
 .add-item{
@@ -14,6 +15,7 @@
   cursor: pointer;
   border-radius:6px;
   margin-left: 10px;
+  margin-bottom: 10px;
 }
 
 .error{
