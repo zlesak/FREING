@@ -40,28 +40,23 @@ class MessageListener @Autowired constructor(
     }
 
     @RabbitListener(queues = ["#{messageSender.replyQueueName}"])
-    fun receiveCustomerResponse(message: Message) {
-        println("[invoice-service] receiveCustomerResponse called, messageProperties: ${message.messageProperties}")
+    fun receiveReplyMessage(message: Message) {
+        println("[invoice-service] receiveMessage called, messageProperties: ${message.messageProperties}")
         try {
-            val response = messageConverter.fromMessage(message) as CustomerResponse
-            val correlationId = message.messageProperties.correlationId ?: response.requestId
+            val deserializedMessage = messageConverter.fromMessage(message)
+            val correlationId = message.messageProperties.correlationId ?: when (deserializedMessage) {
+                is CustomerResponse -> deserializedMessage.requestId
+                is InvoiceResponse -> deserializedMessage.requestId
+                else -> throw IllegalArgumentException("Unknown message type")
+            }
 
-            pendingCustomerResponses.completeCustomerResponseFuture(correlationId, response)
+            when (deserializedMessage) {
+                is CustomerResponse -> pendingCustomerResponses.completeCustomerResponseFuture(correlationId, deserializedMessage)
+                is InvoiceResponse -> pendingInvoiceResponses.completeInvoiceResponseFuture(correlationId, deserializedMessage)
+                else -> throw IllegalArgumentException("Unsupported message type: ${deserializedMessage::class}")
+            }
         } catch (ex: Exception) {
-            println("[invoice-service] ERROR in receiveCustomerResponse: ${ex.message}")
-            ex.printStackTrace()
-        }
-    }
-
-    @RabbitListener(queues = ["#{messageSender.replyQueueName}"])
-    fun receiveInvoiceResponse(message: Message) {
-        try {
-            val response = messageConverter.fromMessage(message) as InvoiceResponse
-            val correlationId = message.messageProperties.correlationId ?: response.requestId
-
-            pendingInvoiceResponses.completeInvoiceResponseFuture(correlationId, response)
-        } catch (ex: Exception) {
-            println("[invoice-service] ERROR in receiveInvoiceResponse: ${ex.message}")
+            println("[invoice-service] ERROR in receiveMessage: ${ex.message}")
             ex.printStackTrace()
         }
     }

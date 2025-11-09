@@ -61,7 +61,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"id\": 1,\n    \"name\": \"Jan\",\n    \"surname\": \"Novák\",\n    \"email\": \"jan.novak@example.com\",\n    \"phoneNumber\": \"+420123456789\",\n    \"birthDate\": \"1990-01-01T00:00:00.000+00:00\",\n    \"street\": \"Hlavní ulice\",\n    \"houseNumber\": \"123\",\n    \"city\": \"Praha\",\n    \"zip\": \"11000\",\n    \"country\": \"CZ\",\n    \"ico\": \"12345678\",\n    \"dic\": \"CZ12345678\",\n    \"bankCode\": \"0100\",\n    \"bankAccount\": \"1234567890\",\n    \"currency\": \"CZK\"\n}",
+									"raw": "{\n    \"id\": {{customerId}},\n    \"name\": \"Jan\",\n    \"surname\": \"Novák\",\n    \"tradeName\": \"\",\n    \"email\": \"jan.novak@example.com\",\n    \"phoneNumber\": \"+420123456789\",\n    \"birthDate\": \"1990-01-01T00:00:00.000+00:00\",\n    \"street\": \"Hlavní ulice\",\n    \"houseNumber\": \"123\",\n    \"city\": \"Praha\",\n    \"zip\": \"11000\",\n    \"country\": \"CZ\",\n    \"ico\": \"12345678\",\n    \"dic\": \"CZ12345678\",\n    \"bankCode\": \"0100\",\n    \"bankAccount\": \"1234567890\",\n    \"currency\": \"CZK\"\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -338,7 +338,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"invoiceNumber\": \"INV-20250001\",\n    \"referenceNumber\": \"REF-2025-0001\",\n    \"customerId\": {{customerId}},\n    \"issueDate\": \"2025-10-05\",\n    \"dueDate\": \"2025-11-05\",\n    \"amount\": 2420.00,\n    \"currency\": \"CZK\",\n    \"status\": \"DRAFT\",\n    \"items\": [\n        {\n            \"id\": 1,\n            \"name\": \"Schůzka\",\n            \"description\": \"Konzultace ohledně FREING\",\n            \"code\": \"K001\",\n            \"unit\": \"hour\",\n            \"quantity\": 1,\n            \"unitPrice\": 1000.00,\n            \"vat\": 21,\n            \"totalPrice\": 1210.00\n        },\n        {\n            \"name\": \"Schůzka 2\",\n            \"description\": \"Konzultace ohledně FREING\",\n            \"code\": \"K001\",\n            \"unit\": \"hour\",\n            \"quantity\": 1,\n            \"unitPrice\": 1000.00,\n            \"vat\": 21,\n            \"totalPrice\": 1210.00\n        }\n    ]\n}",
+									"raw": "{\n    \"invoiceNumber\": \"INV-20250001\",\n    \"referenceNumber\": \"REF-2025-0001\",\n    \"customerId\": {{customerId}},\n    \"issueDate\": \"2025-10-05\",\n    \"dueDate\": \"2025-11-05\",\n    \"amount\": 2420.00,\n    \"currency\": \"CZK\",\n    \"status\": \"SENT\",\n    \"items\": [\n        {\n            \"id\": 1,\n            \"name\": \"Schůzka\",\n            \"description\": \"Konzultace ohledně FREING\",\n            \"code\": \"K001\",\n            \"unit\": \"hour\",\n            \"quantity\": 1,\n            \"unitPrice\": 1000.00,\n            \"vat\": 21,\n            \"totalPrice\": 1210.00\n        },\n        {\n            \"name\": \"Schůzka 2\",\n            \"description\": \"Konzultace ohledně FREING\",\n            \"code\": \"K001\",\n            \"unit\": \"hour\",\n            \"quantity\": 1,\n            \"unitPrice\": 1000.00,\n            \"vat\": 21,\n            \"totalPrice\": 1210.00\n        }\n    ]\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -438,6 +438,32 @@
 											"key": "size",
 											"value": "10",
 											"description": "Invoice page size"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get invoice by ID - XML",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseURL}}{{invoicesEndpoint}}/get-by-id/:Id/xml",
+									"host": [
+										"{{baseURL}}{{invoicesEndpoint}}"
+									],
+									"path": [
+										"get-by-id",
+										":Id",
+										"xml"
+									],
+									"variable": [
+										{
+											"key": "Id",
+											"value": "{{invoiceId}}",
+											"description": "Invoice Id"
 										}
 									]
 								}
