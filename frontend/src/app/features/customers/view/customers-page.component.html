@@ -1,8 +1,12 @@
 <section class="page customers">
   <h2>Zákazníci</h2>
 
-  <div class="toolbar"><a routerLink="/customers/new">+ Nový zákazník</a></div>
-
+  <div class="toolbar">
+    <button mat-button class="add-button" (click)="router.navigate(['/customers/new'])">
+      <mat-icon color="white" aria-label="add">add</mat-icon>
+      Nový zákazník
+    </button>
+  </div>
   @if (loading) {
     <div>Načítám…</div>
   }
@@ -12,42 +16,32 @@
   }
 
   @if (!loading && !error && customers.length) {
-   <table class="customers-table">
-     <thead>
-       <tr>
-         <th>#</th>
-         <th>Jméno</th>
-         <th>Příjmení</th>
-         <th>Obchodní jméno</th>
-         <th>Email</th>
-         <th>Telefon</th>
-         <th>Město</th>
-         <th>Ulice</th>
-         <th>Číslo domu</th>
-         <th>PSČ</th>
-         <th>Země</th>
-         <th>IČO</th>
-         <th>DIČ</th>
-       </tr>
-     </thead>
-     <tbody>
-       <tr *ngFor="let c of customers; index as i">
-         <td>{{ i + 1 }}</td>
-         <td>{{ c.name }}</td>
-         <td>{{ c.surname }}</td>
-         <td>{{ c.tradeName }}</td>
-         <td>{{ c.email }}</td>
-         <td>{{ c.phoneNumber }}</td>
-         <td>{{ c.city }}</td>
-         <td>{{ c.street }}</td>
-         <td>{{ c.houseNumber }}</td>
-         <td>{{ c.zip }}</td>
-         <td>{{ c.country }}</td>
-         <td>{{ c.ico }}</td>
-         <td>{{ c.dic }}</td>
-       </tr>
-     </tbody>
-   </table>
+    <table class="customers-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Jméno</th>
+          <th>Příjmení</th>
+          <th>Email</th>
+          <th>Telefon</th>
+          <th>Město</th>
+        </tr>
+      </thead>
+      <tbody>
+      @if(customers.length > 0){
+        @for(c of customers; track $index){
+          <tr>
+            <td>{{ $index + 1 }}</td>
+            <td>{{ c.name }}</td>
+            <td>{{ c.surname }}</td>
+            <td>{{ c.email }}</td>
+            <td>{{ c.phoneNumber }}</td>
+            <td>{{ c.city }}</td>
+          </tr>
+        }
+      }
+      </tbody>
+    </table>
   }
 
   @if (!loading && !error && !customers.length) {
