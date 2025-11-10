@@ -7,52 +7,64 @@
       Nový zákazník
     </button>
   </div>
-  @if (loading) {
-    <div>Načítám…</div>
+
+  @if (loading()) {
+    <mat-progress-bar style="width: 80%; margin: auto" mode="indeterminate"></mat-progress-bar>
   }
 
   @if (error) {
     <div class="error">{{ error }}</div>
   }
 
-  @if (!loading && !error && customers.length) {
-    <table class="customers-table">
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Jméno</th>
-          <th>Příjmení</th>
-          <th>Email</th>
-          <th>Telefon</th>
-          <th>Město</th>
-        </tr>
-      </thead>
-      <tbody>
-      @if(customers.length > 0){
-        @for(c of customers; track $index){
-          <tr>
-            <td>{{ $index + 1 }}</td>
-            <td>{{ c.name }}</td>
-            <td>{{ c.surname }}</td>
-            <td>{{ c.email }}</td>
-            <td>{{ c.phoneNumber }}</td>
-            <td>{{ c.city }}</td>
-          </tr>
-        }
-      }
-      </tbody>
+  @if (!loading() && !error && dataSource.data.length) {
+    <table mat-table [dataSource]="dataSource" matSort class="customers-table">
+
+      <ng-container matColumnDef="index">
+        <th mat-header-cell *matHeaderCellDef>#</th>
+        <td mat-cell *matCellDef="let c; let i = index">{{ i + 1 }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Jméno</th>
+        <td mat-cell *matCellDef="let c">{{ c.name }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="surname">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Příjmení</th>
+        <td mat-cell *matCellDef="let c">{{ c.surname }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="email">
+        <th mat-header-cell *matHeaderCellDef>Email</th>
+        <td mat-cell *matCellDef="let c">{{ c.email }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="phoneNumber">
+        <th mat-header-cell *matHeaderCellDef>Telefon</th>
+        <td mat-cell *matCellDef="let c">{{ c.phoneNumber }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="city">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Město</th>
+        <td mat-cell *matCellDef="let c">{{ c.city }}</td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
     </table>
   }
 
-  @if (!loading && !error && !customers.length) {
-    <p>Žádné faktury k zobrazení.</p>
-  }
+  <mat-paginator #paginator
+                 [length]="totalElements"
+                 [pageSize]="currentSize"
+                 [pageSizeOptions]="[5, 10, 25, 50]"
+                 [showFirstLastButtons]="true"
+                 [disabled]="loading()"
+                 (page)="pageUpdate($event)">
+  </mat-paginator>
 
-  @if (totalPages > 1) {
-    <div class="pagination">
-      <button (click)="prev()" [disabled]="page === 0">Předchozí</button>
-      <span>Stránka {{ page + 1 }} / {{ totalPages }} ({{ totalElements }} faktur)</span>
-      <button (click)="next()" [disabled]="page + 1 >= totalPages">Další</button>
-    </div>
+  @if (!loading() && !error && !dataSource.data.length) {
+    <p>Žádní zákazníci k zobrazení.</p>
   }
 </section>
