@@ -41,3 +41,43 @@
   margin: 10px;
   color: white;
 }
+
+.status-badge{
+  padding: 5px;
+  border-radius: 8px;
+}
+
+.status-DRAFT, .status-PENDING {
+  background-color: #e5e7eb;
+  color: #374151;
+}
+
+.status-PAID {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.status-OVERDUE, .status-CANCELLED {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+tr.element-row {
+  cursor: pointer;
+}
+
+tr.table-row:hover {
+  background: #f4f4f4;
+}
+
+tr.table-row:active {
+  background: #d9ffe7;
+}
+
+.mat-header-cell, .mat-cell {
+  text-align: center;
+  justify-content: center;
+}
+
+.mat-row, .mat-header-row {
+  align-items: center;
+}
