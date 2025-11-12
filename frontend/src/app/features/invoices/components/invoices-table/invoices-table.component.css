@@ -2,6 +2,15 @@
   width: 100%;
   border-collapse: collapse;
 }
+.card{
+  max-width: 65vw; margin: 0 auto;
+  border-radius: 10px;
+  box-shadow: 0 0 6px 0 rgba(0, 0, 0, 0.53);
+  -webkit-box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.53);
+  -moz-box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.53);
+  overflow-x: auto;
+  z-index: 10;
+}
 
 .invoices-table th, .invoice-table td {
   padding: .5rem .75rem;
@@ -47,20 +56,6 @@
   border-radius: 8px;
 }
 
-.status-DRAFT, .status-PENDING {
-  background-color: #e5e7eb;
-  color: #374151;
-}
-
-.status-PAID {
-  background-color: #d1fae5;
-  color: #065f46;
-}
-
-.status-OVERDUE, .status-CANCELLED {
-  background-color: #fee2e2;
-  color: #991b1b;
-}
 tr.element-row {
   cursor: pointer;
 }

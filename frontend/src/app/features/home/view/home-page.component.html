@@ -1,4 +1,17 @@
 <section class="page home">
-  <h2>Domovská stránka</h2>
-  <p>Obsah bude doplněn.</p>
+  <div style="display: flex; flex-direction: row">
+    <div style="width: 50vw">
+      <app-invoices-page
+      (outputData)="getInvoices($event)"
+      ></app-invoices-page>
+    </div>
+      <invoice-chart-pie
+        [data]="chartDataStatuses()"
+        [title]="'Stavy faktur'"
+      ></invoice-chart-pie>
+    <invoice-chart-pie
+      [data]="chartDataCurrency()"
+      [title]="'Distribuce měn'"
+    ></invoice-chart-pie>
+  </div>
 </section>

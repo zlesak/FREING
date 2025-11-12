@@ -7,6 +7,7 @@ export class KeycloakService {
   private keycloakAuth!: KeycloakInstance;
   private refreshTimeoutId: number | null = null;
   private readonly refreshMinValidity = 30;
+  public hasAdminAccess: boolean = false;
 
   public async init(): Promise<void> {
     this.keycloakAuth = new Keycloak({
@@ -24,6 +25,7 @@ export class KeycloakService {
     return new Promise((resolve, reject) => {
       this.keycloakAuth.init(initOptions).then((authenticated) => {
         if (authenticated) {
+          this.hasAdminAccess = this.hasAnyRole(['accountant','manager']);
           try {
             this.scheduleTokenRefresh();
           } catch (e) {
@@ -139,4 +141,5 @@ export class KeycloakService {
         }
       });
   }
+
 }

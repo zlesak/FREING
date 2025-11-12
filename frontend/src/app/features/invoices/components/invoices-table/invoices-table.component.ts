@@ -1,6 +1,9 @@
-import {AfterViewChecked, Component, inject, OnInit, signal, ViewChild} from '@angular/core';
-import { InvoicesServiceController } from '../controller/invoices.service';
-import { InvoiceApi } from '../../../api/generated';
+import {
+  AfterViewChecked, Component,
+  inject, OnInit, output, signal, ViewChild
+} from '@angular/core';
+import { InvoicesServiceController } from '../../controller/invoices.service';
+import { InvoiceApi } from '../../../../api/generated';
 import {MatIconModule} from '@angular/material/icon';
 import {MatDividerModule} from '@angular/material/divider';
 import {MatButtonModule} from '@angular/material/button';
@@ -9,21 +12,32 @@ import {MatProgressBar} from '@angular/material/progress-bar';
 import {
   MatTableDataSource, MatTableModule
 } from '@angular/material/table';
-import {DatePipe, NgClass} from '@angular/common';
+import {DatePipe} from '@angular/common';
 import {MatSort, MatSortModule} from '@angular/material/sort';
 import {MatPaginator, MatPaginatorModule, PageEvent} from '@angular/material/paginator';
+import {MatCard} from '@angular/material/card';
+import {Invoice} from '../../../../api/generated/invoice';
+import {getStatusColor} from '../../../home/view/home-page.component';
+
+export enum InvoiceStatus {
+  DRAFT = 'DRAFT',
+  PENDING = 'PENDING',
+  PAID = 'PAID',
+  OVERDUE = 'OVERDUE',
+  CANCELLED = 'CANCELLED'
+}
 
 @Component({
   selector: 'app-invoices-page',
   standalone: true,
-  templateUrl: './invoices-page.component.html',
-  styleUrl: './invoices-page.component.css',
-  imports: [MatButtonModule, MatDividerModule, MatIconModule, MatProgressBar, MatTableModule, DatePipe, NgClass, MatSortModule, MatPaginatorModule],
+  templateUrl: './invoices-table.component.html',
+  styleUrl: './invoices-table.component.css',
+  imports: [MatButtonModule, MatDividerModule, MatIconModule, MatProgressBar, MatTableModule, DatePipe, MatSortModule, MatPaginatorModule, MatCard],
 })
-export class InvoicesPageComponent implements OnInit, AfterViewChecked {
+export class InvoicesTableComponent implements OnInit, AfterViewChecked {
   private readonly invoicesService = inject( InvoicesServiceController);
   protected readonly router = inject(Router);
-
+  outputData = output<Invoice[]>()
   protected dataSource = new MatTableDataSource<InvoiceApi.Invoice>([]);
   protected loading = signal<boolean>(false);
   protected error?: string;
@@ -62,7 +76,7 @@ export class InvoicesPageComponent implements OnInit, AfterViewChecked {
         this.dataSource.data = resp.content;
 
         this.totalElements = resp.totalElements;
-
+        this.outputData.emit(this.dataSource.data);
         if (this.paginator) {
           this.paginator.length = this.totalElements;
           this.paginator.pageSize = this.currentSize;
@@ -82,4 +96,6 @@ export class InvoicesPageComponent implements OnInit, AfterViewChecked {
     this.currentPage = event.pageIndex;
     this.currentSize = event.pageSize;
   }
+
+  protected readonly getStatusColor = getStatusColor;
 }
