@@ -5,6 +5,7 @@ import { CustomersPageComponent } from './features/customers/view/customers-page
 import { HomePageComponent } from './features/home/view/home-page.component';
 import { InvoiceCreateComponent } from './features/invoices/components/invoice-create/invoice-create.component';
 import { CustomerCreateComponent } from './features/customers/components/customer-create/customer-create.component';
+import {InvoiceDetailComponent} from './features/invoices/components/invoice-detail/invoice-detail.component';
 
 export const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'home' },
@@ -12,6 +13,7 @@ export const routes: Routes = [
   { path: 'invoices/new', component: InvoiceCreateComponent, canActivate: [AuthGuard], data: { roles: ['manager', 'accountant'] } },
   { path: 'customers/new', component: CustomerCreateComponent },
   { path: 'customers', component: CustomersPageComponent, canActivate: [AuthGuard] },
+  { path: 'invoice/:id', component: InvoiceDetailComponent, canActivate: [AuthGuard] },
   { path: '**', redirectTo: 'home'}
 ];
 

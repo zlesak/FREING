@@ -51,9 +51,9 @@ export class HomePageComponent {
     });
 
     return Object.entries(currencyCount).map(([currency, { occurrence, color }]) => ({
-      status: currency, // keep "status" field to fit chart input
+      status: currency,
       occurrence,
-      color, // attach the color directly
+      color,
     }));
   });
 
@@ -85,5 +85,5 @@ export function getCurrencyColor(currency: string): string {
     CZK: '#ffc107',
     GBP: '#9c27b0',
   };
-  return colors[currency.toUpperCase()] ?? '#b0bec5'; // default gray
+  return colors[currency.toUpperCase()] ?? '#b0bec5';
 }
