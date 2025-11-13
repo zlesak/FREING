@@ -18,6 +18,7 @@ import {MatPaginator, MatPaginatorModule, PageEvent} from '@angular/material/pag
 import {MatCard} from '@angular/material/card';
 import {Invoice} from '../../../../api/generated/invoice';
 import {getStatusColor} from '../../../home/view/home-page.component';
+import {KeycloakService} from '../../../../keycloak.service';
 
 export enum InvoiceStatus {
   DRAFT = 'DRAFT',
@@ -36,6 +37,7 @@ export enum InvoiceStatus {
 })
 export class InvoicesTableComponent implements OnInit, AfterViewChecked {
   private readonly invoicesService = inject( InvoicesServiceController);
+  private readonly keycloakService = inject( KeycloakService );
   protected readonly router = inject(Router);
   outputData = output<Invoice[]>()
   protected dataSource = new MatTableDataSource<InvoiceApi.Invoice>([]);
@@ -58,7 +60,12 @@ export class InvoicesTableComponent implements OnInit, AfterViewChecked {
   ];
 
   ngOnInit(): void {
-    this.loadAllInvoices();
+    if (this.keycloakService.hasAdminAccess){
+      this.loadAllInvoices();
+    } else {
+
+    }
+
   }
 
   ngAfterViewChecked() {
@@ -92,9 +99,41 @@ export class InvoicesTableComponent implements OnInit, AfterViewChecked {
       }
     });
   }
+
+  loadInvoicesForUser(){
+    this.loading.set(true);
+    this.error = undefined;
+    this.invoicesService.getInvoices(0, 999).subscribe({
+      next: (resp: InvoiceApi.InvoicesPagedResponse) => {
+        //TODO: get all invoices for user, when API is ready
+        this.dataSource.data = resp.content;
+
+        this.totalElements = resp.totalElements;
+        this.outputData.emit(this.dataSource.data);
+        if (this.paginator) {
+          this.paginator.length = this.totalElements;
+          this.paginator.pageSize = this.currentSize;
+          this.paginator.pageIndex = 0;
+        }
+        if (this.sort) this.dataSource.sort = this.sort;
+        if (this.paginator) this.dataSource.paginator = this.paginator;
+        this.loading.set(false);
+      },
+      error: (err) => {
+        this.error = err.message || 'Nepodařilo se načíst faktury';
+        this.loading.set(false);
+      }
+    });
+  }
+
   pageUpdate(event: PageEvent){
     this.currentPage = event.pageIndex;
     this.currentSize = event.pageSize;
+  }
+
+  async onInvoiceClick(invoice: any){
+    console.log(invoice);
+    await this.router.navigate(['/invoice', invoice.id]);
   }
 
   protected readonly getStatusColor = getStatusColor;

@@ -54,7 +54,11 @@
 
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
 
-      <tr class="table-row" mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      <tr class="table-row"
+          mat-row *matRowDef="let row;
+           columns: displayedColumns;"
+          (click)="onInvoiceClick(row)"
+      ></tr>
     </table>
 
  }
