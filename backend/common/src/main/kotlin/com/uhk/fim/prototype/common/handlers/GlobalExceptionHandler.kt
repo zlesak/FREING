@@ -4,7 +4,6 @@ import com.uhk.fim.prototype.common.exceptions.AbstractResponseException
 import com.uhk.fim.prototype.common.exceptions.NotFoundException
 import com.uhk.fim.prototype.common.exceptions.OperationDeniedException
 import com.uhk.fim.prototype.common.exceptions.WrongDataException
-import com.uhk.fim.prototype.common.exceptions.customer.CustomerNotFoundException
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -36,18 +35,8 @@ class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.message)
     }
 
-    @ExceptionHandler(CustomerNotFoundException::class)
-    fun handleCustomerNotFound(ex: CustomerNotFoundException): ResponseEntity<String> {
-        return buildResponse(ex)
-    }
-
     fun buildResponse(ex: AbstractResponseException): ResponseEntity<String> {
         logger.warn("Message: ${ex.message} with status ${ex.httpStatus}")
         return ResponseEntity.status(ex.httpStatus).body(ex.message)
-    }
-    fun buildResponse(ex: CustomerNotFoundException): ResponseEntity<String> {
-        val message = "Customer not found: ${ex.message}"
-        logger.warn(message)
-        return ResponseEntity.status(404).body(message)
     }
 }
