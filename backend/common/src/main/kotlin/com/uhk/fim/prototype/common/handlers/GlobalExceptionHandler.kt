@@ -20,17 +20,17 @@ class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(NotFoundException::class)
-    fun handleAccessDenied(ex: NotFoundException): ResponseEntity<String> {
+    fun handleNotFound(ex: NotFoundException): ResponseEntity<String> {
         return buildResponse(ex)
     }
 
     @ExceptionHandler(WrongDataException::class)
-    fun handleAccessDenied(ex: WrongDataException): ResponseEntity<String> {
+    fun handleWrongData(ex: WrongDataException): ResponseEntity<String> {
         return buildResponse(ex)
     }
 
     @ExceptionHandler(Exception::class)
-    fun handleAccessDenied(ex: Exception): ResponseEntity<String> {
+    fun handleOther(ex: Exception): ResponseEntity<String> {
         logger.error(ex.message, ex)
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.message)
     }
