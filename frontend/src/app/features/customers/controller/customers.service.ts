@@ -42,7 +42,7 @@ export class CustomersServiceController {
   }
 
   getCustomerInfoFromAres(ico: string): Observable<CustomerApi.Customer> {
-    return from(CustomerApi.CustomerControllerService.getCustomerInfoFromAresByIco({ ico })).pipe(
+    return from(this.customerControllerService.getCustomerInfoFromAresByIco({ ico })).pipe(
       catchError(this.handleError)
     );
   }

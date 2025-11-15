@@ -5,13 +5,6 @@
     </mat-card-header>
 
     <mat-card-content>
-      @if (error) {
-        <div class="alert error">{{ error }}</div>
-      }
-      @if (success) {
-        <div class="alert success">{{ success }}</div>
-      }
-
       <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
         <div class="grid">
           <mat-form-field>
@@ -23,36 +16,31 @@
               placeholder="20250001"
               required
             />
-            @if (form.get('invoiceNumber')?.touched && form.get('invoiceNumber')?.hasError('required')) {
-              <mat-error>Číslo faktury je povinné</mat-error>
+            @if (form.get('invoiceNumber')?.touched && form.get('invoiceNumber')?.invalid) {
+              <mat-error>Vyplňte číslo faktury (min. 3 znaky)</mat-error>
             }
           </mat-form-field>
 
           <mat-form-field>
-            <mat-label>Zákazník</mat-label>
+            <mat-label>Referenční číslo faktury</mat-label>
             <input
               matInput
-              formControlName="customerName"
+              type="text"
+              formControlName="referenceNumber"
+              placeholder="INV-2025-11-07"
+            />
+          </mat-form-field>
+
+          <mat-form-field>
+            <mat-label>Zákazník (ID)</mat-label>
+            <input
+              matInput
+              formControlName="customerId"
+              type="number"
               required
             />
-            @if (form.get('customerName')?.touched && form.get('customerName')?.hasError('required')) {
+            @if (form.get('customerId')?.touched && form.get('customerId')?.invalid) {
               <mat-error>Zákazník je povinný</mat-error>
-            }
-          </mat-form-field>
-
-          <mat-form-field>
-            <mat-label>Email</mat-label>
-            <input
-              matInput
-              type="email"
-              formControlName="customerEmail"
-              required
-            />
-            @if (form.get('customerEmail')?.touched && form.get('customerEmail')?.hasError('required')) {
-              <mat-error>Email je povinný</mat-error>
-            }
-            @if (form.get('customerEmail')?.touched && form.get('customerEmail')?.hasError('email')) {
-              <mat-error>Prosím zadejte platný email</mat-error>
             }
           </mat-form-field>
 
@@ -104,21 +92,29 @@
             </mat-select>
           </mat-form-field>
 
+          <mat-form-field>
+            <mat-label>Celková částka bez daně</mat-label>
+            <input matInput type="number" formControlName="subAmount" readonly/>
+          </mat-form-field>
 
           <mat-form-field>
-            <mat-label>Celková částka</mat-label>
-            <input matInput type="number" formControlName="totalAmount" readonly />
+            <mat-label>Celková částka s daní</mat-label>
+            <input matInput type="number" formControlName="amount" readonly />
           </mat-form-field>
         </div>
-        <h3>Položky</h3>
 
+        <h3>Položky</h3>
         <table class="items">
           <thead>
           <tr>
+            <th>Název</th>
             <th>Popis</th>
+            <th>Jednotka</th>
             <th>Množství</th>
             <th>Jedn. cena</th>
-            <th>Celkem</th>
+            <th>Celkem bez daně</th>
+            <th>DPH</th>
+            <th>Celkem s daní</th>
             <th></th>
           </tr>
           </thead>
@@ -130,21 +126,52 @@
                   <mat-form-field>
                     <input
                       matInput
-                      formControlName="description"
+                      formControlName="name"
                       required
                     />
                   </mat-form-field>
+                  @if (item.get('name')?.touched && item.get('name')?.invalid) {
+                    <mat-error>Název je povinný</mat-error>
+                  }
                 </td>
                 <td>
                   <mat-form-field>
                     <input
                       matInput
-                      type="number"
-                      min="1"
-                      formControlName="quantity"
+                      formControlName="description"
                       required
                     />
                   </mat-form-field>
+                  @if (item.get('description')?.touched && item.get('description')?.invalid) {
+                    <mat-error class="invalid">Popis je povinný</mat-error>
+                  }
+                </td>
+                <td>
+                  <mat-form-field>
+                    <input
+                      matInput
+                      formControlName="unit"
+                      required
+                      (input)="recalcItemTotal(i)"
+                    />
+                  </mat-form-field>
+                  @if (item.get('unit')?.touched && item.get('unit')?.invalid) {
+                    <mat-error>Jednotka je povinná</mat-error>
+                  }
+                </td>
+                <td>
+                  <mat-form-field>
+                    <input
+                      matInput
+                      formControlName="quantity"
+                      type="number"
+                      min="0"
+                      (input)="recalcItemTotal(i)"
+                    />
+                  </mat-form-field>
+                  @if (item.get('quantity')?.touched && item.get('quantity')?.invalid) {
+                    <mat-error>Zadejte množství</mat-error>
+                  }
                 </td>
                 <td>
                   <mat-form-field>
@@ -155,7 +182,21 @@
                       min="0"
                       formControlName="unitPrice"
                       required
+                      (input)="recalcItemTotal(i)"
                     />
+                  </mat-form-field>
+                </td>
+                <td>
+                  <mat-form-field>
+                    <input matInput formControlName="subTotalPrice" readonly />
+                  </mat-form-field>
+                </td>
+                <td>
+                  <mat-form-field>
+                  <input matInput formControlName="vat" type="number" min="0" (input)="recalcItemTotal(i)" />
+                  @if (item.get('vat')?.touched && item.get('vat')?.invalid) {
+                    <mat-error class="invalid">Zadejte DPH</mat-error>
+                  }
                   </mat-form-field>
                 </td>
                 <td>
@@ -163,6 +204,7 @@
                     <input matInput formControlName="totalPrice" readonly />
                   </mat-form-field>
                 </td>
+
                 <td style="width: 30px">
                   <button
                     mat-icon-button
@@ -199,6 +241,13 @@
           </button>
           <a mat-button routerLink="/invoices">Zpět</a>
         </div>
-      </form> </mat-card-content>
+      </form>
+      @if (error) {
+        <mat-error>{{ error }}</mat-error>
+      }
+      @if (success) {
+        <mat-hint>{{ success }}</mat-hint>
+      }
+    </mat-card-content>
   </mat-card>
 </section>
