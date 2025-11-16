@@ -1,1 +1,134 @@
-here display invoice with id: {{invoiceId}}
+<mat-card class="invoice-detail">
+  @if(invoiceDetail()){
+       <h2>Faktura č. {{invoiceDetail()?.invoiceNumber}}</h2>
+    <mat-card-content>
+
+      <div class="invoice-dates">
+        <div>
+          <strong>Datum vytvoření:</strong>
+          <span>{{ invoiceDetail()?.issueDate | date: 'dd.MM.yyyy' }}</span>
+        </div>
+        <div>
+          <strong>Datum splatnosti:</strong>
+          <span>{{ invoiceDetail()?.dueDate | date: 'dd.MM.yyyy' }}</span>
+        </div>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <div class="parties-container">
+
+        <div class="party-box">
+          <h3>Odběratel:</h3>
+
+          <p>
+            <strong>{{customerDetail()?.name}} {{customerDetail()?.surname}}</strong><br>
+            {{customerDetail()?.email}}<br>
+            {{customerDetail()?.phoneNumber}}
+          </p>
+
+          <div class="customer-section">
+            <div class="customer-row">
+              <span class="label">Ulice, č.p.:</span>
+              <span class="value">{{customerDetail()?.street}} {{customerDetail()?.houseNumber}}</span>
+            </div>
+
+            <div class="customer-row">
+              <span class="label">PSČ, Město:</span>
+              <span class="value">{{customerDetail()?.zip}} {{customerDetail()?.city}}</span>
+            </div>
+
+            <div class="customer-row">
+              <span class="label">Země:</span>
+              <span class="value">{{customerDetail()?.country}}</span>
+            </div>
+          </div>
+
+          <div class="customer-section">
+            <div class="customer-row">
+              <span class="label">IČO:</span>
+              <span class="value">{{customerDetail()?.ico}}</span>
+            </div>
+
+            <div class="customer-row">
+              <span class="label">DIČ:</span>
+              <span class="value">{{customerDetail()?.dic}}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="party-box">
+          <h3>Dodavatel:</h3>
+          <p>
+            <strong>Jmeno</strong><br>
+           Ulice<br>
+            ZIP Mesto<br>
+           Stat
+          </p>
+          <p>
+            <strong>IČO:</strong>  ICO<br>
+            <strong>DIČ:</strong> DIC<br>
+            <strong>IBAN:</strong> IBAN
+          </p>
+        </div>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <h3>Položky faktury</h3>
+      <table class="items-table">
+        <thead>
+        <tr>
+          <th>Počet</th>
+          <th>Název</th>
+          <th>Jedn. cena</th>
+          <th>Sazba DPH(v %)</th>
+          <th>Základ daně</th>
+        </tr>
+        </thead>
+        <tbody>
+        @for(item of invoiceDetail()?.items; track $index){
+          <tr>
+            <td>{{ item.quantity }}</td>
+            <td>{{ item.name }}</td>
+            <td>{{ item.unitPrice}} </td>
+            <td>{{ item.vatRate | percent }}</td>
+            <td>{{ item.totalPrice}}</td>
+          </tr>
+        }
+        </tbody>
+      </table>
+
+      <div class="total-summary">
+        <div class="total-row">
+          <span>Základ daně celkem:</span>
+          <strong>{{ invoiceDetail()?.amount | currency:'CZK':'symbol-narrow' }}</strong>
+        </div>
+        <div class="total-row">
+          <span>DPH celkem:</span>
+          <strong>{{ invoiceDetail()?.amount | currency:'CZK':'symbol-narrow' }}</strong>
+        </div>
+        <div class="total-row grand-total">
+          <span>Celkem k úhradě:</span>
+          <strong>{{ invoiceDetail()?.amount | currency:'CZK':'symbol-narrow' }}</strong>
+        </div>
+      </div>
+
+    </mat-card-content>
+
+    <mat-card-actions align="end">
+      <button mat-raised-button color="secondary" (click)="edit()">
+        <mat-icon>edit</mat-icon>
+        Editovat
+      </button>
+      <button mat-raised-button color="primary" (click)="generatePDF()">
+        <mat-icon>picture_as_pdf</mat-icon>
+        Export do PDF
+      </button>
+      <button mat-raised-button color="accent" (click)="pay()">
+        <mat-icon>payment</mat-icon>
+        Zaplatit
+      </button>
+    </mat-card-actions>
+  }
+</mat-card>
