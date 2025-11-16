@@ -19,7 +19,7 @@ import javax.xml.transform.stream.StreamSource
 
 @Service
 class PdfRenderingService {
-    fun renderInvoicePdf(invoiceData: Map<String, Any>): ByteArray {
+    fun renderInvoicePdf(invoiceData: Map<String, Any?>): ByteArray {
         val xml = invoiceData["xml"] as? String
             ?: throw IllegalArgumentException("Chybí XML data v invoiceData")
 

@@ -1,7 +1,7 @@
 package invoice_service.messaging.pendingMessages
 
 import com.uhk.fim.prototype.common.exceptions.PendingMessageException
-import com.uhk.fim.prototype.common.messaging.dto.CustomerResponse
+import com.uhk.fim.prototype.common.messaging.dto.MessageResponse
 import org.springframework.stereotype.Component
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
@@ -9,12 +9,12 @@ import kotlin.collections.set
 
 @Component
 class PendingCustomerMessages {
-    private val pendingCustomerResponses = ConcurrentHashMap<String, CompletableFuture<CustomerResponse>>()
+    private val pendingCustomerResponses = ConcurrentHashMap<String, CompletableFuture<MessageResponse>>()
 
-    fun registerCustomerResponseFuture(correlationId: String, future: CompletableFuture<CustomerResponse>) {
+    fun registerCustomerResponseFuture(correlationId: String, future: CompletableFuture<MessageResponse>) {
         pendingCustomerResponses[correlationId] = future
     }
-    fun completeCustomerResponseFuture(correlationId: String, response: CustomerResponse) {
+    fun completeCustomerResponseFuture(correlationId: String, response: MessageResponse) {
         val pending = pendingCustomerResponses.remove(correlationId)
         if (pending != null) {
             pending.complete(response)

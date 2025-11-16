@@ -1,7 +1,9 @@
 package invoice_service.controllers
 
 import com.uhk.fim.prototype.common.messaging.dto.InvoiceRequest
-import com.uhk.fim.prototype.common.messaging.dto.InvoiceResponse
+import com.uhk.fim.prototype.common.messaging.dto.MessageResponse
+import com.uhk.fim.prototype.common.messaging.enums.SourceService
+import com.uhk.fim.prototype.common.messaging.enums.invoice.MessageInvoiceAction
 import invoice_service.dtos.invoices.requests.InvoiceCreateRequest
 import invoice_service.dtos.invoices.requests.InvoiceUpdateRequest
 import invoice_service.dtos.invoices.responses.InvoicesPagedResponse
@@ -60,14 +62,15 @@ class InvoiceController(
         @PathVariable id: Long
     ): ResponseEntity<String> {
         val correlationId = UUID.randomUUID().toString()
-        val future = CompletableFuture<InvoiceResponse>()
+        val future = CompletableFuture<MessageResponse>()
         pendingInvoiceMessages.registerInvoiceResponseFuture(correlationId, future)
         messageSender.sendInvoiceRequest(
             InvoiceRequest(
+                apiSourceService = SourceService.INVOICE,
                 requestId = correlationId,
-                invoiceId = id,
+                targetId = id,
                 payload = null,
-                action = "renderInvoice"
+                action = MessageInvoiceAction.RENDER
             ),
             correlationId
         )
