@@ -1,11 +1,15 @@
 package com.uhk.fim.prototype.common.messaging
 
+import org.aopalliance.intercept.MethodInterceptor
 import org.springframework.amqp.core.*
+import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory
+import org.springframework.amqp.rabbit.connection.ConnectionFactory
 import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Primary
 
 @Configuration
 class RabbitConfig {
@@ -51,5 +55,17 @@ class RabbitConfig {
         val template = RabbitTemplate(connectionFactory)
         template.messageConverter = messageConverter
         return template
+    }
+
+    @Bean
+    @Primary
+    fun rabbitListenerContainerFactory(
+        connectionFactory: CachingConnectionFactory,
+        rabbitListenerAdvice: MethodInterceptor
+    ): SimpleRabbitListenerContainerFactory {
+        val factory = SimpleRabbitListenerContainerFactory()
+        factory.setConnectionFactory(connectionFactory)
+        factory.setAdviceChain(rabbitListenerAdvice) // global advice
+        return factory
     }
 }
