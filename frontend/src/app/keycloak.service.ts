@@ -1,6 +1,8 @@
 // frontend/src/app/keycloak.service.ts
 import { Injectable } from '@angular/core';
-import Keycloak, { KeycloakInstance, KeycloakInitOptions } from 'keycloak-js';
+import Keycloak, {KeycloakInstance, KeycloakInitOptions, KeycloakProfile} from 'keycloak-js';
+import {HttpClient} from '@angular/common/http';
+import {firstValueFrom} from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class KeycloakService {
@@ -8,6 +10,10 @@ export class KeycloakService {
   private refreshTimeoutId: number | null = null;
   private readonly refreshMinValidity = 30;
   public hasAdminAccess: boolean = false;
+  public currentUser: KeycloakProfile | null = null;
+
+  constructor(public readonly http: HttpClient) {
+  }
 
   public async init(): Promise<void> {
     this.keycloakAuth = new Keycloak({
@@ -31,9 +37,13 @@ export class KeycloakService {
           } catch (e) {
             console.warn('Nepodařilo se naplánovat automatické obnovení tokenu', e);
           }
-          resolve();
+          this.keycloakAuth.loadUserProfile().then((currentUser)=>{
+            this.currentUser = currentUser;
+            resolve();
+          })
         } else {
           reject('Neautentizováno');
+          resolve();
         }
       }).catch((error) => reject(error));
     });
@@ -141,5 +151,22 @@ export class KeycloakService {
         }
       });
   }
+
+  public async getAllUsers(): Promise<any[]> {
+    if (!this.hasAnyRole(['admin', 'manager', 'accountant'])) {
+      throw new Error("Access denied");
+    }
+
+    try {
+      const result = await firstValueFrom(
+        this.http.get<any[]>("http://auth.freing.test/admin/realms/freing/users")
+      );
+      return result;
+    } catch (err) {
+      console.error("Error loading users", err);
+      throw err;
+    }
+  }
+
 
 }

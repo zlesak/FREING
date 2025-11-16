@@ -63,9 +63,8 @@ export class InvoicesTableComponent implements OnInit, AfterViewChecked {
     if (this.keycloakService.hasAdminAccess){
       this.loadAllInvoices();
     } else {
-
+      this.loadInvoicesForUser();
     }
-
   }
 
   ngAfterViewChecked() {
@@ -103,6 +102,13 @@ export class InvoicesTableComponent implements OnInit, AfterViewChecked {
   loadInvoicesForUser(){
     this.loading.set(true);
     this.error = undefined;
+    const userId = this.keycloakService.currentUser?.id;
+    if (!userId){
+      console.log('user ID missing!');
+      this.error = 'Error - user data missing';
+      this.loading.set(false);
+      return;
+    }
     this.invoicesService.getInvoices(0, 999).subscribe({
       next: (resp: InvoiceApi.InvoicesPagedResponse) => {
         //TODO: get all invoices for user, when API is ready
