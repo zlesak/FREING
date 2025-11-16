@@ -2,14 +2,14 @@ package rendering_service.messaging
 
 import com.uhk.fim.prototype.common.messaging.RabbitConfig
 import com.uhk.fim.prototype.common.messaging.dto.InvoiceRequest
-import com.uhk.fim.prototype.common.messaging.dto.RenderingResponse
+import com.uhk.fim.prototype.common.messaging.dto.MessageResponse
 import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.stereotype.Component
 import java.util.*
 
 @Component
 class MessageSender(private val rabbitTemplate: RabbitTemplate) {
-    val replyQueueName: String = "rendering.responses.rendering-service-" + UUID.randomUUID().toString()
+    final val replyQueueName: String = "rendering.responses.rendering-service-" + UUID.randomUUID().toString()
 
     init {
         println("[rendering-service] replyQueueName = $replyQueueName")
@@ -32,7 +32,7 @@ class MessageSender(private val rabbitTemplate: RabbitTemplate) {
         }
     }
 
-    fun sendRenderingResponse(response: RenderingResponse, replyTo: String, correlationId: String) {
+    fun sendRenderingResponse(response: MessageResponse, replyTo: String, correlationId: String) {
         println("[rendering-service] Sending rendering response to $replyTo with correlationId=$correlationId")
         rabbitTemplate.convertAndSend(
             "",
