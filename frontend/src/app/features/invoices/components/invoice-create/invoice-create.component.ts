@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, inject, OnInit} from '@angular/core';
 import {
   FormArray,
   FormBuilder,
@@ -26,8 +26,10 @@ import {
   MatDatepickerModule,
   MatDatepickerToggle
 } from '@angular/material/datepicker';
-import {distinctUntilChanged} from 'rxjs';
+import {distinctUntilChanged, firstValueFrom} from 'rxjs';
 import {CurrencyOptions, InvoiceStatus} from '../../../common/Enums.js';
+import {KeycloakService} from '../../../../keycloak.service';
+import {CustomersServiceController} from '../../../customers/controller/customers.service';
 
 @Component({
   selector: 'app-invoice-create',
@@ -59,6 +61,12 @@ import {CurrencyOptions, InvoiceStatus} from '../../../common/Enums.js';
   ]
 })
 export class InvoiceCreateComponent implements OnInit {
+  private readonly keycloakService = inject(KeycloakService);
+  private readonly customerService = inject(CustomersServiceController);
+  private readonly router = inject(Router);
+
+  protected users: {email: string, id: number}[] = [];
+
   form!: FormGroup;
   submitting = false;
   error?: string;
@@ -71,11 +79,10 @@ export class InvoiceCreateComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private invoicesService: InvoicesServiceController,
-    private router: Router,
     private exchangeRates: ExchangeRatesController
   ) {}
 
-  ngOnInit(): void {
+  async ngOnInit() {
     const today = new Date().toISOString().substring(0,10);
     const due = new Date(Date.now()).toISOString().substring(0,10);
     this.form = this.fb.group({
@@ -97,6 +104,9 @@ export class InvoiceCreateComponent implements OnInit {
       if (!newCur || newCur === this.lastCurrency) return;
       this.convertAllItemsCurrency(this.lastCurrency, newCur);
     });
+    if(this.keycloakService.hasAdminAccess){
+      await this.loadUsersInfo()
+    }
   }
 
   private convertAllItemsCurrency(from: string, to: string): void {
@@ -193,7 +203,7 @@ export class InvoiceCreateComponent implements OnInit {
       ...formValue,
       issueDate: new Date(formValue.issueDate).toISOString().split('T')[0],
       dueDate: new Date(formValue.dueDate).toISOString().split('T')[0],
-      amount: formValue.totalAmount,
+      amount: formValue.amount,
       items: formValue.items
     };
 
@@ -208,5 +218,20 @@ export class InvoiceCreateComponent implements OnInit {
         this.error = err.message || 'Chyba při vytváření faktury';
       }
     });
+  }
+  async loadUsersInfo(){
+
+    //users from keycloak - need to set view users permission for manager and accountant
+    const userDetails =  await this.keycloakService.getAllUsers();
+
+    userDetails.forEach(user=> {
+      this.users.push({email: user.email, id: user.id});
+    })
+    console.log(this.users);
+    const usersFromDb = await firstValueFrom(this.customerService.getCustomers(0,999));
+    console.log(usersFromDb);
+    usersFromDb.content.forEach(user=>{
+      this.users.push({email: user.email, id: user.id!});
+    })
   }
 }

@@ -1,0 +1,123 @@
+.invoice-detail{
+    max-width: 35vw; margin: 0 auto;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 6px 0 rgba(0, 0, 0, 0.53);
+    -webkit-box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.53);
+    -moz-box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.53);
+    overflow-x: auto;
+}
+
+.invoice-dates {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  color: #555;
+}
+
+.invoice-dates div {
+  flex-basis: 48%;
+}
+
+.invoice-dates span {
+  font-weight: bold;
+  padding-left: 10px;
+  color: #000;
+}
+
+.parties-container {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin: 20px 0;
+}
+
+.party-box {
+  flex: 1;
+  padding: 0 10px;
+  line-height: 1.6;
+}
+
+.party-box h3 {
+  border-bottom: 2px solid #f0f0f0;
+  padding-bottom: 5px;
+}
+
+.party-box p {
+  font-size: 0.9rem;
+}
+
+.items-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.items-table th,
+.items-table td {
+  border: 1px solid #ddd;
+  padding: 12px 8px;
+  text-align: left;
+}
+
+.items-table th {
+  background-color: #f9f9f9;
+  font-weight: bold;
+}
+
+.items-table td:nth-child(2),
+.items-table td:nth-child(3),
+.items-table td:nth-child(4),
+.items-table td:nth-child(5) {
+  text-align: right;
+}
+
+.total-summary {
+  width: 40%;
+  margin-left: auto;
+  margin-top: 20px;
+  font-size: 1.1rem;
+}
+
+.total-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+}
+
+.total-row.grand-total {
+  font-weight: bold;
+  border-top: 2px solid #333;
+}
+
+mat-card-actions {
+  padding: 16px;
+}
+
+mat-card-actions button {
+  margin-left: 8px;
+}
+
+mat-icon {
+  margin-right: 5px;
+}
+
+.customer-section {
+  margin-top: 10px;
+  line-height: 1.5;
+}
+
+.customer-row {
+  display: flex;
+  justify-content: space-between;
+}
+
+.customer-row .label {
+  font-weight: bold;
+  padding-right: 15px;
+}
+
+.customer-row .value {
+  text-align: right;
+  flex-grow: 1;
+}
