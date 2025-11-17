@@ -18,20 +18,24 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/api/invoices")
 class ReportingController(private val reportingService: ReportingSubService) {
 
-    @Operation(summary = "Vytvořit agregovaný report", description = "Vygeneruje souhrnný report pro všechny nebo filtrované faktury.")
+    @Operation(
+        summary = "Vytvořit agregovaný report",
+        description = "Vygeneruje souhrnný report pro všechny nebo filtrované faktury."
+    )
     @PostMapping("/report")
-    fun makeAggregatedReport(@RequestBody request: InvoiceReportRequest): ResponseEntity<AggregatedReportResponse> {
-        val aggregated = reportingService.makeAggregatedReportByFilter(request)
-        return ResponseEntity.ok(aggregated)
-    }
+    fun makeAggregatedReport(@RequestBody request: InvoiceReportRequest): AggregatedReportResponse =
+        reportingService.makeAggregatedReportByFilter(request)
 
-    @Operation(summary = "Exportovat report jako CSV", description = "Vygeneruje CSV soubor s reportem podle filtru a vrátí jej ke stažení.")
-    @PostMapping("/report/csv")
-    fun exportAggregatedReportCsv(@RequestBody request: InvoiceReportRequest): ResponseEntity<ByteArray> {
-        val csvBytes = reportingService.generateAggregatedReportCsv(request)
-        val headers = HttpHeaders()
-        headers.contentType = MediaType.parseMediaType("text/csv; charset=UTF-8")
-        headers.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=invoice-report.csv")
-        return ResponseEntity.ok().headers(headers).body(csvBytes)
-    }
+    @Operation(
+        summary = "Exportovat report jako CSV",
+        description = "Vygeneruje CSV soubor s reportem podle filtru a vrátí jej ke stažení."
+    )
+    @PostMapping("/report/csv", produces = ["text/csv;charset=UTF-8"])
+    fun exportAggregatedReportCsv(@RequestBody request: InvoiceReportRequest): ResponseEntity<ByteArray> =
+        reportingService.generateAggregatedReportCsv(request).let { csvBytes ->
+            ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType("text/csv; charset=UTF-8"))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=invoice-report.csv")
+                .body(csvBytes)
+        }
 }
