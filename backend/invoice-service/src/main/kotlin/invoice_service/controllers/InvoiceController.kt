@@ -1,10 +1,8 @@
 package invoice_service.controllers
 
-import com.uhk.fim.prototype.common.messaging.ActiveMessagingManager
 import com.uhk.fim.prototype.common.messaging.enums.invoice.MessageInvoiceAction
 import invoice_service.dtos.invoices.requests.InvoiceCreateRequest
 import invoice_service.dtos.invoices.requests.InvoiceUpdateRequest
-import invoice_service.dtos.invoices.responses.InvoicesPagedResponse
 import invoice_service.messaging.MessageSender
 import invoice_service.models.invoices.Invoice
 import invoice_service.services.InvoiceService
@@ -15,8 +13,8 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
+import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
-import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 @Tag(name = "Invoices", description = "API pro správu faktur")
@@ -24,8 +22,7 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("/api/invoices")
 class InvoiceController(
     private val service: InvoiceService,
-    private val messageSender: MessageSender,
-    private val activeMessagingManager: ActiveMessagingManager
+    private val messageSender: MessageSender
 ) {
 
     @Operation(summary = "Získat všechny faktury", description = "Vrací stránkovaný seznam všech faktur.")
@@ -35,18 +32,14 @@ class InvoiceController(
         @RequestParam(defaultValue = "0") page: Int,
         @Parameter(description = "Velikost stránky", example = "10")
         @RequestParam(defaultValue = "10") size: Int
-    ): InvoicesPagedResponse<Invoice> {
-        val pageable = PageRequest.of(page, size)
-        return service.getAllInvoices(pageable)
-    }
+    ): Page<Invoice> = service.getAllInvoices(PageRequest.of(page, size))
 
     @Operation(summary = "Získat fakturu podle ID", description = "Vrací detail faktury podle jejího ID.")
     @GetMapping("/get-by-id/{id}")
     fun getInvoice(
         @Parameter(description = "ID faktury", example = "1")
         @PathVariable id: Long
-    ): ResponseEntity<Invoice> =
-        service.getInvoice(id)?.let { ResponseEntity.ok(it) } ?: (ResponseEntity.notFound().build())
+    ): Invoice = service.getInvoice(id)
 
     @Operation(summary = "Získat fakturu podle ID", description = "Vrací detail faktury podle jejího ID.")
 
@@ -71,7 +64,7 @@ class InvoiceController(
                 content = [Content(schema = Schema(implementation = Invoice::class))]
             ),
             ApiResponse(
-                responseCode = "409",
+                responseCode = "400",
                 description = "Faktura s tímto číslem již existuje",
                 content = [Content(schema = Schema(example = "{\"error\": \"Faktura s tímto číslem již existuje.\"}"))]
             )
@@ -81,9 +74,7 @@ class InvoiceController(
     fun createInvoice(
         @Parameter(description = "Data pro vytvoření faktury")
         @RequestBody request: InvoiceCreateRequest
-    ): Invoice {
-        return service.createInvoice(request)
-    }
+    ): Invoice = service.createInvoice(request)
 
     @Operation(summary = "Aktualizovat fakturu", description = "Aktualizuje existující fakturu podle ID.")
     @PutMapping("/update/{id}")
@@ -92,22 +83,12 @@ class InvoiceController(
         @PathVariable id: Long,
         @Parameter(description = "Data pro aktualizaci faktury")
         @RequestBody request: InvoiceUpdateRequest
-    ): ResponseEntity<Invoice> {
-        val updated = service.updateInvoice(id, request)
-        return if (updated != null) ResponseEntity.ok(updated) else ResponseEntity.status(403).build()
-    }
+    ): Invoice = service.updateInvoice(id, request)
 
     @Operation(summary = "Smazat fakturu", description = "Smaže fakturu podle ID.")
     @DeleteMapping("/delete/{id}")
     fun deleteInvoice(
         @Parameter(description = "ID faktury", example = "1")
         @PathVariable id: Long
-    ): ResponseEntity<String> {
-        val deleted = service.deleteInvoice(id)
-        return if (deleted) {
-            ResponseEntity.noContent().build()
-        } else {
-            ResponseEntity.status(409).body("Nelze smazat fakturu")
-        }
-    }
+    ) = service.deleteInvoice(id)
 }

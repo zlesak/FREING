@@ -1,5 +1,6 @@
 package invoice_service.models.invoices
 
+import invoice_service.dtos.invoices.requests.InvoiceUpdateRequest
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.persistence.*
 import java.math.BigDecimal
@@ -66,5 +67,40 @@ data class Invoice(
 
     fun removeItem(item: InvoiceItem) {
         items.remove(item)
+    }
+
+    fun updateFrom(request: InvoiceUpdateRequest) {
+        this.invoiceNumber = request.invoiceNumber
+        this.customerId = request.customerId
+        this.referenceNumber = request.referenceNumber
+        this.issueDate = request.issueDate
+        this.dueDate = request.dueDate
+        this.amount = request.amount
+        this.currency = request.currency
+        this.status = request.status
+        this.updatedAt = Instant.now()
+
+        val requestItemsMap = request.items.associateBy { it.id }
+
+        val itemsToRemove = this.items.filter { it.id !in requestItemsMap.keys }
+        itemsToRemove.forEach { this.removeItem(it) }
+
+        request.items.forEach { itemRequest ->
+            val item = if (itemRequest.id != null) {
+                this.items.find { it.id == itemRequest.id } ?: InvoiceItem()
+            } else {
+                InvoiceItem()
+            }
+            item.name = itemRequest.name
+            item.description = itemRequest.description
+            item.unit = itemRequest.unit
+            item.quantity = itemRequest.quantity
+            item.unitPrice = itemRequest.unitPrice
+            item.totalPrice = itemRequest.totalPrice
+            item.vatRate = itemRequest.vat
+            if (item.id == null || !this.items.contains(item)) {
+                this.addItem(item)
+            }
+        }
     }
 }
