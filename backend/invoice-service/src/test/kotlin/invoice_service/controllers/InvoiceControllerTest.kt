@@ -6,7 +6,6 @@ import invoice_service.dtos.invoices.requests.InvoiceCreateRequest
 import invoice_service.dtos.invoices.requests.InvoiceUpdateRequest
 import invoice_service.dtos.invoices.responses.InvoicesPagedResponse
 import invoice_service.messaging.MessageSender
-import invoice_service.messaging.pendingMessages.PendingInvoiceMessages
 import invoice_service.models.invoices.InvoiceStatusEnum
 import invoice_service.services.InvoiceService
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -151,7 +150,7 @@ class InvoiceControllerTest {
             idRef.set(inv.getArgument(0))
             futureRef.set(inv.getArgument(1))
             null
-        }.whenever(pending).registerInvoiceResponseFuture(any(), any())
+        }.whenever(pending).register(any(), any())
 
         doAnswer { _ ->
             // when message is sent, complete the previously registered future

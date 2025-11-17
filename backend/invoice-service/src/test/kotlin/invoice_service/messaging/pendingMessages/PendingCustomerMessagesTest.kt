@@ -14,7 +14,7 @@ class PendingCustomerMessagesTest {
         val future = CompletableFuture<CustomerResponse>()
         val correlationId = "corr-1"
 
-        pending.registerCustomerResponseFuture(correlationId, future)
+        pending.register(correlationId, future)
 
         val response = CustomerResponse(
             requestId = "r1",
@@ -23,7 +23,7 @@ class PendingCustomerMessagesTest {
             payload = mapOf("name" to "Jan"),
             error = null
         )
-        pending.completeCustomerResponseFuture(correlationId, response)
+        pending.unregister(correlationId, response)
 
         assertTrue(future.isDone)
         assertEquals(response, future.get())
@@ -42,7 +42,7 @@ class PendingCustomerMessagesTest {
         val unknown = "no-such-id"
 
         val ex = assertThrows(PendingMessageException::class.java) {
-            pending.completeCustomerResponseFuture(unknown, response)
+            pending.unregister(unknown, response)
         }
         assertTrue(ex.message!!.contains(unknown))
     }

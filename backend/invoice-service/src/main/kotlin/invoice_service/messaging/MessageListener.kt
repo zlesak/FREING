@@ -1,5 +1,7 @@
 package invoice_service.messaging
 
+import com.uhk.fim.prototype.common.messaging.ActiveMessageRegistry
+import com.uhk.fim.prototype.common.messaging.ActiveMessagingManager
 import com.uhk.fim.prototype.common.messaging.RabbitConfig
 import com.uhk.fim.prototype.common.messaging.dto.InvoiceRequest
 import com.uhk.fim.prototype.common.messaging.dto.MessageResponse
@@ -7,8 +9,6 @@ import com.uhk.fim.prototype.common.messaging.enums.SourceService
 import com.uhk.fim.prototype.common.messaging.enums.invoice.MessageInvoiceAction
 import invoice_service.messaging.handlers.InvalidMessageActionHandler
 import invoice_service.messaging.handlers.InvoiceServiceHandler
-import invoice_service.messaging.pendingMessages.PendingCustomerMessages
-import invoice_service.messaging.pendingMessages.PendingInvoiceMessages
 import org.springframework.amqp.core.Message
 import org.springframework.amqp.rabbit.annotation.RabbitListener
 import org.springframework.amqp.support.converter.MessageConverter
@@ -19,8 +19,7 @@ class MessageListener (
     private val messageConverter: MessageConverter,
     private val invoiceServiceHandler: InvoiceServiceHandler,
     private val invalidMessageActionHandler: InvalidMessageActionHandler,
-    private val pendingCustomerResponses: PendingCustomerMessages,
-    private val pendingInvoiceResponses: PendingInvoiceMessages
+    private val activeMessagingManager: ActiveMessagingManager,
 ) {
 
     @RabbitListener(queues = [RabbitConfig.INVOICE_REQUESTS])
@@ -50,8 +49,7 @@ class MessageListener (
             }
 
             when (deserializedMessage.sourceService) {
-                SourceService.CUSTOMER-> pendingCustomerResponses.completeCustomerResponseFuture(correlationId, deserializedMessage)
-                SourceService.INVOICE -> pendingInvoiceResponses.completeInvoiceResponseFuture(correlationId, deserializedMessage)
+                SourceService.CUSTOMER, SourceService.INVOICE-> activeMessagingManager.unregisterMessage(correlationId, deserializedMessage)
                 else -> throw IllegalArgumentException("Unsupported message type: ${deserializedMessage::class}")
             }
         } catch (ex: Exception) {

@@ -1,5 +1,6 @@
 package rendering_service.messaging
 
+import com.uhk.fim.prototype.common.messaging.ActiveMessagingManager
 import com.uhk.fim.prototype.common.messaging.RabbitConfig
 import com.uhk.fim.prototype.common.messaging.dto.InvoiceRequest
 import com.uhk.fim.prototype.common.messaging.dto.MessageResponse
@@ -18,7 +19,8 @@ import java.util.concurrent.ConcurrentHashMap
 class MessageListener (
     private val messageSender: MessageSender,
     private val messageConverter: MessageConverter,
-    private val pdfRenderingService: PdfRenderingService
+    private val pdfRenderingService: PdfRenderingService,
+    private val activeMessagingManager: ActiveMessagingManager,
 ) {
     private val renderingRequests = ConcurrentHashMap<String, Message>()
 
@@ -32,14 +34,13 @@ class MessageListener (
 
         if (request.action == MessageInvoiceAction.RENDER) {
             renderingRequests[correlationId] = message
-            val invoiceRequest = InvoiceRequest(
-                apiSourceService = request.apiSourceService,
-                requestId = request.requestId,
+            messageSender.sendInvoiceRequest(
                 targetId = request.targetId,
+                requestId = request.requestId,
+                correlationId = correlationId,
                 action = MessageInvoiceAction.RENDER,
-                payload = null
-            )
-            messageSender.sendInvoiceRequest(invoiceRequest, correlationId)
+                apiSourceService = request.apiSourceService
+                )
         } else {
             val render = MessageResponse(
                 apiSourceService = request.apiSourceService,
@@ -71,7 +72,7 @@ class MessageListener (
 
             if (response.status == MessageStatus.OK) {
                 @Suppress("UNCHECKED_CAST")
-                val invoiceData = response.payload ?: emptyMap()
+                val invoiceData = response.payload
                 val pdfBytes = pdfRenderingService.renderInvoicePdf(invoiceData)
                 val pdfBase64 = Base64.getEncoder().encodeToString(pdfBytes)
                 val render = MessageResponse(
