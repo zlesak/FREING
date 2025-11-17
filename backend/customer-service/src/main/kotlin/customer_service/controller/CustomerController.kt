@@ -45,6 +45,18 @@ class CustomerController(
         val pageable = PageRequest.of(page, size)
         return customerService.getAllCustomers(pageable)
     }
+
+    @GetMapping("/get-customers-not-deleted-paged")
+    fun getAllNotDeleted(
+        @Parameter(description = "Číslo stránky", example = "0")
+        @RequestParam(defaultValue = "0") page: Int,
+        @Parameter(description = "Velikost stránky", example = "10")
+        @RequestParam(defaultValue = "10") size: Int
+    ): CustomersPagedResponse<CustomerEntity> {
+        val pageable = PageRequest.of(page, size)
+        return customerService.getCustomersNotDeleted(pageable)
+    }
+
     @GetMapping("/get-customers-info-from-ares/{ico}")
 
     fun getCustomerInfoFromAresByIco(@PathVariable ico: String): CustomerEntity {

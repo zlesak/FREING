@@ -76,22 +76,26 @@ class CustomerService(
     }
 
     fun getAllCustomers(pageable: Pageable): CustomersPagedResponse<CustomerEntity> {
-        val allCustomers = customerRepo.findAll().filter { !it.deleted }
-
-        val startIndex = pageable.pageNumber * pageable.pageSize
-        val endIndex = minOf(startIndex + pageable.pageSize, allCustomers.size)
-        val pageContent = if (startIndex < allCustomers.size) {
-            allCustomers.subList(startIndex, endIndex)
-        } else {
-            emptyList<CustomerEntity>()
-        }
+        val page = customerRepo.findAll(pageable)
 
         return CustomersPagedResponse(
-            content = pageContent,
-            totalElements = allCustomers.size.toLong(),
-            totalPages = (allCustomers.size + pageable.pageSize - 1) / pageable.pageSize,
-            page = pageable.pageNumber,
-            size = pageable.pageSize
+            content = page.content,
+            totalElements = page.totalElements,
+            totalPages = page.totalPages,
+            page = page.number,
+            size = page.size
+        )
+    }
+
+    fun getCustomersNotDeleted(pageable: Pageable): CustomersPagedResponse<CustomerEntity> {
+        val page = customerRepo.findAllByDeletedFalse(pageable)
+
+        return CustomersPagedResponse(
+            content = page.content,
+            totalElements = page.totalElements,
+            totalPages = page.totalPages,
+            page = page.number,
+            size = page.size
         )
     }
 
