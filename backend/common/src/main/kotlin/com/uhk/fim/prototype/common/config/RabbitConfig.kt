@@ -1,10 +1,13 @@
-package com.uhk.fim.prototype.common.messaging
+package com.uhk.fim.prototype.common.config
 
+import kotlinx.coroutines.CoroutineScope
 import org.aopalliance.intercept.MethodInterceptor
-import org.springframework.amqp.core.*
+import org.springframework.amqp.core.Binding
+import org.springframework.amqp.core.BindingBuilder
+import org.springframework.amqp.core.DirectExchange
+import org.springframework.amqp.core.Queue
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory
-import org.springframework.amqp.rabbit.connection.ConnectionFactory
 import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter
 import org.springframework.context.annotation.Bean
@@ -12,7 +15,9 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
 
 @Configuration
-class RabbitConfig {
+class RabbitConfig(
+    private val appScope: CoroutineScope,
+) {
     companion object {
         const val EXCHANGE = "freing.exchange"
         const val CUSTOMER_REQUESTS = "customer.requests"
@@ -65,7 +70,8 @@ class RabbitConfig {
     ): SimpleRabbitListenerContainerFactory {
         val factory = SimpleRabbitListenerContainerFactory()
         factory.setConnectionFactory(connectionFactory)
-        factory.setAdviceChain(rabbitListenerAdvice) // global advice
+        factory.setAdviceChain(rabbitListenerAdvice)
+        factory.setTaskExecutor { it.asCoroutine(appScope) }
         return factory
     }
 }
