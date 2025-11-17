@@ -1,7 +1,7 @@
 package rendering_service.messaging
 
+import com.uhk.fim.prototype.common.config.RabbitConfig
 import com.uhk.fim.prototype.common.messaging.ActiveMessagingManager
-import com.uhk.fim.prototype.common.messaging.RabbitConfig
 import com.uhk.fim.prototype.common.messaging.dto.InvoiceRequest
 import com.uhk.fim.prototype.common.messaging.dto.MessageResponse
 import com.uhk.fim.prototype.common.messaging.enums.MessageStatus
@@ -32,16 +32,28 @@ class MessageListener (
 
         println("[rendering-service] Received rendering request: $request, replyTo=$replyTo, correlationId=$correlationId")
 
-        if (request.action == MessageInvoiceAction.RENDER) {
-            renderingRequests[correlationId] = message
-            messageSender.sendInvoiceRequest(
-                targetId = request.targetId,
-                requestId = request.requestId,
-                correlationId = correlationId,
-                action = MessageInvoiceAction.RENDER,
-                apiSourceService = request.apiSourceService
+        try {
+            if (request.action == MessageInvoiceAction.RENDER) {
+                renderingRequests[correlationId] = message
+                messageSender.sendInvoiceRequest(
+                    targetId = request.targetId,
+                    requestId = request.requestId,
+                    correlationId = correlationId,
+                    action = MessageInvoiceAction.RENDER,
+                    apiSourceService = request.apiSourceService
                 )
-        } else {
+            } else {
+                val render = MessageResponse(
+                    apiSourceService = request.apiSourceService,
+                    sourceService = SourceService.RENDER,
+                    requestId = request.requestId,
+                    targetId = request.targetId,
+                    status = MessageStatus.ERROR,
+                    error = "Timeout while processing request",
+                )
+                messageSender.sendRenderingResponse(render, replyTo, correlationId)
+            }
+        } catch (ex: Exception){
             val render = MessageResponse(
                 apiSourceService = request.apiSourceService,
                 sourceService = SourceService.RENDER,

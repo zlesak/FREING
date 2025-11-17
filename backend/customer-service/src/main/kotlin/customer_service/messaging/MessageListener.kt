@@ -1,6 +1,6 @@
 package customer_service.messaging
 
-import com.uhk.fim.prototype.common.messaging.RabbitConfig
+import com.uhk.fim.prototype.common.config.RabbitConfig
 import com.uhk.fim.prototype.common.messaging.dto.CustomerRequest
 import com.uhk.fim.prototype.common.messaging.enums.customer.MessageCustomerAction
 import customer_service.messaging.handlers.CustomerServiceHandler
