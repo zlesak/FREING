@@ -36,27 +36,19 @@ class InvoiceService(
         return repo.save(invoice)
     }
 
-fun getInvoice(id: Long, fromMessaging: Boolean = false): Invoice? {
+    fun getInvoice(id: Long, fromMessaging: Boolean = false): Invoice? {
         val invoice = repo.findByIdOrNull(id)
         return if (fromMessaging && invoice?.status == InvoiceStatusEnum.DRAFT) null else invoice
     }
+
     fun getAllInvoices(pageable: Pageable): InvoicesPagedResponse<Invoice> {
-        val allInvoices = repo.findAll()
-
-        val startIndex = pageable.pageNumber * pageable.pageSize
-        val endIndex = minOf(startIndex + pageable.pageSize, allInvoices.size)
-        val pageContent = if (startIndex < allInvoices.size) {
-            allInvoices.subList(startIndex, endIndex)
-        } else {
-            emptyList<Invoice>()
-        }
-
+        val page = repo.findAll(pageable)
         return InvoicesPagedResponse(
-            content = pageContent,
-            totalElements = allInvoices.size.toLong(),
-            totalPages = (allInvoices.size + pageable.pageSize - 1) / pageable.pageSize,
-            page = pageable.pageNumber,
-            size = pageable.pageSize
+            content = page.content,
+            totalElements = page.totalElements,
+            totalPages = page.totalPages,
+            page = page.number,
+            size = page.size
         )
     }
 
