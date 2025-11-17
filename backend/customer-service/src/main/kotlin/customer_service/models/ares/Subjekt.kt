@@ -1,6 +1,6 @@
 package customer_service.models.ares
 
-import customer_service.models.CustomerEntity
+import customer_service.models.Customer
 
 data class Subjekt(
     val ico: String? = null,
@@ -21,8 +21,8 @@ data class Subjekt(
     val subRegistrSzr: String? = null,
     val dicSkDph: String? = null
 ) {
-    fun toCustomerEntity(): CustomerEntity {
-        return CustomerEntity(
+    fun toCustomerEntity(): Customer {
+        return Customer(
             name = "",
             surname = "",
             email = "",

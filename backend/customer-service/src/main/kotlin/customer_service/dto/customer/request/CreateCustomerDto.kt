@@ -1,6 +1,6 @@
 package customer_service.dto.customer.request
 
-import customer_service.models.CustomerEntity
+import customer_service.models.Customer
 import java.util.*
 
 data class CreateCustomerDto(
@@ -21,8 +21,8 @@ data class CreateCustomerDto(
     val bankAccount: String? = null,
     val currency: String? = null,
 ) {
-    fun toEntity(): CustomerEntity {
-        return CustomerEntity(
+    fun toEntity(): Customer {
+        return Customer(
            name = name ?: "",
             surname = surname ?: "",
             tradeName = tradeNumber ?: "",

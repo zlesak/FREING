@@ -6,7 +6,7 @@ import java.util.*
 
 @Entity
 @Table(name = "customer")
-data class CustomerEntity(
+data class Customer(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,
@@ -101,4 +101,23 @@ data class CustomerEntity(
         )
     }
 
+    fun updateFrom(src: Customer) {
+        if (src.name.isNotBlank()) name = src.name
+        if (src.surname.isNotBlank()) surname = src.surname
+        if (src.tradeName.isNotBlank()) tradeName = src.tradeName
+        if (src.email.isNotBlank()) email = src.email
+        if (src.phoneNumber.isNotBlank()) phoneNumber = src.phoneNumber
+
+        birthDate = src.birthDate
+        street = src.street
+        houseNumber = src.houseNumber
+        city = src.city
+        zip = src.zip
+        country = src.country
+        ico = src.ico
+        dic = src.dic
+        bankCode = src.bankCode
+        bankAccount = src.bankAccount
+        currency = src.currency
+    }
 }
