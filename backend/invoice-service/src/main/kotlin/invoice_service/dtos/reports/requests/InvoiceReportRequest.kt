@@ -10,7 +10,7 @@ data class InvoiceReportRequest(
     @field:Schema(description = "Seznam ID faktur (pokud je zadán, použijí se pouze tyto)")
     val invoiceIds: List<Long>? = null,
     @field:Schema(description = "ID zákazníka", example = "42")
-    val customerId: Long,
+    var customerId: Long,
     @field:Schema(description = "Číslo faktury (částečná shoda)", example = "20250001")
     val invoiceNumber: String? = null,
     @field:Schema(description = "Referenční číslo faktury (částečná shoda)", example = "REF-2025-0001")

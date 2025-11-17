@@ -2,6 +2,8 @@ package invoice_service.repository
 
 import invoice_service.models.invoices.Invoice
 import invoice_service.models.invoices.InvoiceStatusEnum
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor
 import org.springframework.data.jpa.repository.Modifying
@@ -17,4 +19,6 @@ interface InvoiceRepository : JpaRepository<Invoice, Long>, JpaSpecificationExec
     fun deleteByIdIfDraft(id: Long): Int
 
     fun findByIdAndStatus(id: Long, status: InvoiceStatusEnum): Invoice?
+
+    fun findAllByCustomerId(customerId: Long, pageable: Pageable): Page<Invoice>
 }

@@ -1,5 +1,7 @@
 package invoice_service.services
 
+import com.uhk.fim.prototype.common.exceptions.OperationDeniedException
+import com.uhk.fim.prototype.common.security.JwtUserPrincipal
 import invoice_service.dtos.reports.requests.InvoiceReportRequest
 import invoice_service.dtos.reports.responses.AggregatedReportResponse
 import invoice_service.dtos.reports.responses.AllInvoicesReportResponse
@@ -10,6 +12,7 @@ import invoice_service.models.invoices.InvoiceStatusEnum
 import invoice_service.repository.InvoiceRepository
 import jakarta.persistence.criteria.Predicate
 import org.springframework.data.jpa.domain.Specification
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
 import java.time.LocalDateTime
@@ -136,7 +139,21 @@ class ReportingSubService(
         return csv.toByteArray(Charsets.UTF_8)
     }
 
-    fun getFilteredInvoices(request: InvoiceReportRequest): List<Invoice> =
-        if (!request.invoiceIds.isNullOrEmpty()) repo.findAllById(request.invoiceIds).toList()
-        else repo.findAll(buildSpecification(request))
+    fun getFilteredInvoices(request: InvoiceReportRequest): List<Invoice> {
+        val authentication = SecurityContextHolder.getContext().authentication
+        val customerId = if (authentication.authorities.any { it.authority == "ROLE_CUSTOMER" }) {
+            (authentication.principal as? JwtUserPrincipal)?.also { request.customerId = it.id } ?: throw OperationDeniedException(
+                message = "Customer not found"
+            )
+        } else null
+
+        val invoices = when {
+            !request.invoiceIds.isNullOrEmpty() -> repo.findAllById(request.invoiceIds)
+            else -> repo.findAll(buildSpecification(request))
+        }
+
+        return customerId?.let { id ->
+            invoices.filter { it.customerId == id.id }
+        } ?: invoices
+    }
 }

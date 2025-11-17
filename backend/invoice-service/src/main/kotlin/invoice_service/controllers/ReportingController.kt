@@ -9,6 +9,8 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.prepost.PostAuthorize
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -23,6 +25,7 @@ class ReportingController(private val reportingService: ReportingSubService) {
         summary = "Vytvořit agregovaný report",
         description = "Vygeneruje souhrnný report pro všechny nebo filtrované faktury."
     )
+    @PreAuthorize("hasRole('MANAGER')")
     @PostMapping("/report")
     fun makeAggregatedReport(@RequestBody request: InvoiceReportRequest): AggregatedReportResponse =
         reportingService.makeAggregatedReportByFilter(request)
@@ -31,6 +34,7 @@ class ReportingController(private val reportingService: ReportingSubService) {
         summary = "Exportovat report jako CSV",
         description = "Vygeneruje CSV soubor s reportem podle filtru a vrátí jej ke stažení."
     )
+    @PreAuthorize("hasRole('MANAGER')")
     @PostMapping("/report/csv", produces = ["text/csv;charset=UTF-8"])
     fun exportAggregatedReportCsv(@RequestBody request: InvoiceReportRequest): ResponseEntity<ByteArray> =
         reportingService.generateAggregatedReportCsv(request).let { csvBytes ->
