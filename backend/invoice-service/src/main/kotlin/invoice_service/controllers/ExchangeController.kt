@@ -13,23 +13,29 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import java.math.BigDecimal
-import java.math.RoundingMode
 
 @Tag(name = "Exchange", description = "Externí směnné kurzy - převod částek")
 @RestController
 @RequestMapping("/api/invoices/exchange")
 class ExchangeController(private val exchangeRateService: ExchangeRateService) {
 
-    @Operation(summary = "Převést částku", description = "Převede částku z jedné měny do druhé podle nejnovějšího kurzu.")
-    @ApiResponse(responseCode = "200", description = "Úspěšná konverze", content = [Content(schema = Schema(implementation = CurrencyConversionResponse::class))])
+    @Operation(
+        summary = "Převést částku",
+        description = "Převede částku z jedné měny do druhé podle nejnovějšího kurzu."
+    )
+    @ApiResponse(
+        responseCode = "200",
+        description = "Úspěšná konverze",
+        content = [Content(schema = Schema(implementation = CurrencyConversionResponse::class))]
+    )
     @GetMapping("/convert")
     fun convert(
-        @Parameter(description = "Zdrojová měna", example = "EUR") @RequestParam from: String,
-        @Parameter(description = "Cílová měna", example = "CZK") @RequestParam to: String,
-        @Parameter(description = "Částka", example = "100.0") @RequestParam amount: BigDecimal
-    ): CurrencyConversionResponse {
-        val result = exchangeRateService.convert(from, to, amount)
-        val rateOut = result.rate.setScale(8, RoundingMode.HALF_UP)
-        return CurrencyConversionResponse(from.uppercase(), to.uppercase(), amount, rateOut, result.converted)
-    }
+        @Parameter(description = "Zdrojová měna", example = "EUR")
+        @RequestParam from: String,
+        @Parameter(description = "Cílová měna", example = "CZK")
+        @RequestParam to: String,
+        @Parameter(description = "Částka k převedení", example = "100.0")
+        @RequestParam amount: BigDecimal
+    ): CurrencyConversionResponse =
+        exchangeRateService.convert(from, to, amount).toResponse(from, to, amount)
 }
