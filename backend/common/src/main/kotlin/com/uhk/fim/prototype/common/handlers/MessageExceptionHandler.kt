@@ -1,8 +1,8 @@
 package com.uhk.fim.prototype.common.handlers
 
+import com.uhk.fim.prototype.common.messaging.ActiveMessagingManager
 import com.uhk.fim.prototype.common.messaging.dto.MessageResponse
 import org.aopalliance.intercept.MethodInterceptor
-import org.aspectj.lang.annotation.Aspect
 import org.springframework.amqp.core.Message
 import org.springframework.amqp.support.converter.MessageConverter
 import org.springframework.context.annotation.Bean
@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component
 @Component
 class MessageExceptionHandler(
     private val messageConverter: MessageConverter,
+    private val activeMessagingManager: ActiveMessagingManager
 ) {
 
     @Bean

@@ -3,8 +3,6 @@ package invoice_service.messaging
 import com.uhk.fim.prototype.common.messaging.dto.CustomerResponse
 import com.uhk.fim.prototype.common.messaging.dto.InvoiceRequest
 import com.uhk.fim.prototype.common.messaging.dto.InvoiceResponse
-import invoice_service.messaging.pendingMessages.PendingCustomerMessages
-import invoice_service.messaging.pendingMessages.PendingInvoiceMessages
 import invoice_service.messaging.handlers.InvalidMessageActionHandler
 import invoice_service.messaging.handlers.InvoiceServiceHandler
 import org.junit.jupiter.api.Test
@@ -40,7 +38,7 @@ class MessageListenerTest {
 
         listener.receiveCustomerResponse(message)
 
-        verify(pendingCustomer, times(1)).completeCustomerResponseFuture("corr-1", resp)
+        verify(pendingCustomer, times(1)).unregister("corr-1", resp)
     }
 
     @Test
@@ -68,7 +66,7 @@ class MessageListenerTest {
 
         listener.receiveInvoiceResponse(message)
 
-        verify(pendingInvoice, times(1)).completeInvoiceResponseFuture("corr-2", resp)
+        verify(pendingInvoice, times(1)).unregister("corr-2", resp)
     }
 
     @Test

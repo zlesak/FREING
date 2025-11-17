@@ -14,7 +14,7 @@ class PendingInvoiceMessagesTest {
         val future = CompletableFuture<InvoiceResponse>()
         val correlationId = "corr-1"
 
-        pending.registerInvoiceResponseFuture(correlationId, future)
+        pending.register(correlationId, future)
 
         val response = InvoiceResponse(
             requestId = "r1",
@@ -23,7 +23,7 @@ class PendingInvoiceMessagesTest {
             payload = mapOf("xml" to "<xml/>"),
             error = null
         )
-        pending.completeInvoiceResponseFuture(correlationId, response)
+        pending.unregister(correlationId, response)
 
         assertTrue(future.isDone)
         assertEquals(response, future.get())
@@ -42,7 +42,7 @@ class PendingInvoiceMessagesTest {
         val unknown = "no-such-id"
 
         val ex = assertThrows(PendingMessageException::class.java) {
-            pending.completeInvoiceResponseFuture(unknown, response)
+            pending.unregister(unknown, response)
         }
         assertTrue(ex.message!!.contains(unknown))
     }
