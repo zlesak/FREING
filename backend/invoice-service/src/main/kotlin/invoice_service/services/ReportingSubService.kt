@@ -6,6 +6,7 @@ import invoice_service.dtos.reports.responses.AllInvoicesReportResponse
 import invoice_service.dtos.reports.responses.CustomerInvoicesReportResponse
 import invoice_service.messaging.handlers.CustomerServiceHandler
 import invoice_service.models.invoices.Invoice
+import invoice_service.models.invoices.InvoiceStatusEnum
 import invoice_service.repository.InvoiceRepository
 import jakarta.persistence.criteria.Predicate
 import org.springframework.data.jpa.domain.Specification
@@ -29,17 +30,32 @@ class ReportingSubService(
             if (request.customerId > 0) {
                 predicates += cb.equal(root.get<Long>("customerId"), request.customerId)
             }
+            request.referenceNumber?.takeIf { it.isNotBlank() }?.let { ref ->
+                predicates += cb.like(cb.lower(root.get("referenceNumber")), "%${ref.lowercase()}%")
+            }
             request.issueDateFrom?.let { from ->
                 predicates += cb.greaterThanOrEqualTo(root.get("issueDate"), from)
             }
             request.issueDateTo?.let { to ->
                 predicates += cb.lessThanOrEqualTo(root.get("issueDate"), to)
             }
+            request.dueDateFrom?.let { from ->
+                predicates += cb.greaterThanOrEqualTo(root.get("dueDate"), from)
+            }
+            request.dueDateTo?.let { to ->
+                predicates += cb.lessThanOrEqualTo(root.get("dueDate"), to)
+            }
             request.minAmount?.let { min ->
                 predicates += cb.greaterThanOrEqualTo(root.get("amount"), min)
             }
             request.maxAmount?.let { max ->
                 predicates += cb.lessThanOrEqualTo(root.get("amount"), max)
+            }
+            request.currency?.takeIf { it.isNotBlank() }?.let { cur ->
+                predicates += cb.equal(cb.lower(root.get("currency")), cur.lowercase())
+            }
+            request.status?.let { status ->
+                predicates += cb.equal(root.get<InvoiceStatusEnum>("status"), status)
             }
 
             cb.and(*predicates.toTypedArray())
@@ -50,9 +66,9 @@ class ReportingSubService(
             .groupBy { it.customerId }
             .map { (id, list) ->
                 CustomerInvoicesReportResponse(
+                    customerName = customerServiceHandler.getCustomerNameById(id),
                     invoiceCount = list.size,
-                    totalAmount = list.totalAmount(),
-                    customerName = customerServiceHandler.getCustomerNameById(id)
+                    totalAmount = list.totalAmount()
                 )
             }
 
@@ -60,9 +76,13 @@ class ReportingSubService(
             AllInvoicesReportResponse(
                 id = inv.id!!,
                 invoiceNumber = inv.invoiceNumber,
+                referenceNumber = inv.referenceNumber,
+                customerId = inv.customerId,
                 issueDate = inv.issueDate,
+                dueDate = inv.dueDate,
                 amount = inv.amount,
-                currency = inv.currency
+                currency = inv.currency,
+                status = inv.status
             )
         }
 
@@ -75,13 +95,8 @@ class ReportingSubService(
         )
     }
 
-    fun makeAggregatedReportByFilter(request: InvoiceReportRequest): AggregatedReportResponse {
-        val invoices = when {
-            !request.invoiceIds.isNullOrEmpty() -> repo.findAllById(request.invoiceIds).toList()
-            else -> repo.findAll(buildSpecification(request))
-        }
-        return generateAggregatedReport(invoices)
-    }
+    fun makeAggregatedReportByFilter(request: InvoiceReportRequest): AggregatedReportResponse =
+        generateAggregatedReport(getFilteredInvoices(request))
 
     fun generateAggregatedReportCsv(request: InvoiceReportRequest): ByteArray {
         val report = makeAggregatedReportByFilter(request)
@@ -103,18 +118,25 @@ class ReportingSubService(
                     .append(c.invoiceCount).append(',')
                     .append(c.totalAmount.toPlainString()).append('\n')
             }
-
             append('\n')
-
-            append("id,invoiceNumber,issueDate,amount,currency\n")
+            append("id,invoiceNumber,referenceNumber,customerId,issueDate,dueDate,amount,currency,status\n")
             report.invoices.forEach { inv ->
-                append(inv.id).append(',')
-                    .append(csvEscape(inv.invoiceNumber)).append(',')
-                    .append(csvEscape(inv.issueDate.toString())).append(',')
-                    .append(inv.amount.toPlainString()).append(',')
-                    .append(csvEscape(inv.currency)).append('\n')
+                append(inv.id)
+                    .append(',').append(csvEscape(inv.invoiceNumber))
+                    .append(',').append(csvEscape(inv.referenceNumber ?: ""))
+                    .append(',').append(inv.customerId)
+                    .append(',').append(csvEscape(inv.issueDate.toString()))
+                    .append(',').append(csvEscape(inv.dueDate.toString()))
+                    .append(',').append(inv.amount.toPlainString())
+                    .append(',').append(csvEscape(inv.currency))
+                    .append(',').append(inv.status.name)
+                    .append('\n')
             }
         }
         return csv.toByteArray(Charsets.UTF_8)
     }
+
+    fun getFilteredInvoices(request: InvoiceReportRequest): List<Invoice> =
+        if (!request.invoiceIds.isNullOrEmpty()) repo.findAllById(request.invoiceIds).toList()
+        else repo.findAll(buildSpecification(request))
 }

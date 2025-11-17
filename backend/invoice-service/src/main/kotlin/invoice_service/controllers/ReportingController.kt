@@ -2,6 +2,7 @@ package invoice_service.controllers
 
 import invoice_service.dtos.reports.requests.InvoiceReportRequest
 import invoice_service.dtos.reports.responses.AggregatedReportResponse
+import invoice_service.models.invoices.Invoice
 import invoice_service.services.ReportingSubService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
@@ -38,4 +39,13 @@ class ReportingController(private val reportingService: ReportingSubService) {
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=invoice-report.csv")
                 .body(csvBytes)
         }
+
+    @Operation(
+        summary = "Zíaskat filtrované faktury",
+        description = "Vrátí seznam faktur odpovídajících zadaným filtrům."
+    )
+    @PostMapping("/filter")
+    fun getFilteredInvoices(@RequestBody request: InvoiceReportRequest): List<Invoice> =
+        reportingService.getFilteredInvoices(request)
+
 }
