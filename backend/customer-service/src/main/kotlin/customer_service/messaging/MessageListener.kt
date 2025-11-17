@@ -1,7 +1,8 @@
 package customer_service.messaging
 
-import com.uhk.fim.prototype.common.messaging.RabbitConfig
+import com.uhk.fim.prototype.common.config.RabbitConfig
 import com.uhk.fim.prototype.common.messaging.dto.CustomerRequest
+import com.uhk.fim.prototype.common.messaging.enums.customer.MessageCustomerAction
 import customer_service.messaging.handlers.CustomerServiceHandler
 import customer_service.messaging.handlers.InvalidMessageActionHandler
 import org.springframework.amqp.core.Message
@@ -28,7 +29,7 @@ class MessageListener @Autowired constructor(
 
         println("[customer-service] Received customer request: $request, replyTo=$replyTo, correlationId=$correlationId")
 
-        if (request.action == "get") {
+        if (request.action == MessageCustomerAction.GET) {
             customerServiceHandler.getCustomer(request, correlationId, replyTo)
         } else {
             invalidMessageActionHandler.handleInvalidMessageAction(request, correlationId, replyTo)

@@ -1,28 +1,29 @@
 package invoice_service.messaging.handlers
 
 import com.uhk.fim.prototype.common.exceptions.customer.CustomerNotFoundException
+import com.uhk.fim.prototype.common.messaging.ActiveMessagingManager
 import com.uhk.fim.prototype.common.messaging.dto.CustomerRequest
-import com.uhk.fim.prototype.common.messaging.dto.CustomerResponse
+import com.uhk.fim.prototype.common.messaging.dto.MessageResponse
+import com.uhk.fim.prototype.common.messaging.enums.MessageStatus
+import com.uhk.fim.prototype.common.messaging.enums.SourceService
+import com.uhk.fim.prototype.common.messaging.enums.customer.MessageCustomerAction
 import invoice_service.messaging.MessageSender
-import invoice_service.messaging.pendingMessages.PendingCustomerMessages
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import java.util.*
-import java.util.concurrent.CompletableFuture
-import java.util.concurrent.TimeUnit
 
 @Component
-class CustomerServiceHandler @Autowired constructor(
+class CustomerServiceHandler (
     private val messageSender: MessageSender,
-    private val pendingCustomerMessages: PendingCustomerMessages
+    private val activeMessageManager: ActiveMessagingManager
 ) {
     @Throws(CustomerNotFoundException::class)
     fun getCustomerNameById(
         customerId: Long,
+        apiSourceService: SourceService = SourceService.INVOICE,
         timeoutSeconds: Long = 5
     ): String {
-        val response = sendCustomerRequestAndReturnResponse(customerId, timeoutSeconds)
-        if (response.status == "ok") {
+        val response = sendCustomerRequestAndReturnResponse(customerId, apiSourceService, timeoutSeconds)
+        if (response.status == MessageStatus.OK) {
             @Suppress("UNCHECKED_CAST")
             val payload = response.payload as Map<String, Any>
             val name = payload["name"] as? String
@@ -35,10 +36,11 @@ class CustomerServiceHandler @Autowired constructor(
     @Throws(CustomerNotFoundException::class)
     fun getCustomerById(
         customerId: Long,
+        apiSourceService: SourceService = SourceService.INVOICE,
         timeoutSeconds: Long = 5
     ): Map<String, Any> {
-        val response = sendCustomerRequestAndReturnResponse(customerId, timeoutSeconds)
-        if (response.status == "ok") {
+        val response = sendCustomerRequestAndReturnResponse(customerId,apiSourceService, timeoutSeconds)
+        if (response.status == MessageStatus.OK) {
             @Suppress("UNCHECKED_CAST")
             return response.payload as Map<String, Any>
         } else {
@@ -48,27 +50,10 @@ class CustomerServiceHandler @Autowired constructor(
 
     fun sendCustomerRequestAndReturnResponse(
         customerId: Long,
+        apiSourceService: SourceService = SourceService.INVOICE,
         timeoutSeconds: Long = 5
-    ): CustomerResponse {
-        val future = CompletableFuture<CustomerResponse>()
-        sendCustomerRequest(customerId, future)
-        return future.get(timeoutSeconds, TimeUnit.SECONDS)
-    }
+    ): MessageResponse {
+        return messageSender.sendCustomerRequest(customerId, MessageCustomerAction.GET, timeoutSeconds = timeoutSeconds, apiSourceService = apiSourceService)
 
-    fun sendCustomerRequest(
-        customerId: Long,
-        future: CompletableFuture<CustomerResponse>
-    ) {
-        val correlationId = UUID.randomUUID().toString()
-        val requestId = UUID.randomUUID().toString()
-
-        val customerReq = CustomerRequest(
-            requestId = requestId,
-            customerId = customerId,
-            action = "get",
-            payload = null
-        )
-        pendingCustomerMessages.registerCustomerResponseFuture(correlationId, future)
-        messageSender.sendCustomerRequest(customerReq, correlationId)
     }
 }

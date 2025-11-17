@@ -1,8 +1,12 @@
 package com.uhk.fim.prototype.common.messaging.dto
 
+import com.uhk.fim.prototype.common.messaging.enums.SourceService
+import com.uhk.fim.prototype.common.messaging.enums.customer.MessageCustomerAction
+
 data class CustomerRequest(
-    val requestId: String,
-    val customerId: Long? = null,
-    val action: String, // např. "get", "create", "update"
-    val payload: Map<String, Any>? = null
-)
+    override val apiSourceService: SourceService,
+    override val requestId: String,
+    override val targetId: Long? = null, //customerId, invoiceId etc.
+    override val action: MessageCustomerAction,
+    override val payload: Map<String, Any>? = null
+) : MessageRequest<MessageCustomerAction>(apiSourceService, requestId, targetId, action, payload)

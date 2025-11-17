@@ -28,6 +28,7 @@ dependencies {
     api("org.springframework.boot:spring-boot-starter-actuator")
     api("com.fasterxml.jackson.module:jackson-module-kotlin")
     api("org.jetbrains.kotlin:kotlin-reflect")
+    api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
 
     api("org.springframework.boot:spring-boot-starter-security")
     api("org.springframework.boot:spring-boot-starter-oauth2-resource-server")

@@ -1,5 +1,6 @@
 package customer_service.service
 
+import com.uhk.fim.prototype.common.exceptions.BadGatewayException
 import com.uhk.fim.prototype.common.exceptions.NotFoundException
 import com.uhk.fim.prototype.common.exceptions.WrongDataException
 import com.uhk.fim.prototype.common.exceptions.customer.CustomerNotFoundException
@@ -24,10 +25,10 @@ class CustomerService(
         )?.let { throw WrongDataException("Customer already exists!") }
 
         if (customer.tradeName.isBlank() && (customer.name.isBlank() || customer.surname.isBlank())) {
-            throw WrongDataException("Musíte vyplnit buď jméno a příjmení, nebo obchodní jméno!")
+            throw WrongDataException("You must fill in either the first name and last name, or the trade name!")
         }
         if (customer.tradeName.isNotBlank() && (customer.name.isNotBlank() || customer.surname.isNotBlank())) {
-            throw WrongDataException("Vyplňte buď jméno a příjmení, nebo obchodní jméno, ne obojí!")
+            throw WrongDataException("Fill in either the first name and last name, or the trade name, not both!")
         }
         if (customer.phoneNumber.isBlank()) throw WrongDataException("Customer phone must be fill!")
         if (customer.email.isBlank()) throw WrongDataException("Customer email must be fill!")
@@ -105,10 +106,10 @@ class CustomerService(
             if (subject != null) {
                 return subject.toCustomerEntity()
             } else {
-                throw NotFoundException("Nepodařilo se najít subjekt v ARES s IČO: $ico")
+                throw NotFoundException("Failed to find a subject in ARES with ICO: $ico")
             }
         } catch (e: Exception) {
-            throw NotFoundException("Chyba při komunikaci s ARES: ${e.message}")
+            throw BadGatewayException("Error while communicating with ARES: ${e.message}")
         }
     }
 }

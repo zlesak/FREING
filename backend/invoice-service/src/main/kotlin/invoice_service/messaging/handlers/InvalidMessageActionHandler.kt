@@ -1,7 +1,9 @@
 package invoice_service.messaging.handlers
 
 import com.uhk.fim.prototype.common.messaging.dto.InvoiceRequest
-import com.uhk.fim.prototype.common.messaging.dto.InvoiceResponse
+import com.uhk.fim.prototype.common.messaging.dto.MessageResponse
+import com.uhk.fim.prototype.common.messaging.enums.MessageStatus
+import com.uhk.fim.prototype.common.messaging.enums.SourceService
 import invoice_service.messaging.MessageSender
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
@@ -10,12 +12,13 @@ import org.springframework.stereotype.Component
 class InvalidMessageActionHandler @Autowired constructor(
     private val messageSender: MessageSender
 ) {
-    fun handleInvalidMessageAction(request: InvoiceRequest, correlationId: String, replyTo: String) {
-         val response = InvoiceResponse(
+    fun handleInvalidMessageAction(request: InvoiceRequest, correlationId: String, replyTo: String, apiSourceService: SourceService = SourceService.INVOICE) {
+         val response = MessageResponse(
+             apiSourceService = apiSourceService,
+             sourceService = SourceService.INVOICE,
              requestId = request.requestId,
-             invoiceId = request.invoiceId,
-             status = "unsupported_action",
-             payload = null,
+             targetId = request.targetId,
+             status = MessageStatus.UNSUPPORTED_ACTION,
              error = "Unsupported action: ${request.action}"
          )
         messageSender.sendInvoiceResponse(response, replyTo, correlationId)

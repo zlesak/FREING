@@ -3,7 +3,6 @@ package invoice_service.messaging.handlers
 import com.uhk.fim.prototype.common.exceptions.customer.CustomerNotFoundException
 import com.uhk.fim.prototype.common.messaging.dto.CustomerResponse
 import invoice_service.messaging.MessageSender
-import invoice_service.messaging.pendingMessages.PendingCustomerMessages
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.*
@@ -25,7 +24,7 @@ class CustomerServiceHandlerTest {
         val corrCaptor = argumentCaptor<String>()
         val futCaptor = argumentCaptor<CompletableFuture<CustomerResponse>>()
 
-        verify(pending, times(1)).registerCustomerResponseFuture(corrCaptor.capture(), futCaptor.capture())
+        verify(pending, times(1)).register(corrCaptor.capture(), futCaptor.capture())
         val capturedCorr = corrCaptor.firstValue
         assertNotNull(capturedCorr)
 
@@ -39,7 +38,7 @@ class CustomerServiceHandlerTest {
 
         val handler = CustomerServiceHandler(messageSender, pending)
 
-        whenever(pending.registerCustomerResponseFuture(any(), any())).thenAnswer { inv ->
+        whenever(pending.register(any(), any())).thenAnswer { inv ->
             val fut = inv.getArgument<CompletableFuture<CustomerResponse>>(1)
             val resp = CustomerResponse(
                 requestId = "r1",
@@ -63,7 +62,7 @@ class CustomerServiceHandlerTest {
 
         val handler = CustomerServiceHandler(messageSender, pending)
 
-        whenever(pending.registerCustomerResponseFuture(any(), any())).thenAnswer { inv ->
+        whenever(pending.register(any(), any())).thenAnswer { inv ->
             val fut = inv.getArgument<CompletableFuture<CustomerResponse>>(1)
             val resp = CustomerResponse(
                 requestId = "r1",
