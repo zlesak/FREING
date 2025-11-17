@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
+import org.springframework.web.client.HttpClientErrorException
 
 @RestControllerAdvice
 class GlobalExceptionHandler {
@@ -22,6 +23,11 @@ class GlobalExceptionHandler {
     @ExceptionHandler(NotFoundException::class)
     fun handleNotFound(ex: NotFoundException): ResponseEntity<String> {
         return buildResponse(ex)
+    }
+
+    @ExceptionHandler(HttpClientErrorException.NotFound::class)
+    fun handleNotFoundHttpClientErrorException(ex: HttpClientErrorException.NotFound): ResponseEntity<String> {
+        return buildResponse(NotFoundException(message = ex.message))
     }
 
     @ExceptionHandler(WrongDataException::class)
