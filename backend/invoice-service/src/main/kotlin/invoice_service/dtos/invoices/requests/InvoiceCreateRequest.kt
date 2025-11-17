@@ -37,7 +37,7 @@ data class InvoiceCreateRequest(
             amount = this.amount,
             currency = this.currency,
             status = this.status,
-            items = this.items.map { it.toInvoiceItem() }.toMutableList()
+            items = this.items.map { it.toInvoiceItem().apply { id = null } }.toMutableList()
         )
     }
 }
