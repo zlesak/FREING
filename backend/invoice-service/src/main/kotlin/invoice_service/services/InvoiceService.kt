@@ -34,6 +34,9 @@ class InvoiceService(
 
     fun getAllInvoices(pageable: Pageable): Page<Invoice> = repo.findAll(pageable)
 
+    fun getAllInvoicesForLoggedInCustomer(customerId: Long, pageable: Pageable): Page<Invoice> =
+        repo.findAllByCustomerId(customerId, pageable)
+
     @Transactional
     fun updateInvoice(id: Long, request: InvoiceUpdateRequest): Invoice =
         (repo.findByIdAndStatus(id, InvoiceStatusEnum.DRAFT)
