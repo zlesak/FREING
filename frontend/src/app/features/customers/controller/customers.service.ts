@@ -22,7 +22,7 @@ export class CustomersServiceController {
     );
   }
 
-  getCustomer(id: number): Observable<CustomerApi.CustomerEntity> {
+  getCustomer(id: number): Observable<CustomerApi.Customer> {
     return from(CustomerApi.CustomerControllerService.getById({ id })).pipe(catchError(this.handleError));
   }
 
@@ -33,13 +33,13 @@ export class CustomersServiceController {
     );
   }
 
-  getCustomers(page = 0, size = 10): Observable<CustomerApi.CustomersPagedResponse> {
+  getCustomers(page = 0, size = 10): Observable<CustomerApi.PageableObject> {
     return from(CustomerApi.CustomerControllerService.getAll({ page, size })).pipe(
       catchError(this.handleError)
     );
   }
 
-  getCustomerInfoFromAres(ico: string): Observable<CustomerApi.CustomerEntity> {
+  getCustomerInfoFromAres(ico: string): Observable<CustomerApi.Customer> {
     return from(CustomerApi.CustomerControllerService.getCustomerInfoFromAresByIco({ ico })).pipe(
       catchError(this.handleError)
     );
