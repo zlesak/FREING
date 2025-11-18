@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component, inject} from '@angular/core';
 import { KeycloakService } from '../../keycloak.service';
 import {RouterLink, RouterLinkActive} from '@angular/router';
 
@@ -13,9 +13,8 @@ import {RouterLink, RouterLinkActive} from '@angular/router';
   standalone: true
 })
 export class HeaderComponent {
-  title: string = 'FREING';
-
-  constructor(private keycloakService: KeycloakService) {}
+  protected readonly keycloakService = inject(KeycloakService);
+  protected readonly title: string = 'FREING';
 
   logout(): void {
     this.keycloakService.logout();

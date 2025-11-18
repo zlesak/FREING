@@ -2,7 +2,7 @@ import {
   AfterViewChecked, Component,
   inject, OnInit, output, signal, ViewChild
 } from '@angular/core';
-import { InvoicesServiceController } from '../../controller/invoices.service';
+import { InvoicesServiceController } from '../../../../controller/invoices.service';
 import { InvoiceApi } from '../../../../api/generated';
 import {MatIconModule} from '@angular/material/icon';
 import {MatDividerModule} from '@angular/material/divider';

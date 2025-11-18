@@ -1,17 +1,130 @@
 <section class="page home">
-  <div style="display: flex; flex-direction: row">
-    <div style="width: 50vw">
-      <app-invoices-page
-      (outputData)="getInvoices($event)"
-      ></app-invoices-page>
+  <form [formGroup]="filterForm">
+    <div class="filter">
+    <mat-form-field
+    subscriptSizing="dynamic"
+    [hideRequiredMarker]="true"
+    >
+      <mat-label>Datum od</mat-label>
+      <input matInput [matDatepicker]="IssueDatePicker"
+             formControlName="from" />
+      <mat-datepicker-toggle matIconSuffix [for]="IssueDatePicker"></mat-datepicker-toggle>
+      <mat-datepicker #IssueDatePicker></mat-datepicker>
+    </mat-form-field>
+
+      <mat-form-field
+        subscriptSizing="dynamic"
+        [hideRequiredMarker]="true"
+      >
+      <mat-label>Datum do</mat-label>
+      <input matInput [matDatepicker]="dueDatePicker"
+             formControlName="to" />
+      <mat-datepicker-toggle matIconSuffix [for]="dueDatePicker"></mat-datepicker-toggle>
+      <mat-datepicker #dueDatePicker></mat-datepicker>
+    </mat-form-field>
+
+    @if(keycloakService.hasAdminAccess){
+      <mat-form-field
+        subscriptSizing="dynamic"
+        [hideRequiredMarker]="true"
+      >
+        <mat-label>Zákazník</mat-label>
+        <mat-select formControlName="customerId">
+          <mat-option [value]="null"> zrušit výběr</mat-option>
+          @for(user of users; track $index){
+            <mat-option [value]="user.id">{{user.email}}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    }
+
+      <mat-form-field
+        subscriptSizing="dynamic"
+        [hideRequiredMarker]="true"
+      >
+      <mat-label>Stav</mat-label>
+      <mat-select formControlName="status">
+        <mat-option [value]="null"> zrušit výběr</mat-option>
+        @for (s of statusOptions; track s) {
+          <mat-option [value]="s">{{ s }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+      <mat-form-field
+        subscriptSizing="dynamic"
+        [hideRequiredMarker]="true"
+      >
+      <mat-label>Částka od</mat-label>
+      <input matInput type="number" formControlName="amountFrom"/>
+    </mat-form-field>
+
+      <mat-form-field
+        subscriptSizing="dynamic"
+        [hideRequiredMarker]="true"
+      >
+      <mat-label>Částka do</mat-label>
+      <input matInput type="number" formControlName="amountTo"/>
+    </mat-form-field>
+
+      <mat-form-field
+        subscriptSizing="dynamic"
+        [hideRequiredMarker]="true"
+      >
+      <mat-label>Měna</mat-label>
+      <mat-select formControlName="currency">
+        <mat-option [value]="null"> zrušit výběr</mat-option>
+        @for (c of currencyOptions; track c) {
+          <mat-option [value]="c">{{ c }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <button mat-raised-button color="primary" (click)="applyFilter()">
+      Filtrovat
+    </button>
     </div>
-      <invoice-chart-pie
-        [data]="chartDataStatuses()"
-        [title]="'Stavy faktur'"
-      ></invoice-chart-pie>
+  </form>
+
+  <div style="display: flex; flex-direction: row; justify-content: space-around; align-items: stretch; padding-top: 20px">
+    <div>
     <invoice-chart-pie
-      [data]="chartDataCurrency()"
-      [title]="'Distribuce měn'"
+      [data]="chartDataStatuses()"
+      [title]="'Stavy faktur'"
     ></invoice-chart-pie>
+      @for(status of chartDataStatuses(); track $index){
+        <div class="info-table" [style.background-color]="status.color">
+        {{status.itemName}} - {{status.occurrence}}
+        </div>
+      }
+    </div>
+    @if(keycloakService.hasAdminAccess){
+      <!-- Admin view -->
+      <div>
+      <invoice-chart-pie
+        [data]="chartDataCustomers()"
+        [title]="'Zákazníci'"
+      ></invoice-chart-pie>
+      @for(customers of chartDataCustomers(); track $index){
+        <div class="info-table" [style.background-color]="customers.color">
+          {{customers.itemName}} - {{customers.occurrence}}
+        </div>
+      }
+    </div>
+      <div>
+      <invoice-chart-pie
+        [data]="chartDataCurrency()"
+        [title]="'Distribuce měn'"
+      ></invoice-chart-pie>
+        @for(currency of chartDataCurrency(); track $index){
+          <div class="info-table" [style.background-color]="currency.color">
+            {{currency.itemName}} - {{currency.occurrence}}
+          </div>
+        }
+      </div>
+    } @else{
+      <!-- TODO: customer info -->
+    }
+
   </div>
 </section>

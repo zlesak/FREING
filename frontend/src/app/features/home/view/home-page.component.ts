@@ -1,30 +1,68 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import {Component, computed, inject, OnInit, signal} from '@angular/core';
 import { KeycloakService } from '../../../keycloak.service';
-import { InvoicesTableComponent } from '../../invoices/components/invoices-table/invoices-table.component';
 import { InvoiceChartPie } from '../../invoices/components/invoice-chart-pie/invoice-chart-pie';
-import { Invoice } from '../../../api/generated/invoice';
+import {Invoice, InvoicesPagedResponse} from '../../../api/generated/invoice';
 import { CommonModule } from '@angular/common';
+import {InvoicesServiceController} from '../../../controller/invoices.service';
+import {
+  MatDatepickerModule,
+} from '@angular/material/datepicker';
+import {MatInputModule} from '@angular/material/input';
+import {FormBuilder, FormGroup, ReactiveFormsModule} from '@angular/forms';
+import {MatNativeDateModule, MatOptionModule} from '@angular/material/core';
+import {firstValueFrom} from 'rxjs';
+import {CustomersServiceController} from '../../customers/controller/customers.service';
+import {CurrencyOptions, InvoiceStatus} from '../../common/Enums.js';
+import {MatSelectModule} from '@angular/material/select';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatButton} from '@angular/material/button';
 
 @Component({
-  selector: 'app-home-page',
-  standalone: true,
   imports: [
     CommonModule,
-    InvoicesTableComponent,
-    InvoiceChartPie
+    InvoiceChartPie,
+    MatFormFieldModule,
+    MatInputModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatSelectModule,
+    MatOptionModule,
+    ReactiveFormsModule,
+    MatButton,
   ],
-  templateUrl: './home-page.component.html',
-  styleUrl: './home-page.component.css'
+  selector: 'app-home-page',
+  standalone: true,
+  styleUrl: './home-page.component.scss',
+  templateUrl: './home-page.component.html'
 })
-export class HomePageComponent {
+export class HomePageComponent implements OnInit{
+  private readonly invoicesService = inject(InvoicesServiceController);
   protected readonly keycloakService = inject(KeycloakService);
-
+  private readonly customerService = inject(CustomersServiceController);
+  private fb = inject(FormBuilder);
   protected invoices = signal<Invoice[]>([]);
+  protected filteredInvoices = signal<Invoice[]>([]);
+  protected loading = signal<boolean>(false);
+  protected error?: string;
+  protected users: {email: string, id: number}[]= [];
+
+  filterForm: FormGroup = this.fb.group({
+    from: [null],
+    to: [null],
+    customerId: [null],
+    status: [null],
+    amountFrom: [null],
+    amountTo: [null],
+    currency: [null]
+  });
+
+  statusOptions = Object.values(InvoiceStatus);
+  currencyOptions = Object.values(CurrencyOptions);
 
   protected chartDataStatuses = computed(() => {
     const statusCount: Record<string, { occurrence: number; color: string }> = {};
 
-    this.invoices().forEach((invoice) => {
+    this.filteredInvoices().forEach(invoice => {
       const status = invoice.status ?? 'Unknown';
       if (!statusCount[status]) {
         statusCount[status] = { occurrence: 0, color: getStatusColor(status).background };
@@ -33,7 +71,7 @@ export class HomePageComponent {
     });
 
     return Object.entries(statusCount).map(([status, { occurrence, color }]) => ({
-      status,
+      itemName: status,
       occurrence,
       color,
     }));
@@ -42,7 +80,7 @@ export class HomePageComponent {
   protected chartDataCurrency = computed(() => {
     const currencyCount: Record<string, { occurrence: number; color: string }> = {};
 
-    this.invoices().forEach((invoice) => {
+    this.invoices().forEach(invoice => {
       const currency = invoice.currency ?? 'Unknown';
       if (!currencyCount[currency]) {
         currencyCount[currency] = { occurrence: 0, color: getCurrencyColor(currency) };
@@ -51,15 +89,127 @@ export class HomePageComponent {
     });
 
     return Object.entries(currencyCount).map(([currency, { occurrence, color }]) => ({
-      status: currency,
+      itemName: currency,
       occurrence,
       color,
     }));
   });
 
-  getInvoices(invoices: Invoice[]): void {
-    this.invoices.set(invoices);
+  protected chartDataCustomers = computed(() => {
+    const customerCount: Record<string, number> = {};
+
+    this.filteredInvoices().forEach(invoice => {
+      const id = invoice.customerId ?? 'Unknown';
+      customerCount[id] = (customerCount[id] || 0) + 1;
+    });
+
+    const sorted = Object.entries(customerCount).sort((a, b) => b[1] - a[1]);
+
+    return sorted.map(([customerId, occurrence]) => ({
+      itemName: this.resolveCustomerName(customerId),
+      occurrence,
+      color: hashIdToColor(customerId),
+    }));
+  });
+
+
+  protected resolveCustomerName(customerId: string | number): string {
+    const user = this.users.find(u => u.id === Number(customerId));
+    return user ? user.email : `User ${customerId}`;
   }
+
+  ngOnInit(){
+    if (this.keycloakService.hasAdminAccess){
+      this.loadAllInvoices();
+      this.loadUsers().then(()=>
+        this.applyFilter()
+      );
+    } else {
+      this.loadInvoicesForUser();
+      this.applyFilter()
+    }
+  }
+
+  loadAllInvoices(): void {
+    this.loading.set(true);
+    this.error = undefined;
+    this.invoicesService.getInvoices(0, 999).subscribe({
+      next: (resp: InvoicesPagedResponse) => {
+        const invoices = resp.content;
+        this.invoices.set(invoices);
+        this.loading.set(false);
+      },
+      error: (err) => {
+        this.error = err.message || 'Nepodařilo se načíst faktury';
+        this.loading.set(false);
+      }
+    });
+  }
+
+  loadInvoicesForUser(){
+    this.loading.set(true);
+    this.error = undefined;
+    const userId = this.keycloakService.currentUser?.id;
+    if (!userId){
+      console.log('user ID missing!');
+      this.error = 'Error - user data missing';
+      this.loading.set(false);
+      return;
+    }
+    //TODO: load user invoices when api is ready
+    this.invoicesService.getInvoices(0, 999).subscribe({
+      next: (resp: InvoicesPagedResponse) => {
+        const invoices = resp.content;
+        this.invoices.set(invoices);
+        this.loading.set(false);
+      },
+      error: (err) => {
+        this.error = err.message || 'Nepodařilo se načíst faktury';
+        this.loading.set(false);
+      }
+    });
+  }
+
+  async loadUsers(){
+    //users from keycloak - need to set view users permission for manager and accountant
+    const userDetails =  await this.keycloakService.getAllUsers();
+
+    userDetails.forEach(user=> {
+      this.users.push({email: user.email, id: user.id});
+    })
+    console.log(this.users);
+    const usersFromDb = await firstValueFrom(this.customerService.getCustomers(0,999));
+    console.log(usersFromDb);
+    usersFromDb.content.forEach(user=>{
+      this.users.push({email: user.email, id: user.id!});
+    })
+  }
+  applyFilter() {
+    console.log(`loading filter for invoices ${this.invoices()}`);
+    const { from, to, customerId, status, amountFrom, amountTo, currency } =
+      this.filterForm.value;
+
+    const filtered = this.invoices().filter(inv => {
+
+      if (from && new Date(inv.issueDate) < new Date(from)) return false;
+      if (to && new Date(inv.dueDate) > new Date(to)) return false;
+
+      if (customerId && inv.customerId !== customerId) return false;
+
+      if (status && inv.status !== status) return false;
+
+      if (amountFrom !== null && inv.amount < amountFrom) return false;
+      if (amountTo !== null && inv.amount > amountTo) return false;
+
+      if (currency && inv.currency !== currency) return false;
+
+      return true;
+    });
+
+    this.filteredInvoices.set(filtered);
+    console.log(filtered)
+  }
+
 }
 
 export function getStatusColor(status: string): { background: string; color: string } {
@@ -78,12 +228,30 @@ export function getStatusColor(status: string): { background: string; color: str
       return { background: '#f3f4f6', color: '#111827' };
   }
 }
-export function getCurrencyColor(currency: string): string {
+export function getCurrencyColor(currency: string | null | undefined): string {
+  if (!currency) return '#b0bec5';
   const colors: Record<string, string> = {
     USD: '#4caf50',
     EUR: '#2196f3',
     CZK: '#ffc107',
-    GBP: '#9c27b0',
   };
-  return colors[currency.toUpperCase()] ?? '#b0bec5';
+  return colors[currency.toUpperCase()];
 }
+
+export function hashIdToColor(id: string | number | null | undefined): string {
+  if (id === null || id === undefined) return '#b0bec5';
+
+  const str = id.toString();
+
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = str.charCodeAt(i) + ((hash << 5) - hash);
+  }
+
+  const r = 128 + ((hash >> 16) & 0xFF) % 128;
+  const g = 128 + ((hash >> 8) & 0xFF) % 128;
+  const b = 128 + (hash & 0xFF) % 128;
+
+  return `#${r.toString(16).padStart(2,'0')}${g.toString(16).padStart(2,'0')}${b.toString(16).padStart(2,'0')}`;
+}
+

@@ -1,5 +1,7 @@
 import {Component, inject, OnInit, signal} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
+import {firstValueFrom} from 'rxjs';
+import {PaymentServiceController} from '../../../../../controller/payment.service';
 
 @Component({
   selector: 'app-invoice-pdf-component',
@@ -8,6 +10,7 @@ import {ActivatedRoute} from '@angular/router';
   styleUrl: './invoice-pdf-component.css'
 })
 export class InvoicePdfComponent implements OnInit{
+  private readonly paymentService = inject(PaymentServiceController);
   private readonly route = inject(ActivatedRoute);
   protected error = signal<string | null>(null);
   protected loading = signal<boolean>(false);
@@ -34,8 +37,9 @@ export class InvoicePdfComponent implements OnInit{
     await this.loadInvoicePDF(this.invoiceId);
   }
 
-  loadInvoicePDF(id: number){
-    //TODO: load rendered pdf and display
+  async loadInvoicePDF(id: number){
+   const invoicePdf = await firstValueFrom(this.paymentService.getPdf(id));
+   console.log(invoicePdf);
   }
 
 

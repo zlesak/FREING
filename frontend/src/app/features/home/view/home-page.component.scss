@@ -1,0 +1,25 @@
+@use '@angular/material' as mat;
+
+.filter{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 5px;
+  border-radius: 10px;
+  background-color: #ecf0fd;
+  align-items: center;
+  align-content: space-around;
+  justify-content: space-between;
+  @include mat.form-field-density(-1);
+  mat-form-field {
+    flex: 1 1 100px;
+  }
+}
+.info-table{
+  padding: 5px;
+  margin: 3px;
+  border-width: 1px;
+  border-color: #333333;
+  border-radius: 10px;
+  border-style: solid;
+}
