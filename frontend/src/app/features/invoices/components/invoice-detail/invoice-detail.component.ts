@@ -9,6 +9,9 @@ import {MatDivider} from '@angular/material/divider';
 import{MatIcon} from '@angular/material/icon';
 import {CustomerEntity} from '../../../../api/generated/customer';
 import {CustomersServiceController} from '../../../customers/controller/customers.service';
+import {InvoicesServiceController} from '../../../../controller/invoices.service';
+import {KeycloakService} from '../../../../keycloak.service';
+import {InvoiceStatus} from '../../../common/Enums.js';
 
 @Component({
   selector: 'app-invoice-detail-component',
@@ -28,11 +31,12 @@ import {CustomersServiceController} from '../../../customers/controller/customer
   styleUrls: ['./invoice-detail.component.css']
 })
 export class InvoiceDetailComponent implements OnInit {
-  private readonly invoiceService = inject(InvoicesService);
+  protected readonly keycloakService = inject(KeycloakService);
+  private readonly invoiceService = inject(InvoicesServiceController);
   private readonly customerService = inject(CustomersServiceController);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
-
+  invoiceStatus = InvoiceStatus;
   protected invoiceId!: number;
   protected invoiceDetail = signal<Invoice | null>(null);
   protected customerDetail = signal<CustomerEntity | null>(null);
@@ -66,7 +70,7 @@ export class InvoiceDetailComponent implements OnInit {
     this.error.set(null);
 
     try {
-      const invoice = await firstValueFrom(this.invoiceService.getInvoice({ id: id }));
+      const invoice = await firstValueFrom(this.invoiceService.getInvoice(id));
       this.invoiceDetail.set(invoice);
       console.log('Loaded invoice:', invoice);
 
@@ -91,4 +95,10 @@ export class InvoiceDetailComponent implements OnInit {
   generatePDF(){
     this.router.navigate(['/invoice/pdf/', this.invoiceId])
   }
+
+  readonly restrictedStatuses = [
+    InvoiceStatus.OVERDUE,
+    InvoiceStatus.PENDING,
+  ] as InvoiceStatus[];
+
 }

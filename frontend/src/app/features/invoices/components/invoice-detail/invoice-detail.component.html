@@ -125,10 +125,16 @@
         <mat-icon>picture_as_pdf</mat-icon>
         Export do PDF
       </button>
+      @if (
+        !keycloakService.hasAdminAccess &&
+        restrictedStatuses.includes(invoiceDetail()?.status!)
+        ) {
+
       <button mat-raised-button color="accent" (click)="pay()">
         <mat-icon>payment</mat-icon>
         Zaplatit
       </button>
+      }
     </mat-card-actions>
   }
 </mat-card>

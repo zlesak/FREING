@@ -7,9 +7,9 @@ import {
   Validators
 } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { InvoicesServiceController } from '../../controller/invoices.service';
+import { InvoicesServiceController } from '../../../../controller/invoices.service';
 import { InvoiceApi } from '../../../../api/generated';
-import { ExchangeRatesController } from '../../controller/exchange.service';
+import { ExchangeRatesController } from '../../../../controller/exchange.service';
 import {
   MatCard, MatCardContent, MatCardHeader
 } from '@angular/material/card';
