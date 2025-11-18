@@ -10,7 +10,7 @@ export class InvoicesServiceController {
     InvoiceApi.OpenAPI.BASE = environment.apiBase;
   }
 
-  getInvoices(page = 0, size = 10): Observable<InvoiceApi.InvoicesPagedResponse> {
+  getInvoices(page = 0, size = 10): Observable<InvoiceApi.PageableObject> {
     return from(InvoiceApi.InvoicesService.getAllInvoices({ page, size })).pipe(
       catchError(this.handleError)
     );
