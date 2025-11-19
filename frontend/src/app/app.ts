@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import {HeaderComponent} from './components/header/header.components';
+import {HeaderComponent} from './features/header/header.components';
 import {RouterOutlet} from '@angular/router';
 
 @Component({

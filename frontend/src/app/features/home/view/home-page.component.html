@@ -94,7 +94,7 @@
     ></invoice-chart-pie>
       @for(status of chartDataStatuses(); track $index){
         <div class="info-table" [style.background-color]="status.color">
-        {{status.itemName}} - {{status.occurrence}}
+        {{status.itemName}}<span class="occurrence">{{status.occurrence}}</span>
         </div>
       }
     </div>
@@ -107,7 +107,7 @@
       ></invoice-chart-pie>
       @for(customers of chartDataCustomers(); track $index){
         <div class="info-table" [style.background-color]="customers.color">
-          {{customers.itemName}} - {{customers.occurrence}}
+          <span>{{customers.itemName}}</span><span>{{customers.occurrence}}</span>
         </div>
       }
     </div>
@@ -118,7 +118,7 @@
       ></invoice-chart-pie>
         @for(currency of chartDataCurrency(); track $index){
           <div class="info-table" [style.background-color]="currency.color">
-            {{currency.itemName}} - {{currency.occurrence}}
+            {{currency.itemName}}<span class="occurrence">{{currency.occurrence}}</span>
           </div>
         }
       </div>

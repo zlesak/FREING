@@ -15,7 +15,6 @@ import {
 import {DatePipe} from '@angular/common';
 import {MatSort, MatSortModule} from '@angular/material/sort';
 import {MatPaginator, MatPaginatorModule, PageEvent} from '@angular/material/paginator';
-import {MatCard} from '@angular/material/card';
 import {Invoice} from '../../../../api/generated/invoice';
 import {getStatusColor} from '../../../home/view/home-page.component';
 import {KeycloakService} from '../../../../keycloak.service';
@@ -33,11 +32,11 @@ export enum InvoiceStatus {
   standalone: true,
   templateUrl: './invoices-table.component.html',
   styleUrl: './invoices-table.component.css',
-  imports: [MatButtonModule, MatDividerModule, MatIconModule, MatProgressBar, MatTableModule, DatePipe, MatSortModule, MatPaginatorModule, MatCard],
+  imports: [MatButtonModule, MatDividerModule, MatIconModule, MatProgressBar, MatTableModule, DatePipe, MatSortModule, MatPaginatorModule],
 })
 export class InvoicesTableComponent implements OnInit, AfterViewChecked {
   private readonly invoicesService = inject( InvoicesServiceController);
-  private readonly keycloakService = inject( KeycloakService );
+  protected readonly keycloakService = inject( KeycloakService );
   protected readonly router = inject(Router);
   outputData = output<Invoice[]>()
   protected dataSource = new MatTableDataSource<InvoiceApi.Invoice>([]);
