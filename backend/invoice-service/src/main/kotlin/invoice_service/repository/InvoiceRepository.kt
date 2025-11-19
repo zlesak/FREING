@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor
 import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDate
 
 interface InvoiceRepository : JpaRepository<Invoice, Long>, JpaSpecificationExecutor<Invoice> {
     fun existsByInvoiceNumber(invoiceNumber: String): Boolean
@@ -21,4 +22,6 @@ interface InvoiceRepository : JpaRepository<Invoice, Long>, JpaSpecificationExec
     fun findByIdAndStatus(id: Long, status: InvoiceStatusEnum): Invoice?
 
     fun findAllByCustomerId(customerId: Long, pageable: Pageable): Page<Invoice>
+
+    fun findAllByStatusAndDueDateBefore(status: InvoiceStatusEnum, dueDate: LocalDate): List<Invoice>
 }
