@@ -18,7 +18,7 @@
             <mat-label>Jméno</mat-label>
             <input matInput formControlName="name" placeholder="Jan" required />
             @if (form.get('surname')?.touched && form.get('surname')?.invalid) {
-              <mat-error>Přijmení je povinné</mat-error>
+              <mat-error>Jméno je povinné</mat-error>
             }
           </mat-form-field>
 
@@ -26,7 +26,7 @@
             <mat-label>Příjmení</mat-label>
             <input matInput formControlName="surname" placeholder="Novák" />
             @if (form.get('')?.touched && form.get('')?.hasError('required')) {
-              <mat-error>Email je povinný</mat-error>
+              <mat-error>Přijmení je povinné</mat-error>
             }
           </mat-form-field>
 
@@ -124,6 +124,9 @@
           <mat-form-field>
             <mat-label>IČO</mat-label>
             <input matInput formControlName="ico" placeholder="12345678" />
+            <button matSuffix matIconButton aria-label="Clear" (click)="loadInfoFromARES()">
+              <mat-icon>search</mat-icon>
+            </button>
           </mat-form-field>
 
           <mat-form-field>
