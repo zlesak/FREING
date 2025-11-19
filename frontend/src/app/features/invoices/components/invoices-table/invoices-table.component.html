@@ -1,13 +1,14 @@
 <section class="page invoices">
+  <div>
   <h2>Faktury</h2>
-
-  <div class="toolbar">
-    <button mat-button class="add-button" (click)="router.navigate(['/invoices/new'])">
-      <mat-icon color="white" aria-label="add">add</mat-icon>
-      Nová faktura
-    </button>
-  </div>
-  <mat-card class=card>
+  @if(keycloakService.hasAdminAccess){
+    <div>
+      <button mat-button class="add-button" (click)="router.navigate(['/invoices/new'])">
+        <mat-icon color="white" aria-label="add">add</mat-icon>
+        Nová faktura
+      </button>
+    </div>
+  }
   @if (loading()) {
     <mat-progress-bar style="width: 80%; margin: auto" mode="indeterminate"></mat-progress-bar>
   }
@@ -63,9 +64,9 @@
           (click)="onInvoiceClick(row)"
       ></tr>
     </table>
-
  }
-
+  </div>
+  <div>
   <mat-paginator #paginator
                  [length]="totalElements"
                  [pageSize]="currentSize"
@@ -75,5 +76,5 @@
                  (page)="pageUpdate($event)"
                  aria-label="Select page">
   </mat-paginator>
-  </mat-card>
+  </div>
 </section>

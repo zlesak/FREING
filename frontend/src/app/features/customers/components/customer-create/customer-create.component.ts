@@ -8,10 +8,12 @@ import {MatLabel} from '@angular/material/input';
 import {MatInput} from '@angular/material/input';
 import {MatCard, MatCardContent, MatCardHeader} from '@angular/material/card';
 import {MatDatepicker, MatDatepickerInput, MatDatepickerToggle} from '@angular/material/datepicker';
-import {MatButton} from '@angular/material/button';
+import {MatButton, MatIconButton} from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import {MatNativeDateModule, MatOption, provideNativeDateAdapter} from '@angular/material/core';
 import {MatSelect} from '@angular/material/select';
+import {firstValueFrom} from 'rxjs';
+import {MatIcon} from '@angular/material/icon';
 
 @Component({
   selector: 'app-customer-create',
@@ -33,7 +35,9 @@ import {MatSelect} from '@angular/material/select';
     MatButton,
     MatNativeDateModule,
     MatOption,
-    MatSelect
+    MatSelect,
+    MatIcon,
+    MatIconButton
   ], providers: [
     provideNativeDateAdapter(),
   ],
@@ -97,4 +101,65 @@ export class CustomerCreateComponent {
       },
     });
   }
+
+  async loadInfoFromARES(): Promise<void> {
+    const icoControl = this.form.get('ico');
+    let ico:string = icoControl?.value;
+    ico = ico.trim();
+
+    if (!ico || ico.length !== 8) {
+      console.error('Invalid IČO format.');
+      icoControl?.setErrors({ 'invalidIcoFormat': true });
+      return;
+    }
+    try {
+      const aresInfo = await firstValueFrom(this.customersService.getCustomerInfoFromAres(ico));
+
+      console.log('ARES Info Received:', aresInfo);
+
+      const patchData: { [key: string]: any } = {};
+
+      const isPresent = (value: any): boolean => {
+        return value !== null && value !== undefined && value !== '';
+      }
+
+      if (isPresent(aresInfo.tradeName)) {
+        patchData['name'] = aresInfo.tradeName;
+        patchData['surname'] = ' ';
+      }
+
+      patchData['street'] = aresInfo.street;
+      patchData['houseNumber'] = aresInfo.houseNumber;
+      patchData['city'] = aresInfo.city;
+      patchData['zip'] = aresInfo.zip;
+      patchData['country'] = aresInfo.country;
+
+      patchData['ico'] = aresInfo.ico;
+      if (isPresent(aresInfo.dic)) {
+        patchData['dic'] = aresInfo.dic;
+      }
+
+      if (isPresent(aresInfo.bankAccount)) {
+        patchData['bankAccount'] = aresInfo.bankAccount;
+      }
+      if (isPresent(aresInfo.bankCode)) {
+        patchData['bankCode'] = aresInfo.bankCode;
+      }
+
+      if (isPresent(aresInfo.currency)) {
+        patchData['currency'] = aresInfo.currency;
+      }
+      /* ARES doesnt return correct birthday
+      if (isPresent(aresInfo.birthDate)) {
+        patchData['birthDate'] = new Date(aresInfo.birthDate!);
+      }
+    */
+      this.form.patchValue(patchData);
+
+    } catch (error) {
+      console.error('Error fetching ARES information:', error);
+      icoControl?.setErrors({ 'aresLookupFailed': true });
+    }
+  }
+
 }

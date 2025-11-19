@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
-import { Invoice, InvoicesService } from '../../../../api/generated/invoice';
+import { Invoice } from '../../../../api/generated/invoice';
 import { firstValueFrom } from 'rxjs';
 import {MatCard, MatCardActions, MatCardContent} from '@angular/material/card';
 import {MatButton} from '@angular/material/button';
@@ -36,8 +36,7 @@ export class InvoiceDetailComponent implements OnInit {
   private readonly customerService = inject(CustomersServiceController);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
-  invoiceStatus = InvoiceStatus;
-  protected invoiceId!: number;
+  protected invoiceId: number = 0;
   protected invoiceDetail = signal<Invoice | null>(null);
   protected customerDetail = signal<CustomerEntity | null>(null);
   protected error = signal<string | null>(null);
@@ -87,7 +86,7 @@ export class InvoiceDetailComponent implements OnInit {
 
 
   edit(){
-
+    this.router.navigate([`/invoice/edit/`, this.invoiceId])
   }
   pay(){
 
@@ -96,9 +95,13 @@ export class InvoiceDetailComponent implements OnInit {
     this.router.navigate(['/invoice/pdf/', this.invoiceId])
   }
 
-  readonly restrictedStatuses = [
+  readonly paymentStatuses = [
     InvoiceStatus.OVERDUE,
-    InvoiceStatus.PENDING,
+    InvoiceStatus.SENT
+  ] as InvoiceStatus[];
+
+  readonly editStatuses = [
+    InvoiceStatus.DRAFT
   ] as InvoiceStatus[];
 
 }

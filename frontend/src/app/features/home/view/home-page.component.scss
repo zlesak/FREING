@@ -16,10 +16,13 @@
   }
 }
 .info-table{
+  display: flex;
   padding: 5px;
   margin: 3px;
   border-width: 1px;
   border-color: #333333;
   border-radius: 10px;
   border-style: solid;
+  justify-content: space-between;
 }
+

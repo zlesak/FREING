@@ -72,6 +72,8 @@
           </p>
         </div>
       </div>
+      <mat-divider></mat-divider>
+      <h3>Stav</h3> {{ invoiceDetail()?.status}}
 
       <mat-divider></mat-divider>
 
@@ -117,17 +119,19 @@
     </mat-card-content>
 
     <mat-card-actions align="end">
-      <button mat-raised-button color="secondary" (click)="edit()">
-        <mat-icon>edit</mat-icon>
-        Editovat
-      </button>
+      @if (keycloakService.hasAdminAccess && editStatuses.includes(invoiceDetail()?.status!)){
+        <button mat-raised-button color="secondary" (click)="edit()">
+          <mat-icon>edit</mat-icon>
+          Editovat
+        </button>
+      }
       <button mat-raised-button color="primary" (click)="generatePDF()">
         <mat-icon>picture_as_pdf</mat-icon>
         Export do PDF
       </button>
       @if (
         !keycloakService.hasAdminAccess &&
-        restrictedStatuses.includes(invoiceDetail()?.status!)
+        paymentStatuses.includes(invoiceDetail()?.status!)
         ) {
 
       <button mat-raised-button color="accent" (click)="pay()">

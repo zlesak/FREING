@@ -3,7 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { AuthGuard } from './auth.guard';
 import { CustomersPageComponent } from './features/customers/view/customers-page.component';
 import { HomePageComponent } from './features/home/view/home-page.component';
-import { InvoiceCreateComponent } from './features/invoices/components/invoice-create/invoice-create.component';
+import { InvoiceCreateEditComponent } from './features/invoices/components/invoice-create-edit/invoice-create-edit.component';
 import { CustomerCreateComponent } from './features/customers/components/customer-create/customer-create.component';
 import {InvoiceDetailComponent} from './features/invoices/components/invoice-detail/invoice-detail.component';
 import {
@@ -16,7 +16,8 @@ export const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'home' },
   { path: 'home', component: HomePageComponent, canActivate: [AuthGuard] },
   { path: 'invoices', component: InvoicesTableComponent, canActivate: [AuthGuard] },
-  { path: 'invoices/new', component: InvoiceCreateComponent, canActivate: [AuthGuard], data: { roles: ['manager', 'accountant'] } },
+  { path: 'invoices/new', component: InvoiceCreateEditComponent, canActivate: [AuthGuard], data: { roles: ['manager', 'accountant'] } },
+  { path: 'invoice/edit/:id', component: InvoiceCreateEditComponent, canActivate: [AuthGuard], data: { roles: ['manager', 'accountant'] } },
   { path: 'customers/new', component: CustomerCreateComponent },
   { path: 'payments', component: PaymentsComponent },
   { path: 'customers', component: CustomersPageComponent, canActivate: [AuthGuard] },

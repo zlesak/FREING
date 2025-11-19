@@ -1,4 +1,4 @@
-import {Component, inject, OnInit} from '@angular/core';
+import {Component, inject, OnInit, signal} from '@angular/core';
 import {
   FormArray,
   FormBuilder,
@@ -6,7 +6,7 @@ import {
   ReactiveFormsModule,
   Validators
 } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import { InvoicesServiceController } from '../../../../controller/invoices.service';
 import { InvoiceApi } from '../../../../api/generated';
 import { ExchangeRatesController } from '../../../../controller/exchange.service';
@@ -33,8 +33,8 @@ import {CustomersServiceController} from '../../../customers/controller/customer
 
 @Component({
   selector: 'app-invoice-create',
-  templateUrl: './invoice-create.component.html',
-  styleUrls: ['./invoice-create.component.css'],
+  templateUrl: './invoice-create-edit.component.html',
+  styleUrls: ['./invoice-create-edit.component.css'],
   standalone: true,
   imports: [
     ReactiveFormsModule,
@@ -60,21 +60,21 @@ import {CustomersServiceController} from '../../../customers/controller/customer
     provideNativeDateAdapter(),
   ]
 })
-export class InvoiceCreateComponent implements OnInit {
+export class InvoiceCreateEditComponent implements OnInit {
   private readonly keycloakService = inject(KeycloakService);
   private readonly customerService = inject(CustomersServiceController);
-  private readonly router = inject(Router);
-
+  protected readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
+  protected editMode = signal(false);
   protected users: {email: string, id: number}[] = [];
-
-  form!: FormGroup;
-  submitting = false;
-  error?: string;
-  success?: string;
-  lastCurrency = 'CZK';
-
-  currencyOptions = Object.values(CurrencyOptions);
-  statusOptions = Object.values(InvoiceStatus);
+  protected editInvoiceId: number = 0;
+  protected form!: FormGroup;
+  protected submitting = false;
+  protected error?: string;
+  protected success?: string;
+  protected lastCurrency = 'CZK';
+  protected currencyOptions = Object.values(CurrencyOptions);
+  protected statusOptions = Object.values(InvoiceStatus);
 
   constructor(
     private fb: FormBuilder,
@@ -82,31 +82,93 @@ export class InvoiceCreateComponent implements OnInit {
     private exchangeRates: ExchangeRatesController
   ) {}
 
-  async ngOnInit() {
+  ngOnInit() {
+    this.buildForm();
+    this.loadData();
+  }
+
+  private async loadData() {
+    if(this.keycloakService.hasAdminAccess){
+      await this.loadUsersInfo();
+    }
+
+    const idParam = this.route.snapshot.paramMap.get('id');
+    if (idParam) {
+      this.editMode.set(true);
+      this.editInvoiceId = +idParam;
+      console.log('editing existing invoice');
+
+      try {
+        const invoice = await firstValueFrom(this.invoicesService.getInvoice(+idParam));
+        console.log(invoice);
+
+        this.lastCurrency = invoice.currency;
+
+        this.form.patchValue({
+          invoiceNumber: invoice.invoiceNumber,
+          referenceNumber: invoice.referenceNumber,
+          customerId: invoice.customerId,
+          issueDate: invoice.issueDate,
+          dueDate: invoice.dueDate,
+          amount: invoice.amount,
+          subAmount: invoice.items.reduce((a, i) => a + i.totalPrice, 0),
+          currency: invoice.currency,
+          status: invoice.status
+        });
+
+        this.items.clear();
+
+        invoice.items.forEach(item => {
+          const group = this.newItem();
+          group.patchValue({
+            description: item.description,
+            name: item.name,
+            quantity: item.quantity,
+            totalPrice: item.totalPrice,
+            unit: item.unit,
+            unitPrice: item.unitPrice,
+            vat: item.vatRate
+          });
+
+          this.items.push(group);
+        });
+
+        this.setupCurrencyListener();
+
+      } catch (e) {
+        console.error('Error loading invoice', e);
+        this.error = 'Nepodařilo se načíst fakturu.';
+      }
+    } else {
+      this.editMode.set(false);
+      this.addItem();
+      this.lastCurrency = this.form.get('currency')!.value;
+      this.setupCurrencyListener();
+    }
+  }
+
+  private setupCurrencyListener() {
+    this.form.get('currency')!.valueChanges.pipe(distinctUntilChanged()).subscribe(newCur => {
+      if (!newCur || newCur === this.lastCurrency) return;
+      this.convertAllItemsCurrency(this.lastCurrency, newCur);
+    });
+  }
+
+  private buildForm() {
     const today = new Date().toISOString().substring(0,10);
-    const due = new Date(Date.now()).toISOString().substring(0,10);
+
     this.form = this.fb.group({
       invoiceNumber: ['', [Validators.required, Validators.minLength(3)]],
       referenceNumber: [''],
       customerId: [null, [Validators.required]],
       issueDate: [today, Validators.required],
-      dueDate: [due, Validators.required],
+      dueDate: [today, Validators.required],
       amount: [0, [Validators.required, Validators.min(0)]],
-      subAmount: [0, [Validators.min(0)]],
+      subAmount: [0],
       currency: ['CZK', Validators.required],
       status: ['DRAFT', Validators.required],
       items: this.fb.array([])
     });
-    this.addItem();
-
-    this.lastCurrency = this.form.get('currency')!.value;
-    this.form.get('currency')!.valueChanges.pipe(distinctUntilChanged()).subscribe(newCur => {
-      if (!newCur || newCur === this.lastCurrency) return;
-      this.convertAllItemsCurrency(this.lastCurrency, newCur);
-    });
-    if(this.keycloakService.hasAdminAccess){
-      await this.loadUsersInfo()
-    }
   }
 
   private convertAllItemsCurrency(from: string, to: string): void {
@@ -198,38 +260,56 @@ export class InvoiceCreateComponent implements OnInit {
     this.submitting = true;
 
     const formValue = this.form.getRawValue();
+    if(this.editMode()){
+      const request: InvoiceApi.InvoiceUpdateRequest = {
+        ...formValue,
+        issueDate: new Date(formValue.issueDate).toISOString().split('T')[0],
+        dueDate: new Date(formValue.dueDate).toISOString().split('T')[0],
+        amount: formValue.amount,
+        items: formValue.items
+      };
 
-    const request: InvoiceApi.InvoiceCreateRequest = {
-      ...formValue,
-      issueDate: new Date(formValue.issueDate).toISOString().split('T')[0],
-      dueDate: new Date(formValue.dueDate).toISOString().split('T')[0],
-      amount: formValue.amount,
-      items: formValue.items
-    };
+      this.invoicesService.updateInvoice(this.editInvoiceId, request).subscribe({
+        next: () => {
+          this.submitting = false;
+          this.success = 'Faktura byla updavena';
+          setTimeout(() => this.router.navigate(['/invoices']), 800);
+        },
+        error: err => {
+          this.submitting = false;
+          this.error = err.message || 'Chyba při editaci faktury';
+        }
+      });
+    } else {
+      const request: InvoiceApi.InvoiceCreateRequest = {
+        ...formValue,
+        issueDate: new Date(formValue.issueDate).toISOString().split('T')[0],
+        dueDate: new Date(formValue.dueDate).toISOString().split('T')[0],
+        amount: formValue.amount,
+        items: formValue.items
+      };
 
-    this.invoicesService.createInvoice(request).subscribe({
-      next: () => {
-        this.submitting = false;
-        this.success = 'Faktura byla vytvořena';
-        setTimeout(() => this.router.navigate(['/invoices']), 800);
-      },
-      error: err => {
-        this.submitting = false;
-        this.error = err.message || 'Chyba při vytváření faktury';
-      }
-    });
+      this.invoicesService.createInvoice(request).subscribe({
+        next: () => {
+          this.submitting = false;
+          this.success = 'Faktura byla vytvořena';
+          setTimeout(() => this.router.navigate(['/invoices']), 800);
+        },
+        error: err => {
+          this.submitting = false;
+          this.error = err.message || 'Chyba při vytváření faktury';
+        }
+      });
+    }
   }
-  async loadUsersInfo(){
 
-    //users from keycloak - need to set view users permission for manager and accountant
+  async loadUsersInfo(){
     const userDetails =  await this.keycloakService.getAllUsers();
 
     userDetails.forEach(user=> {
       this.users.push({email: user.email, id: user.id});
     })
-    console.log(this.users);
     const usersFromDb = await firstValueFrom(this.customerService.getCustomers(0,999));
-    console.log(usersFromDb);
     usersFromDb.content.forEach(user=>{
       this.users.push({email: user.email, id: user.id!});
     })

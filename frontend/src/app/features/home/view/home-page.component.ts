@@ -80,7 +80,7 @@ export class HomePageComponent implements OnInit{
   protected chartDataCurrency = computed(() => {
     const currencyCount: Record<string, { occurrence: number; color: string }> = {};
 
-    this.invoices().forEach(invoice => {
+    this.filteredInvoices().forEach(invoice => {
       const currency = invoice.currency ?? 'Unknown';
       if (!currencyCount[currency]) {
         currencyCount[currency] = { occurrence: 0, color: getCurrencyColor(currency) };
@@ -177,9 +177,7 @@ export class HomePageComponent implements OnInit{
     userDetails.forEach(user=> {
       this.users.push({email: user.email, id: user.id});
     })
-    console.log(this.users);
     const usersFromDb = await firstValueFrom(this.customerService.getCustomers(0,999));
-    console.log(usersFromDb);
     usersFromDb.content.forEach(user=>{
       this.users.push({email: user.email, id: user.id!});
     })
@@ -246,11 +244,14 @@ export function hashIdToColor(id: string | number | null | undefined): string {
   let hash = 0;
   for (let i = 0; i < str.length; i++) {
     hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    hash = hash & hash;
   }
 
-  const r = 128 + ((hash >> 16) & 0xFF) % 128;
-  const g = 128 + ((hash >> 8) & 0xFF) % 128;
-  const b = 128 + (hash & 0xFF) % 128;
+  hash = Math.imul(hash, 2654435761);
+
+  const r = 128 + ((hash >> 24) & 0xFF) % 128;
+  const g = 128 + ((hash >> 16) & 0xFF) % 128;
+  const b = 128 + ((hash >> 8) & 0xFF) % 128;
 
   return `#${r.toString(16).padStart(2,'0')}${g.toString(16).padStart(2,'0')}${b.toString(16).padStart(2,'0')}`;
 }
