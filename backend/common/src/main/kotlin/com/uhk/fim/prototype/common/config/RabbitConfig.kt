@@ -1,7 +1,8 @@
 package com.uhk.fim.prototype.common.config
 
-import kotlinx.coroutines.CoroutineScope
-import org.aopalliance.intercept.MethodInterceptor
+import com.uhk.fim.prototype.common.handlers.MessageExceptionHandler
+import com.uhk.fim.prototype.common.messaging.preprocessor.MessageListenerPreprocessor
+import com.uhk.fim.prototype.common.messaging.preprocessor.MessageListenerProcessorChain
 import org.springframework.amqp.core.Binding
 import org.springframework.amqp.core.BindingBuilder
 import org.springframework.amqp.core.DirectExchange
@@ -10,14 +11,12 @@ import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFacto
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory
 import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
 
 @Configuration
 class RabbitConfig(
-    private val appScope: CoroutineScope,
 ) {
     companion object {
         const val EXCHANGE = "freing.exchange"
@@ -67,11 +66,16 @@ class RabbitConfig(
     @Primary
     fun rabbitListenerContainerFactory(
         connectionFactory: CachingConnectionFactory,
-        @Qualifier("messagePreProcessorChain") preprocessorChain: MethodInterceptor
+        preprocessorChain: MessageListenerProcessorChain,
+        messageListenerProcessor: MessageListenerPreprocessor,
+        messageExceptionHandler: MessageExceptionHandler
     ): SimpleRabbitListenerContainerFactory {
         val factory = SimpleRabbitListenerContainerFactory()
         factory.setConnectionFactory(connectionFactory)
-        factory.setAdviceChain(preprocessorChain)
+        factory.setAdviceChain(preprocessorChain
+            .registerProcessor(messageListenerProcessor)
+            .registerProcessor(messageExceptionHandler)
+        )
         factory.setConcurrentConsumers(3)
         factory.setMaxConcurrentConsumers(6)
         return factory

@@ -1,38 +1,32 @@
 package com.uhk.fim.prototype.common.messaging.preprocessor
 
 import com.uhk.fim.prototype.common.messaging.dto.MessageResponse
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import org.aopalliance.intercept.MethodInterceptor
+import org.aopalliance.intercept.MethodInvocation
 import org.springframework.amqp.core.Message
 import org.springframework.amqp.support.converter.MessageConverter
-import org.springframework.beans.factory.annotation.Qualifier
-import org.springframework.context.annotation.Bean
 import org.springframework.stereotype.Component
 
 @Component
 class MessageListenerProcessorChain(
-    private val processors: List<MessageListenerProcessor>,
     private val messageConverter: MessageConverter,
-    private val appScope: CoroutineScope,
-) {
+): MethodInterceptor {
+
+    private val processors: MutableList<MessageListenerProcessor> = mutableListOf()
 
 
-    @Bean
-    @Qualifier("messagePreProcessorChain")
-    fun messageListenerPreProcessorChain(): MethodInterceptor = MethodInterceptor { invocation ->
-        val inputData = excludeProcessorInputData(invocation.arguments)?: return@MethodInterceptor invocation.proceed()
+    override fun invoke(invocation: MethodInvocation): Any? {
+        val inputData = excludeProcessorInputData(invocation.arguments)?: return invocation.proceed()
 
         processors.forEach { it.process(inputData) }
 
-        appScope.launch {
-            try {
-                println("Running task in coroutine on thread: ${Thread.currentThread().name}")
-                invocation.proceed()
-            } catch (ex: Exception) {
-                println("Error in coroutine task: $ex")
-            }
-        }
+        return invocation.proceed()
+    }
+
+    fun registerProcessor(processor: MessageListenerProcessor): MessageListenerProcessorChain{
+        println("[MessageListenerProcessorChain] registered new processor: ${processor::class.simpleName}")
+        processors.add(processor)
+        return this
     }
 
     private fun excludeProcessorInputData(args: Array<Any>): MessageProcess? {
@@ -65,8 +59,6 @@ class MessageListenerProcessorChain(
 
         return payload
     }
-
-
 }
 
 data class MessageProcess(
