@@ -1,6 +1,6 @@
 package com.uhk.fim.prototype.common.config
 
-import com.uhk.fim.prototype.common.handlers.MessageExceptionHandler
+import com.uhk.fim.prototype.common.messaging.preprocessor.MessageExceptionPreprocessor
 import com.uhk.fim.prototype.common.messaging.preprocessor.MessageListenerPreprocessor
 import com.uhk.fim.prototype.common.messaging.preprocessor.MessageListenerProcessorChain
 import org.springframework.amqp.core.Binding
@@ -68,13 +68,13 @@ class RabbitConfig(
         connectionFactory: CachingConnectionFactory,
         preprocessorChain: MessageListenerProcessorChain,
         messageListenerProcessor: MessageListenerPreprocessor,
-        messageExceptionHandler: MessageExceptionHandler
+        messageExceptionPreprocessor: MessageExceptionPreprocessor
     ): SimpleRabbitListenerContainerFactory {
         val factory = SimpleRabbitListenerContainerFactory()
         factory.setConnectionFactory(connectionFactory)
         factory.setAdviceChain(preprocessorChain
             .registerProcessor(messageListenerProcessor)
-            .registerProcessor(messageExceptionHandler)
+            .registerProcessor(messageExceptionPreprocessor)
         )
         factory.setConcurrentConsumers(3)
         factory.setMaxConcurrentConsumers(6)

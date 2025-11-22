@@ -1,16 +1,14 @@
-package com.uhk.fim.prototype.common.handlers
+package com.uhk.fim.prototype.common.messaging.preprocessor
 
 import com.uhk.fim.prototype.common.messaging.ActiveMessagingManager
 import com.uhk.fim.prototype.common.messaging.dto.MessageResponse
-import com.uhk.fim.prototype.common.messaging.preprocessor.MessageListenerProcessor
-import com.uhk.fim.prototype.common.messaging.preprocessor.MessageProcess
 import org.aopalliance.intercept.MethodInterceptor
 import org.springframework.amqp.core.Message
 import org.springframework.amqp.support.converter.MessageConverter
 import org.springframework.stereotype.Component
 
 @Component
-class MessageExceptionHandler(
+class MessageExceptionPreprocessor(
     private val messageConverter: MessageConverter,
     private val activeMessagingManager: ActiveMessagingManager
 ) : MessageListenerProcessor {
