@@ -4,7 +4,6 @@ import java.util.concurrent.CompletableFuture
 
 /**
  * Cache for active messages interface. Classes which implement this interface should has different cacheType
- * cacheType: T means that this cache is responsible for responses which are of type T
  */
 interface ActiveMessagesCache<T> {
     val messagesCache: MessagesCache<T>
