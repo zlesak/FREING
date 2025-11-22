@@ -10,6 +10,7 @@ import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFacto
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory
 import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
@@ -66,12 +67,11 @@ class RabbitConfig(
     @Primary
     fun rabbitListenerContainerFactory(
         connectionFactory: CachingConnectionFactory,
-        rabbitListenerAdvice: MethodInterceptor
+        @Qualifier("messagePreProcessorChain") preprocessorChain: MethodInterceptor
     ): SimpleRabbitListenerContainerFactory {
         val factory = SimpleRabbitListenerContainerFactory()
         factory.setConnectionFactory(connectionFactory)
-        factory.setAdviceChain(rabbitListenerAdvice)
-        factory.setTaskExecutor { it.asCoroutine(appScope) }
+        factory.setAdviceChain(preprocessorChain)
         return factory
     }
 }

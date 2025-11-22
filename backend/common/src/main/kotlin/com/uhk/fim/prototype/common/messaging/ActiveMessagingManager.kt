@@ -34,6 +34,11 @@ class ActiveMessagingManager(
        return message?.get()
     }
 
+    fun completeExceptionally(correlationId: String, ex: Throwable) {
+        val message = activeMessageRegistry.unregister(correlationId)
+        message?.completeExceptionally(ex)
+    }
+
 
     private fun generateIds() = Pair(UUID.randomUUID().toString(), UUID.randomUUID().toString())
 }

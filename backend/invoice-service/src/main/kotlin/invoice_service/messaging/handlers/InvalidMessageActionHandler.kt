@@ -5,11 +5,10 @@ import com.uhk.fim.prototype.common.messaging.dto.MessageResponse
 import com.uhk.fim.prototype.common.messaging.enums.MessageStatus
 import com.uhk.fim.prototype.common.messaging.enums.SourceService
 import invoice_service.messaging.MessageSender
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
 @Component
-class InvalidMessageActionHandler @Autowired constructor(
+class InvalidMessageActionHandler (
     private val messageSender: MessageSender
 ) {
     fun handleInvalidMessageAction(request: InvoiceRequest, correlationId: String, replyTo: String, apiSourceService: SourceService = SourceService.INVOICE) {

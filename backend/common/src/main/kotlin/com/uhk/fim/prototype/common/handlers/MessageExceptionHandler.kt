@@ -2,19 +2,20 @@ package com.uhk.fim.prototype.common.handlers
 
 import com.uhk.fim.prototype.common.messaging.ActiveMessagingManager
 import com.uhk.fim.prototype.common.messaging.dto.MessageResponse
+import com.uhk.fim.prototype.common.messaging.preprocessor.MessageListenerProcessor
+import com.uhk.fim.prototype.common.messaging.preprocessor.MessageProcess
 import org.aopalliance.intercept.MethodInterceptor
 import org.springframework.amqp.core.Message
 import org.springframework.amqp.support.converter.MessageConverter
-import org.springframework.context.annotation.Bean
 import org.springframework.stereotype.Component
 
 @Component
 class MessageExceptionHandler(
     private val messageConverter: MessageConverter,
     private val activeMessagingManager: ActiveMessagingManager
-) {
+) : MessageListenerProcessor {
 
-    @Bean
+
     fun rabbitListenerAdvice(): MethodInterceptor = MethodInterceptor { invocation ->
 
         val payload = invocation.arguments
@@ -47,6 +48,12 @@ class MessageExceptionHandler(
 
         // Proceed to the actual listener method
         invocation.proceed()
+    }
+
+    //handle all error from messages
+    override fun process(message: MessageProcess): MessageProcess {
+        println("[MessageExceptionHandler] handling message errors")
+        return message
     }
 
 }

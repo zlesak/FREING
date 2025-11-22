@@ -1,12 +1,13 @@
 package rendering_service.messaging
 
 import com.uhk.fim.prototype.common.config.RabbitConfig
-import com.uhk.fim.prototype.common.messaging.ActiveMessagingManager
+import com.uhk.fim.prototype.common.extensions.processInCoroutine
 import com.uhk.fim.prototype.common.messaging.dto.InvoiceRequest
 import com.uhk.fim.prototype.common.messaging.dto.MessageResponse
 import com.uhk.fim.prototype.common.messaging.enums.MessageStatus
 import com.uhk.fim.prototype.common.messaging.enums.SourceService
 import com.uhk.fim.prototype.common.messaging.enums.invoice.MessageInvoiceAction
+import kotlinx.coroutines.CoroutineScope
 import org.springframework.amqp.core.Message
 import org.springframework.amqp.rabbit.annotation.RabbitListener
 import org.springframework.amqp.support.converter.MessageConverter
@@ -20,12 +21,26 @@ class MessageListener (
     private val messageSender: MessageSender,
     private val messageConverter: MessageConverter,
     private val pdfRenderingService: PdfRenderingService,
-    private val activeMessagingManager: ActiveMessagingManager,
-) {
+    private val rabbitScope: CoroutineScope
+    ) {
     private val renderingRequests = ConcurrentHashMap<String, Message>()
 
     @RabbitListener(queues = [RabbitConfig.RENDERING_REQUESTS])
     fun receiveRenderingRequest(message: Message) {
+      message.processInCoroutine(rabbitScope){
+          processRenderingRequest(it)
+      }
+    }
+
+    @RabbitListener(queues = ["#{messageSender.replyQueueName}"])
+    fun receiveInvoiceResponse(message: Message) {
+       message.processInCoroutine(rabbitScope){
+           processReply(it)
+       }
+    }
+
+
+    suspend fun processRenderingRequest(message: Message) {
         val request = messageConverter.fromMessage(message) as InvoiceRequest
         val correlationId = message.messageProperties.correlationId ?: request.requestId
         val replyTo = message.messageProperties.replyTo ?: return
@@ -66,8 +81,7 @@ class MessageListener (
         }
     }
 
-    @RabbitListener(queues = ["#{messageSender.replyQueueName}"])
-    fun receiveInvoiceResponse(message: Message) {
+    suspend fun processReply(message: Message) {
         println("[rendering-service] receiveInvoiceResponse called, messageProperties: ${message.messageProperties}")
         try {
             val response = messageConverter.fromMessage(message) as MessageResponse
@@ -113,4 +127,5 @@ class MessageListener (
             ex.printStackTrace()
         }
     }
+
 }

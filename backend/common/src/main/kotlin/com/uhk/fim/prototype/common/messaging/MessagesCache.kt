@@ -1,6 +1,5 @@
 package com.uhk.fim.prototype.common.messaging
 
-import com.uhk.fim.prototype.common.exceptions.PendingMessageException
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
 
