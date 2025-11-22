@@ -72,6 +72,8 @@ class RabbitConfig(
         val factory = SimpleRabbitListenerContainerFactory()
         factory.setConnectionFactory(connectionFactory)
         factory.setAdviceChain(preprocessorChain)
+        factory.setConcurrentConsumers(3)
+        factory.setMaxConcurrentConsumers(6)
         return factory
     }
 }
