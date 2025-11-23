@@ -10,6 +10,7 @@ services:
           - freing.test
           - service.freing.test
           - pgadmin.freing.test
+          - mail.freing.test
     ports:
       - "80:80"
     volumes:

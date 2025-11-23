@@ -11,12 +11,12 @@ Služby:
 
 ## Postup pro spuštění
 ### 1. Přidání testovacích domén do /etc/hosts (unix-based systémy)
-Aby fungovaly domény používané v konfiguraci (např. `auth.freing.test`, `freing.test`, `service.freing.test` a `pgadmin.freing.test`), je nutné přidat záznamy do `/etc/hosts`.  
-Otevřte `sudo nano /etc/hosts` a přidejte tento řádek: `127.0.0.1 auth.freing.test rabbitmq.freing.test freing.test service.freing.test pgadmin.freing.test`  
+Aby fungovaly domény používané v konfiguraci (např. `auth.freing.test`, `freing.test`, `service.freing.test`, `pgadmin.freing.test` a `mail.freing.test`), je nutné přidat záznamy do `/etc/hosts`.  
+Otevřte `sudo nano /etc/hosts` a přidejte tento řádek: `127.0.0.1 auth.freing.test rabbitmq.freing.test freing.test service.freing.test pgadmin.freing.test mail.freing.test`  
 
 nebo použijte příkaz:
 ```bash
-     echo "127.0.0.1 auth.freing.test rabbitmq.freing.test freing.test service.freing.test pgadmin.freing.test" >> /etc/hosts
+     echo "127.0.0.1 auth.freing.test rabbitmq.freing.test freing.test service.freing.test pgadmin.freing.test mail.freing.test" >> /etc/hosts
 ```
 Pro Windows upravte `C:\Windows\System32\drivers\etc\hosts` obdobně.
 
