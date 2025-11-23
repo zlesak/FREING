@@ -4,6 +4,7 @@ import invoice_service.config.ExchangeRatesProperties
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.runApplication
+import org.springframework.scheduling.annotation.EnableScheduling
 
 @SpringBootApplication(
 	scanBasePackages = [
@@ -12,6 +13,7 @@ import org.springframework.boot.runApplication
 	]
 )
 @EnableConfigurationProperties(ExchangeRatesProperties::class)
+@EnableScheduling
 class InvoiceServiceApplication
 
 fun main(args: Array<String>) {

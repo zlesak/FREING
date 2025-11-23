@@ -16,8 +16,7 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
 
 @Configuration
-class RabbitConfig(
-) {
+class RabbitConfig() {
     companion object {
         const val EXCHANGE = "freing.exchange"
         const val CUSTOMER_REQUESTS = "customer.requests"

@@ -1,6 +1,6 @@
 package customer_service.dto.customer.response
 
-import customer_service.models.CustomerEntity
+import customer_service.models.Customer
 import java.util.Date
 
 data class CustomerDto(
@@ -23,8 +23,8 @@ data class CustomerDto(
     val currency: String? = null
 )
 {
-    fun toEntity(): CustomerEntity {
-        return CustomerEntity(
+    fun toEntity(): Customer {
+        return Customer(
             id = id,
             name = name,
             surname = surname,

@@ -10,7 +10,6 @@ import java.util.concurrent.Executors
 @Configuration
 class CoroutineConfig {
 
-
     @Bean(destroyMethod = "close")
     fun rabbitDispatcher(): ExecutorCoroutineDispatcher =
         Executors.newFixedThreadPool(32).asCoroutineDispatcher()

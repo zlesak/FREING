@@ -32,7 +32,7 @@ class MessageListener(
         logger.info("Received render response with status: ${response.status} with $message")
         val correlationId = message.messageProperties.correlationId
         if (correlationId != null) {
-            activeMessagingManager.unregisterMessage(correlationId, response)
+           activeMessagingManager.unregisterMessage(correlationId, response)
         }
     }
 }

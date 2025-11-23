@@ -1,21 +1,18 @@
 package invoice_service.config
 
+import com.uhk.fim.prototype.common.security.CustomJwtAuthenticationConverter
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.core.convert.converter.Converter
-import org.springframework.security.authentication.AbstractAuthenticationToken
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
-import org.springframework.security.config.annotation.web.builders.HttpSecurity
-import org.springframework.security.config.Customizer
 import org.springframework.http.HttpMethod
-import org.springframework.security.core.GrantedAuthority
-import org.springframework.security.core.authority.SimpleGrantedAuthority
-import org.springframework.security.oauth2.jwt.Jwt
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter
+import org.springframework.security.config.Customizer
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
+import org.springframework.security.config.annotation.web.builders.HttpSecurity
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.web.SecurityFilterChain
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity(prePostEnabled = true, proxyTargetClass = true, securedEnabled = true, jsr250Enabled = true)
 class SecurityConfig {
 
     @Bean
@@ -40,41 +37,9 @@ class SecurityConfig {
             }
             .oauth2ResourceServer { oauth2 ->
                 oauth2.jwt { jwt ->
-                    jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())
+                    jwt.jwtAuthenticationConverter(CustomJwtAuthenticationConverter())
                 }
             }
         return http.build()
-    }
-
-    private fun jwtAuthenticationConverter(): Converter<Jwt, AbstractAuthenticationToken> {
-        val converter = JwtAuthenticationConverter()
-        converter.setJwtGrantedAuthoritiesConverter { jwt ->
-            val authorities = mutableListOf<GrantedAuthority>()
-
-            // map scopes/scp -> SCOPE_x authorities
-            val scopesFromString = jwt.claims["scope"] as? String
-            if (!scopesFromString.isNullOrBlank()) {
-                scopesFromString.split(" ").forEach { authorities.add(SimpleGrantedAuthority("SCOPE_$it")) }
-            }
-            // some tokens use 'scp' as list
-            val scopes = jwt.claims["scp"] as? List<*>
-            scopes?.filterIsInstance<String>()?.forEach { authorities.add(SimpleGrantedAuthority("SCOPE_$it")) }
-
-            // map realm roles -> ROLE_x
-            val realm = jwt.claims["realm_access"] as? Map<*, *>
-            val realmRoles = realm?.get("roles") as? List<*>
-            realmRoles?.filterIsInstance<String>()?.forEach { authorities.add(SimpleGrantedAuthority("ROLE_$it")) }
-
-            // map client (resource) roles -> ROLE_x
-            val resourceAccess = jwt.claims["resource_access"] as? Map<*, *>
-            resourceAccess?.values?.forEach { entry ->
-                val map = entry as? Map<*, *>
-                val roles = map?.get("roles") as? List<*>
-                roles?.filterIsInstance<String>()?.forEach { authorities.add(SimpleGrantedAuthority("ROLE_$it")) }
-            }
-
-            authorities
-        }
-        return converter
     }
 }

@@ -4,9 +4,9 @@ import com.uhk.fim.prototype.common.messaging.ActiveMessagingManager
 import com.uhk.fim.prototype.common.messaging.enums.invoice.MessageInvoiceAction
 import invoice_service.dtos.invoices.requests.InvoiceCreateRequest
 import invoice_service.dtos.invoices.requests.InvoiceUpdateRequest
-import invoice_service.dtos.invoices.responses.InvoicesPagedResponse
 import invoice_service.messaging.MessageSender
 import invoice_service.models.invoices.Invoice
+import com.uhk.fim.prototype.common.security.JwtUserPrincipal
 import invoice_service.services.InvoiceService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
@@ -15,8 +15,11 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
+import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
-import org.springframework.http.ResponseEntity
+import org.springframework.security.access.prepost.PostAuthorize
+import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.*
 
 @Tag(name = "Invoices", description = "API pro správu faktur")
@@ -28,28 +31,47 @@ class InvoiceController(
     private val activeMessagingManager: ActiveMessagingManager
 ) {
 
-    @Operation(summary = "Získat všechny faktury", description = "Vrací stránkovaný seznam všech faktur.")
+    @Operation(summary = "Získat všechny faktury", description = "Vrací stránkovaný seznam všech faktur pro účetní.")
+    @PreAuthorize("hasRole('ACCOUNTANT') or hasRole('MANAGER')")
     @GetMapping("/get-invoices-pages")
     fun getAllInvoices(
         @Parameter(description = "Číslo stránky", example = "0")
         @RequestParam(defaultValue = "0") page: Int,
         @Parameter(description = "Velikost stránky", example = "10")
         @RequestParam(defaultValue = "10") size: Int
-    ): InvoicesPagedResponse<Invoice> {
-        val pageable = PageRequest.of(page, size)
-        return service.getAllInvoices(pageable)
+    ): Page<Invoice> = service.getAllInvoices(PageRequest.of(page, size))
+
+    @Operation(
+        summary = "Získat faktury přihlášeného zákazníka",
+        description = "Vrací stránkovaný seznam faktur pro přihlášeného zákazníka."
+    )
+    @PreAuthorize("hasRole('CUSTOMER')")
+    @GetMapping("/get-my-invoices-pages")
+    fun getMyInvoices(
+        authentication: Authentication,
+        @Parameter(description = "Číslo stránky", example = "0")
+        @RequestParam(defaultValue = "0") page: Int,
+        @Parameter(description = "Velikost stránky", example = "10")
+        @RequestParam(defaultValue = "10") size: Int
+    ): Page<Invoice>  {
+        val principal = authentication.principal as JwtUserPrincipal
+        return service.getAllInvoicesForLoggedInCustomer(
+            principal.id,
+            PageRequest.of(page, size))
     }
 
     @Operation(summary = "Získat fakturu podle ID", description = "Vrací detail faktury podle jejího ID.")
+    @PostAuthorize("hasRole('ACCOUNTANT') or hasRole('MANAGER') or returnObject.customerId == authentication.principal.id")
     @GetMapping("/get-by-id/{id}")
     fun getInvoice(
+        authentication: Authentication,
         @Parameter(description = "ID faktury", example = "1")
         @PathVariable id: Long
-    ): ResponseEntity<Invoice> =
-        service.getInvoice(id)?.let { ResponseEntity.ok(it) } ?: (ResponseEntity.notFound().build())
+    ): Invoice = service.getInvoice(id)
 
     @Operation(summary = "Získat fakturu podle ID", description = "Vrací detail faktury podle jejího ID.")
 
+    @PreAuthorize("hasRole('ACCOUNTANT') or hasRole('MANAGER')")
     @GetMapping("/get-by-id/{id}/xml")
     fun getInvoiceXml(
         @Parameter(description = "ID faktury", example = "1")
@@ -71,43 +93,34 @@ class InvoiceController(
                 content = [Content(schema = Schema(implementation = Invoice::class))]
             ),
             ApiResponse(
-                responseCode = "409",
+                responseCode = "400",
                 description = "Faktura s tímto číslem již existuje",
                 content = [Content(schema = Schema(example = "{\"error\": \"Faktura s tímto číslem již existuje.\"}"))]
             )
         ]
     )
+    @PreAuthorize("hasRole('ACCOUNTANT') or hasRole('MANAGER')")
     @PostMapping("/create")
     fun createInvoice(
         @Parameter(description = "Data pro vytvoření faktury")
         @RequestBody request: InvoiceCreateRequest
-    ): Invoice {
-        return service.createInvoice(request)
-    }
+    ): Invoice = service.createInvoice(request)
 
     @Operation(summary = "Aktualizovat fakturu", description = "Aktualizuje existující fakturu podle ID.")
+    @PreAuthorize("hasRole('ACCOUNTANT') or hasRole('MANAGER')")
     @PutMapping("/update/{id}")
     fun updateInvoice(
         @Parameter(description = "ID faktury", example = "1")
         @PathVariable id: Long,
         @Parameter(description = "Data pro aktualizaci faktury")
         @RequestBody request: InvoiceUpdateRequest
-    ): ResponseEntity<Invoice> {
-        val updated = service.updateInvoice(id, request)
-        return if (updated != null) ResponseEntity.ok(updated) else ResponseEntity.status(403).build()
-    }
+    ): Invoice = service.updateInvoice(id, request)
 
     @Operation(summary = "Smazat fakturu", description = "Smaže fakturu podle ID.")
+    @PreAuthorize("hasRole('ACCOUNTANT') or hasRole('MANAGER')")
     @DeleteMapping("/delete/{id}")
     fun deleteInvoice(
         @Parameter(description = "ID faktury", example = "1")
         @PathVariable id: Long
-    ): ResponseEntity<String> {
-        val deleted = service.deleteInvoice(id)
-        return if (deleted) {
-            ResponseEntity.noContent().build()
-        } else {
-            ResponseEntity.status(409).body("Nelze smazat fakturu")
-        }
-    }
+    ) = service.deleteInvoice(id)
 }

@@ -80,12 +80,8 @@ class InvoiceServiceHandler(
                 error = ex.getErrorProps()
             )
         } finally {
-            if (response != null) {
-                messageSender.sendInvoiceResponse(response, replyTo, correlationId)
-            }
-            else {
-                throw NotFoundException("ERROR: response is null in createXmlInvoice for requestId=${request.requestId}")
-            }
+            response?.let { messageSender.sendInvoiceResponse(it, replyTo, correlationId) }
+                ?: throw NotFoundException("ERROR: response is null in createXmlInvoice for requestId=${request.requestId}")
         }
     }
 }

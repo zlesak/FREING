@@ -160,6 +160,35 @@
 							"response": []
 						},
 						{
+							"name": "Get not deleted customers paged",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseURL}}{{customersEndpoint}}/get-customers-not-deleted-paged?page=0&size=10",
+									"host": [
+										"{{baseURL}}{{customersEndpoint}}"
+									],
+									"path": [
+										"get-customers-not-deleted-paged"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "0",
+											"description": "Number of customer page"
+										},
+										{
+											"key": "size",
+											"value": "10",
+											"description": "Size of the customer page"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
 							"name": "Get customer info via ICO from ARES",
 							"request": {
 								"method": "GET",
@@ -200,7 +229,7 @@
 										"header": [],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"invoiceIds\": [],\n    \"customerId\": 0,\n    \"issueDateFrom\": \"2025-10-04\",\n    \"issueDateTo\": \"2025-10-07\",\n    \"minAmount\": 0,\n    \"maxAmount\": 15000\n}",
+											"raw": "{\n    \"invoiceIds\": [],\n    \"customerId\": null,\n    \"invoiceNumber\": null,\n    \"referenceNumber\": null,\n    \"issueDateFrom\": \"2025-10-04\",\n    \"issueDateTo\": \"2025-10-07\",\n    \"dueDateFrom\": null,\n    \"dueDateTo\": null,\n    \"minAmount\": 0,\n    \"maxAmount\": 15000,\n    \"currency\": null,\n    \"statuses\": []\n}",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -464,6 +493,61 @@
 											"key": "Id",
 											"value": "{{invoiceId}}",
 											"description": "Invoice Id"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Filtered invoices",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"invoiceIds\": [],\n  \"customerId\": 0,\n  \"invoiceNumber\": null,\n  \"referenceNumber\": null,\n  \"issueDateFrom\": \"2025-10-04\",\n  \"issueDateTo\": \"2025-10-10\",\n  \"dueDateFrom\": null,\n  \"dueDateTo\": null,\n  \"minAmount\": 0,\n  \"maxAmount\": 15000,\n  \"currency\": \"CZK\",\n  \"statuses\": []\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseURL}}{{invoicesEndpoint}}/filter",
+									"host": [
+										"{{baseURL}}{{invoicesEndpoint}}"
+									],
+									"path": [
+										"filter"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get my invoices paged",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseURL}}{{invoicesEndpoint}}/get-my-invoices-pages?page=0&size=10",
+									"host": [
+										"{{baseURL}}{{invoicesEndpoint}}"
+									],
+									"path": [
+										"get-my-invoices-pages"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "0",
+											"description": "Invoice page number"
+										},
+										{
+											"key": "size",
+											"value": "10",
+											"description": "Invoice page size"
 										}
 									]
 								}
