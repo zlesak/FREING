@@ -9,30 +9,30 @@ import org.springframework.context.annotation.Configuration
 @Configuration
 class KeycloakAdminConfig {
 
-    @Value("\${keycloak.server-url}")
-    private lateinit var serverUrl: String
+    @Value("\${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
+    private lateinit var issuerUri: String
 
     @Value("\${keycloak.realm}")
     private lateinit var realm: String
 
-    @Value("\${keycloak.client-id}")
+    @Value("\${spring.security.oauth2.client.registration.service-client.client-id}")
     private lateinit var clientId: String
 
-    @Value("\${keycloak.admin-user}")
-    private lateinit var adminUser: String
+    @Value("\${spring.security.oauth2.client.registration.service-client.client-secret}")
+    private lateinit var clientSecret: String
 
-    @Value("\${keycloak.admin-password}")
-    private lateinit var adminPassword: String
+    @Value("\${spring.security.oauth2.client.registration.service-client.authorization-grant-type}")
+    private lateinit var grantType: String
 
     @Bean
     fun keycloak(): Keycloak {
+        val serverUrl = issuerUri.substring(0, issuerUri.indexOf("/realms"))
         return KeycloakBuilder.builder()
             .serverUrl(serverUrl)
             .realm(realm)
             .clientId(clientId)
-            .username(adminUser)
-            .password(adminPassword)
-            .grantType("password")
+            .clientSecret(clientSecret)
+            .grantType(grantType)
             .build()
     }
 }

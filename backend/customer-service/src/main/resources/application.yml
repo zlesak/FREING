@@ -43,10 +43,3 @@ management:
       probes:
         enabled: true
 
-keycloak:
-  server-url: ${KEYCLOAK_HOST:http://auth.freing.test:8100}
-  realm: ${KEYCLOAK_REALM:freing}
-  client-id: ${KEYCLOAK_ADMIN_CLIENT_ID:admin-cli}
-  admin-user: ${KEYCLOAK_ADMIN_USER:admin}
-  admin-password: ${KEYCLOAK_ADMIN_PASSWORD:admin}
-

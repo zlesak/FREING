@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class CustomerService(
@@ -20,6 +21,7 @@ class CustomerService(
     private val keycloakAdminClient: KeycloakAdminClient
 ) {
 
+    @Transactional
     fun create(customer: Customer): Customer {
         when {
             getCustomerByEmailOrPhoneNumber(customer.email, customer.phoneNumber) != null ->
@@ -46,12 +48,27 @@ class CustomerService(
             attributes = mapOf("db_id" to listOf(savedCustomer.id.toString()))
         }
 
-        val password = java.util.UUID.randomUUID().toString()
-        val responseStatus = keycloakAdminClient.createUser(user, password)
+        val userId: String = try {
+            keycloakAdminClient.createUser(user)
+        } catch (ex: Exception) {
+            // rollback DB change if Keycloak user creation fails
+            customerRepo.deleteById(savedCustomer.id!!)
+            throw RuntimeException("Failed to create user in Keycloak: ${ex.message}", ex)
+        }
 
-        if (responseStatus != 201) {
-            customerRepo.delete(savedCustomer)
-            throw RuntimeException("Failed to create user in Keycloak. Status: $responseStatus")
+        try {
+            keycloakAdminClient.addRealmRoleToUser(userId, "customer")
+            // send update password email so user can set password themselves
+            keycloakAdminClient.sendUpdatePasswordEmail(userId)
+        } catch (ex: Exception) {
+            // if role assignment or email fails, clean up created Keycloak user and DB
+            try {
+                keycloakAdminClient.deleteUser(userId)
+            } catch (_: Exception) {
+                // log cleanup failure but prefer to report original error
+            }
+            customerRepo.deleteById(savedCustomer.id!!)
+            throw RuntimeException("Failed to assign role or send email to Keycloak user: ${ex.message}", ex)
         }
         return savedCustomer
     }
