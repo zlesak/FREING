@@ -1,6 +1,7 @@
 package customer_service.messaging.handlers
 
 import com.uhk.fim.prototype.common.messaging.dto.CustomerRequest
+import com.uhk.fim.prototype.common.messaging.dto.ErrorProps
 import com.uhk.fim.prototype.common.messaging.dto.MessageResponse
 import com.uhk.fim.prototype.common.messaging.enums.MessageStatus
 import com.uhk.fim.prototype.common.messaging.enums.SourceService
@@ -19,7 +20,10 @@ class InvalidMessageActionHandler (
             targetId = request.targetId,
             status = MessageStatus.UNSUPPORTED_ACTION,
             payload = emptyMap(),
-            error = "Unsupported action: ${request.action}"
+            error = ErrorProps(
+                "Unsupported action: ${request.action}",
+                IllegalStateException::class.java
+            )
         )
         messageSender.sendCustomerResponse(response, replyTo, correlationId)
     }

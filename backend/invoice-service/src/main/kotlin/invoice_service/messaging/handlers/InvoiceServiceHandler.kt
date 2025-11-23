@@ -1,8 +1,8 @@
 package invoice_service.messaging.handlers
 
+import com.uhk.fim.prototype.common.exceptions.BadGatewayException
 import com.uhk.fim.prototype.common.exceptions.NotFoundException
-import com.uhk.fim.prototype.common.exceptions.customer.CustomerNotFoundException
-import com.uhk.fim.prototype.common.exceptions.invoice.ZugfredInvoiceServiceException
+import com.uhk.fim.prototype.common.exceptions.getErrorProps
 import com.uhk.fim.prototype.common.messaging.dto.InvoiceRequest
 import com.uhk.fim.prototype.common.messaging.dto.MessageResponse
 import com.uhk.fim.prototype.common.messaging.enums.MessageStatus
@@ -43,23 +43,23 @@ class InvoiceServiceHandler(
                 payload = mapOf("xml" to xml),
                 error = null
             )
-        } catch (ex: CustomerNotFoundException) {
+        } catch (ex: NotFoundException) {
             response = MessageResponse(
                 apiSourceService = request.apiSourceService,
                 sourceService = SourceService.INVOICE,
                 requestId = request.requestId,
                 targetId = request.targetId,
                 status = MessageStatus.ERROR,
-                error = "Failed to retrieve customer data: ${ex.message}"
+                error = ex.getErrorProps()
             )
-        } catch (ex: ZugfredInvoiceServiceException) {
+        } catch (ex: BadGatewayException) {
             response = MessageResponse(
                 apiSourceService = request.apiSourceService,
                 sourceService = SourceService.INVOICE,
                 requestId = request.requestId,
                 targetId = request.targetId,
                 status = MessageStatus.ERROR,
-                error = "Failed to generate ZUGFeRD XML: ${ex.message}"
+                error = ex.getErrorProps()
             )
         } catch (ex: NotFoundException) {
             response = MessageResponse(
@@ -68,7 +68,7 @@ class InvoiceServiceHandler(
                 requestId = request.requestId,
                 targetId = request.targetId,
                 status = MessageStatus.NOT_FOUND,
-                error = "InvoiceServiceException: ${ex.message}"
+                error = ex.getErrorProps()
             )
         } catch (ex: Exception) {
             response = MessageResponse(
@@ -77,7 +77,7 @@ class InvoiceServiceHandler(
                 requestId = request.requestId,
                 targetId = request.targetId,
                 status = MessageStatus.ERROR,
-                error = "Unexpected exception in InvoiceServiceHandler: ${ex.message}"
+                error = ex.getErrorProps()
             )
         } finally {
             if (response != null) {

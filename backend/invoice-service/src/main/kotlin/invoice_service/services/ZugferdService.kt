@@ -4,7 +4,7 @@ import com.google.zxing.BarcodeFormat
 import com.google.zxing.EncodeHintType
 import com.google.zxing.common.BitMatrix
 import com.google.zxing.qrcode.QRCodeWriter
-import com.uhk.fim.prototype.common.exceptions.invoice.ZugfredInvoiceServiceException
+import com.uhk.fim.prototype.common.exceptions.BadGatewayException
 import org.mustangproject.*
 import org.mustangproject.ZUGFeRD.Profiles
 import org.mustangproject.ZUGFeRD.ZUGFeRD2PullProvider
@@ -69,7 +69,7 @@ class ZugferdService {
             return String(zf2p.xml)
 
         } catch (e: Exception) {
-            throw ZugfredInvoiceServiceException("Zugferd invoice processing failed: ${e.message ?: "Unknown error"}")
+            throw BadGatewayException("Zugferd invoice processing failed: ${e.message ?: "Unknown error"}")
         }
     }
 

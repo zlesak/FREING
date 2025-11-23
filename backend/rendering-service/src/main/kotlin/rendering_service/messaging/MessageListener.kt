@@ -1,7 +1,10 @@
 package rendering_service.messaging
 
 import com.uhk.fim.prototype.common.config.RabbitConfig
+import com.uhk.fim.prototype.common.exceptions.NotFoundException
+import com.uhk.fim.prototype.common.exceptions.getErrorProps
 import com.uhk.fim.prototype.common.extensions.processInCoroutine
+import com.uhk.fim.prototype.common.messaging.dto.ErrorProps
 import com.uhk.fim.prototype.common.messaging.dto.InvoiceRequest
 import com.uhk.fim.prototype.common.messaging.dto.MessageResponse
 import com.uhk.fim.prototype.common.messaging.enums.MessageStatus
@@ -64,7 +67,10 @@ class MessageListener (
                     requestId = request.requestId,
                     targetId = request.targetId,
                     status = MessageStatus.ERROR,
-                    error = "Timeout while processing request",
+                    error = ErrorProps(
+                        "Unsupported action: ${request.action}",
+                        IllegalStateException::class.java
+                    ),
                 )
                 messageSender.sendRenderingResponse(render, replyTo, correlationId)
             }
@@ -75,7 +81,7 @@ class MessageListener (
                 requestId = request.requestId,
                 targetId = request.targetId,
                 status = MessageStatus.ERROR,
-                error = "Unsupported action: ${request.action}"
+                error = ex.getErrorProps()
             )
             messageSender.sendRenderingResponse(render, replyTo, correlationId)
         }
@@ -118,7 +124,7 @@ class MessageListener (
                     requestId = response.requestId,
                     targetId = response.targetId,
                     status = MessageStatus.ERROR,
-                    error = response.error ?: "Invoice data not found"
+                    error = response.error ?: ErrorProps( "Invoice data not found", NotFoundException::class.java)
                 )
                 messageSender.sendRenderingResponse(render, origReplyTo, correlationId)
             }

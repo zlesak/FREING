@@ -3,7 +3,6 @@ package customer_service.service
 import com.uhk.fim.prototype.common.exceptions.BadGatewayException
 import com.uhk.fim.prototype.common.exceptions.NotFoundException
 import com.uhk.fim.prototype.common.exceptions.WrongDataException
-import com.uhk.fim.prototype.common.exceptions.customer.CustomerNotFoundException
 import customer_service.dto.customer.response.CustomersPagedResponse
 import customer_service.external.AresClient
 import customer_service.models.CustomerEntity
@@ -66,8 +65,8 @@ class CustomerService(
     }
 
     fun getCustomerById(id: Long, fromMessaging: Boolean = false): CustomerEntity {
-        val customer = customerRepo.findByIdOrNull(id) ?: throw CustomerNotFoundException("Customer not found!")
-        if (!fromMessaging && customer.deleted) throw CustomerNotFoundException("Customer not found!")
+        val customer = customerRepo.findByIdOrNull(id) ?: throw NotFoundException("Customer not found!")
+        if (!fromMessaging && customer.deleted) throw NotFoundException("Customer not found!")
         return customer
     }
 

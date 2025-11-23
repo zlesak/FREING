@@ -1,5 +1,6 @@
 package invoice_service.messaging.handlers
 
+import com.uhk.fim.prototype.common.messaging.dto.ErrorProps
 import com.uhk.fim.prototype.common.messaging.dto.InvoiceRequest
 import com.uhk.fim.prototype.common.messaging.dto.MessageResponse
 import com.uhk.fim.prototype.common.messaging.enums.MessageStatus
@@ -18,7 +19,10 @@ class InvalidMessageActionHandler (
              requestId = request.requestId,
              targetId = request.targetId,
              status = MessageStatus.UNSUPPORTED_ACTION,
-             error = "Unsupported action: ${request.action}"
+             error = ErrorProps(
+                 "Unsupported action: ${request.action}",
+                 IllegalStateException::class.java
+             )
          )
         messageSender.sendInvoiceResponse(response, replyTo, correlationId)
     }

@@ -1,7 +1,8 @@
 package customer_service.messaging.handlers
 
+import com.uhk.fim.prototype.common.exceptions.NotFoundException
 import com.uhk.fim.prototype.common.exceptions.WrongDataException
-import com.uhk.fim.prototype.common.exceptions.customer.CustomerNotFoundException
+import com.uhk.fim.prototype.common.exceptions.getErrorProps
 import com.uhk.fim.prototype.common.messaging.dto.CustomerRequest
 import com.uhk.fim.prototype.common.messaging.dto.MessageResponse
 import com.uhk.fim.prototype.common.messaging.enums.MessageStatus
@@ -37,10 +38,9 @@ class CustomerServiceHandler(
                 targetId = customer.id,
                 status = MessageStatus.OK,
                 payload = payload,
-                error = null
             )
 
-        } catch (ex: CustomerNotFoundException) {
+        } catch (ex: NotFoundException) {
             response = MessageResponse(
                 apiSourceService = request.apiSourceService,
                 sourceService = SourceService.CUSTOMER,
@@ -48,7 +48,7 @@ class CustomerServiceHandler(
                 targetId = request.targetId,
                 status = MessageStatus.NOT_FOUND,
                 payload = emptyMap(),
-                error = "Failed to retrieve customer data: ${ex.message}"
+                error = ex.getErrorProps()
             )
         } catch (ex: WrongDataException) {
             response = MessageResponse(
@@ -58,7 +58,7 @@ class CustomerServiceHandler(
                 targetId = request.targetId,
                 status = MessageStatus.ERROR,
                 payload = emptyMap(),
-                error = "Customer ID is not set in request: ${ex.message}"
+                error = ex.getErrorProps()
             )
         } catch (ex: Exception) {
             response = MessageResponse(
@@ -68,7 +68,7 @@ class CustomerServiceHandler(
                 targetId = request.targetId,
                 status = MessageStatus.ERROR,
                 payload = emptyMap(),
-                error = "Unexpected exception in CustomerServiceHandler: ${ex.message}"
+                error = ex.getErrorProps()
             )
         } finally {
             if (response != null) {
