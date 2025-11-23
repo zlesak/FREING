@@ -2,7 +2,6 @@ package rendering_service.messaging
 
 import com.uhk.fim.prototype.common.config.RabbitConfig
 import com.uhk.fim.prototype.common.extensions.processInCoroutine
-import com.uhk.fim.prototype.common.extensions.processInCoroutineWithContext
 import com.uhk.fim.prototype.common.messaging.dto.InvoiceRequest
 import com.uhk.fim.prototype.common.messaging.dto.MessageResponse
 import com.uhk.fim.prototype.common.messaging.enums.MessageStatus

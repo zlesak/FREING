@@ -1,11 +1,13 @@
 package com.uhk.fim.prototype.common.messaging
 
+import com.uhk.fim.prototype.common.extensions.getUnwrapped
 import com.uhk.fim.prototype.common.messaging.dto.MessageIds
 import com.uhk.fim.prototype.common.messaging.dto.MessageResponse
 import org.springframework.stereotype.Service
 import java.util.*
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeoutException
 
 @Service
 class ActiveMessagingManager(
@@ -20,8 +22,8 @@ class ActiveMessagingManager(
         activeMessageRegistry.register(activeCorrelationId, future)
         send(MessageIds(activeCorrelationId, activeRequestId))
         return try {
-            future.get(timeoutSeconds, TimeUnit.SECONDS)
-        }catch (ex: Exception){
+            future.getUnwrapped(timeoutSeconds, TimeUnit.SECONDS)
+        }catch (ex: TimeoutException){
             unregisterMessage(activeCorrelationId)
             throw ex
         }
@@ -30,13 +32,20 @@ class ActiveMessagingManager(
     fun unregisterMessage(correlationId: String, response: MessageResponse? = null): MessageResponse? {
        println("Unregistering message with correlationId: $correlationId")
        val message = activeMessageRegistry.unregister(correlationId)
+
+        if (message != null){
+         println("unregistering was not successful because there was no active message for $correlationId")
+       }
+
        message?.complete(response)
        return message?.get()
     }
 
-    fun completeExceptionally(correlationId: String, ex: Throwable) {
+    fun completeExceptionally(correlationId: String, ex: Throwable): Boolean {
+        println("Unregistering message with correlationId: $correlationId exceptionally")
         val message = activeMessageRegistry.unregister(correlationId)
         message?.completeExceptionally(ex)
+        return message != null
     }
 
 

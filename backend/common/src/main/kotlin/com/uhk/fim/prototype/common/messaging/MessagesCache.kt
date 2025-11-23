@@ -13,8 +13,6 @@ class MessagesCache<T> {
     }
 
     fun unregister(correlationId: String): CompletableFuture<T>? {
-        val unregistered = messagesCache.remove(correlationId)
-        if (unregistered == null) println("unregistering was not successful because there was no active message for $correlationId")
-        return unregistered
+        return messagesCache.remove(correlationId)
     }
 }

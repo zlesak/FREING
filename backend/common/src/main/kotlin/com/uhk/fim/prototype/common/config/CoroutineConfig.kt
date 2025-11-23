@@ -20,7 +20,7 @@ class CoroutineConfig {
         rabbitDispatcher: ExecutorCoroutineDispatcher,
         handler: CoroutinesExceptionHandler
     ): CoroutineScope =
-        CoroutineScope(SupervisorJob() + rabbitDispatcher + handler)
+        CoroutineScope(Job() + rabbitDispatcher + handler)
 
     @Bean
     fun appScopeDisposable(scope: CoroutineScope) = DisposableBean { scope.cancel() }
