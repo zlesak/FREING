@@ -1,9 +1,7 @@
 package customer_service.service
 
-import com.uhk.fim.prototype.common.exceptions.BadGatewayException
 import com.uhk.fim.prototype.common.exceptions.NotFoundException
 import com.uhk.fim.prototype.common.exceptions.WrongDataException
-import customer_service.dto.customer.response.CustomersPagedResponse
 import customer_service.external.AresClient
 import customer_service.external.KeycloakAdminClient
 import customer_service.models.Customer
@@ -23,7 +21,7 @@ class CustomerService(
 ) {
 
     @Transactional
-    fun create(customer: CustomerEntity): CustomerEntity {
+    fun create(customer: Customer): Customer {
         getCustomerByEmailOrPhoneNumber(
             customer.email,
             customer.phoneNumber
@@ -74,30 +72,28 @@ class CustomerService(
         return savedCustomer
     }
 
-}
+    fun update(customer: Customer): Customer =
+        getCustomerById(customer.id!!, false).apply { updateFrom(customer) }
+            .let { customerRepo.save(it) }
 
-fun update(customer: Customer): Customer =
-    getCustomerById(customer.id!!, false).apply { updateFrom(customer) }
-        .let { customerRepo.save(it) }
+    fun deleteCustomer(id: Long) =
+        customerRepo.findByIdOrNull(id)?.let {
+            it.deleted = true
+            customerRepo.save(it)
+        } ?: throw NotFoundException("Customer not found!")
 
-fun deleteCustomer(id: Long) =
-    customerRepo.findByIdOrNull(id)?.let {
-        it.deleted = true
-        customerRepo.save(it)
-    } ?: throw NotFoundException("Customer not found!")
+    fun getCustomerById(id: Long, fromMessaging: Boolean = false): Customer =
+        customerRepo.findByIdOrNull(id)
+            ?.takeUnless { !fromMessaging && it.deleted }
+            ?: throw NotFoundException("Customer not found!")
 
-fun getCustomerById(id: Long, fromMessaging: Boolean = false): Customer =
-    customerRepo.findByIdOrNull(id)
-        ?.takeUnless { !fromMessaging && it.deleted }
-        ?: throw CustomerNotFoundException("Customer not found!")
+    private fun getCustomerByEmailOrPhoneNumber(email: String, phoneNumber: String): Customer? =
+        customerRepo.findByEmailOrPhoneNumber(email, phoneNumber)?.takeIf { !it.deleted }
 
-private fun getCustomerByEmailOrPhoneNumber(email: String, phoneNumber: String): Customer? =
-    customerRepo.findByEmailOrPhoneNumber(email, phoneNumber)?.takeIf { !it.deleted }
+    fun getAllCustomers(pageable: Pageable): Page<Customer> = customerRepo.findAll(pageable)
 
-fun getAllCustomers(pageable: Pageable): Page<Customer> = customerRepo.findAll(pageable)
+    fun getCustomersNotDeleted(pageable: Pageable): Page<Customer> = customerRepo.findAllByDeletedFalse(pageable)
 
-fun getCustomersNotDeleted(pageable: Pageable): Page<Customer> = customerRepo.findAllByDeletedFalse(pageable)
-
-fun getCustomerFromAres(ico: String): Customer = aresClient.getSubjectByIcoARES(ico)?.toCustomerEntity()
-    ?: throw WrongDataException("Prázdné tělo odpovědi ARES pro ICO $ico")
+    fun getCustomerFromAres(ico: String): Customer = aresClient.getSubjectByIcoARES(ico)?.toCustomerEntity()
+        ?: throw WrongDataException("Prázdné tělo odpovědi ARES pro ICO $ico")
 }
