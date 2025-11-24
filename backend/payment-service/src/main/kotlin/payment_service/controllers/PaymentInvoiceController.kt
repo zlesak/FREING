@@ -32,9 +32,4 @@ class PaymentInvoiceController(
 
         return ResponseEntity.status(502).body(mapOf("error" to "Failed to render invoice: ${response.error}"))
     }
-
-    @PostMapping("/invoice/pay/{id}")
-    fun pay(@PathVariable id: String): Boolean {
-        return false
-    }
 }
