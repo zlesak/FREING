@@ -2,7 +2,6 @@ package customer_service.service
 
 import com.uhk.fim.prototype.common.exceptions.NotFoundException
 import com.uhk.fim.prototype.common.exceptions.WrongDataException
-import com.uhk.fim.prototype.common.exceptions.customer.CustomerNotFoundException
 import customer_service.external.AresClient
 import customer_service.external.KeycloakAdminClient
 import customer_service.models.Customer
@@ -23,7 +22,6 @@ class CustomerService(
 
     @Transactional
     fun create(customer: Customer): Customer {
-        // --- Validace sjednocená z obou verzí ---
         when {
             getCustomerByEmailOrPhoneNumber(customer.email, customer.phoneNumber) != null ->
                 throw WrongDataException("Customer already exists!")
@@ -38,20 +36,17 @@ class CustomerService(
                 throw WrongDataException("Customer email must be fill!")
         }
 
-        // --- Uložení zákazníka ---
         val savedCustomer = customerRepo.save(customer)
 
-        // --- Příprava Keycloak uživatele ---
         val user = UserRepresentation().apply {
             username = savedCustomer.email
             email = savedCustomer.email
-            firstName = if (savedCustomer.tradeName.isNotBlank()) savedCustomer.tradeName else savedCustomer.name
+            firstName = savedCustomer.tradeName.ifBlank { savedCustomer.name }
             lastName = if (savedCustomer.tradeName.isNotBlank()) "" else savedCustomer.surname
             isEnabled = true
             attributes = mapOf("db_id" to listOf(savedCustomer.id.toString()))
         }
 
-        // --- Vytvoření uživatele v Keycloak ---
         val userId: String = try {
             keycloakAdminClient.createUser(user)
         } catch (ex: Exception) {
@@ -59,7 +54,6 @@ class CustomerService(
             throw RuntimeException("Failed to create user in Keycloak: ${ex.message}", ex)
         }
 
-        // --- Role + email, fallback + rollback ---
         try {
             keycloakAdminClient.addRealmRoleToUser(userId, "customer")
             keycloakAdminClient.sendUpdatePasswordEmail(userId)
@@ -88,7 +82,7 @@ class CustomerService(
     fun getCustomerById(id: Long, fromMessaging: Boolean = false): Customer =
         customerRepo.findByIdOrNull(id)
             ?.takeUnless { !fromMessaging && it.deleted }
-            ?: throw CustomerNotFoundException("Customer not found!")
+            ?: throw NotFoundException("Customer not found!")
 
     private fun getCustomerByEmailOrPhoneNumber(email: String, phoneNumber: String): Customer? =
         customerRepo.findByEmailOrPhoneNumber(email, phoneNumber)?.takeIf { !it.deleted }
