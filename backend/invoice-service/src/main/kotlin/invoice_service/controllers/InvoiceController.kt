@@ -1,6 +1,5 @@
 package invoice_service.controllers
 
-import com.uhk.fim.prototype.common.messaging.ActiveMessagingManager
 import com.uhk.fim.prototype.common.messaging.enums.invoice.MessageInvoiceAction
 import invoice_service.dtos.invoices.requests.InvoiceCreateRequest
 import invoice_service.dtos.invoices.requests.InvoiceUpdateRequest
@@ -27,8 +26,7 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("/api/invoices")
 class InvoiceController(
     private val service: InvoiceService,
-    private val messageSender: MessageSender,
-    private val activeMessagingManager: ActiveMessagingManager
+    private val messageSender: MessageSender
 ) {
 
     @Operation(summary = "Získat všechny faktury", description = "Vrací stránkovaný seznam všech faktur pro účetní.")

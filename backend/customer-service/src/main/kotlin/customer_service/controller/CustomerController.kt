@@ -12,47 +12,41 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api/customers")
+@PreAuthorize("hasAnyAuthority('SCOPE_service.call', 'ROLE_MANAGER', 'ROLE_ACCOUNTANT')")
 class CustomerController(
     private val customerService: CustomerService
 ) {
 
     @PostMapping("/create")
-    @PreAuthorize("hasRole('ACCOUNTANT') or hasRole('MANAGER')")
     fun create(@RequestBody customer: CreateCustomerDto): CustomerDto =
         customerService.create(customer.toEntity()).toDto()
 
     @PostMapping("/update")
-    @PreAuthorize("hasRole('ACCOUNTANT') or hasRole('MANAGER')")
     fun update(@RequestBody customer: CustomerDto): CustomerDto = customerService.update(customer.toEntity()).toDto()
 
     @DeleteMapping("delete/{id}")
-    @PreAuthorize("hasRole('ACCOUNTANT') or hasRole('MANAGER')")
     fun delete(@PathVariable id: Long) = customerService.deleteCustomer(id)
 
     @GetMapping("/get-by-id/{id}")
-    @PreAuthorize("hasRole('ACCOUNTANT') or hasRole('MANAGER')")
     fun getById(@PathVariable("id") id: Long): Customer = customerService.getCustomerById(id)
 
     @GetMapping("/get-customers-paged")
-    @PreAuthorize("hasRole('ACCOUNTANT')")
     fun getAll(
         @Parameter(description = "Číslo stránky", example = "0")
         @RequestParam(defaultValue = "0") page: Int,
         @Parameter(description = "Velikost stránky", example = "10")
         @RequestParam(defaultValue = "10") size: Int
-    ): Page<Customer> = customerService.getAllCustomers(PageRequest.of(page, size))
+    ): Page<CustomerDto> = customerService.getAllCustomers(PageRequest.of(page, size)).map { it.toDto() }
 
     @GetMapping("/get-customers-not-deleted-paged")
-    @PreAuthorize("hasRole('ACCOUNTANT')")
     fun getAllNotDeleted(
         @Parameter(description = "Číslo stránky", example = "0")
         @RequestParam(defaultValue = "0") page: Int,
         @Parameter(description = "Velikost stránky", example = "10")
         @RequestParam(defaultValue = "10") size: Int
-    ): Page<Customer> = customerService.getCustomersNotDeleted(PageRequest.of(page, size))
+    ): Page<CustomerDto> = customerService.getCustomersNotDeleted(PageRequest.of(page, size)).map { it.toDto() }
 
     @GetMapping("/get-customers-info-from-ares/{ico}")
-    @PreAuthorize("hasRole('ACCOUNTANT')")
     fun getCustomerInfoFromAresByIco(@PathVariable ico: String): Customer =
         customerService.getCustomerFromAres(ico)
 }

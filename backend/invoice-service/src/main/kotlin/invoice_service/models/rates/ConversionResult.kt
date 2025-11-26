@@ -7,17 +7,17 @@ import java.math.BigDecimal
 
 @Schema(description = "Výsledek konverze měny")
 data class ConversionResult(
-    @Schema(description = "Konvertovaná částka", example = "100")
-    val converted: BigDecimal,
-    @Schema(description = "Směnný kurz použitý pro konverzi", example = "23.4567")
-    val rate: BigDecimal
+    val from: String,
+    val to: String,
+    val rate: BigDecimal,
+    val originalAmount: BigDecimal
 ) {
-    fun toResponse(from: String, to: String, originalAmount: BigDecimal) =
+    fun toResponse() =
         CurrencyConversionResponse(
             from = from.uppercase(),
             to = to.uppercase(),
             originalAmount = originalAmount,
             rate = rate.roundRate(),
-            convertedAmount = converted
+            convertedAmount = originalAmount * rate
         )
 }

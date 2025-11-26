@@ -20,16 +20,14 @@ class InvoiceService(
 ) {
 
     @Transactional
-    fun createInvoice(request: InvoiceCreateRequest): Invoice =
-        request.toInvoice().also {
-            if (repo.existsByInvoiceNumber(request.invoiceNumber)) {
-                throw WrongDataException("Faktura s tímto číslem již existuje.")
-            }
-        }.let { repo.save(it) }
+    fun createInvoice(request: InvoiceCreateRequest): Invoice = request.toInvoice().also {
+        if (repo.existsByInvoiceNumber(request.invoiceNumber)) {
+            throw WrongDataException("Faktura s tímto číslem již existuje.")
+        }
+    }.let { repo.save(it) }
 
     fun getInvoice(id: Long, fromMessaging: Boolean = false): Invoice =
-        repo.findByIdOrNull(id)
-            ?.takeUnless { fromMessaging && it.status == InvoiceStatusEnum.DRAFT }
+        repo.findByIdOrNull(id)?.takeUnless { fromMessaging && it.status == InvoiceStatusEnum.DRAFT }
             ?: throw NotFoundException("Faktura s ID $id nebyla nalezena")
 
     fun getAllInvoices(pageable: Pageable): Page<Invoice> = repo.findAll(pageable)
@@ -40,12 +38,13 @@ class InvoiceService(
     @Transactional
     fun updateInvoice(id: Long, request: InvoiceUpdateRequest): Invoice =
         (repo.findByIdAndStatus(id, InvoiceStatusEnum.DRAFT)
-            ?: throw OperationDeniedException("Nelze upravit fakturu - buď neexistuje, nebo není ve stavu DRAFT"))
-            .also { it.updateFrom(request) }
-            .let { repo.save(it) }
+            ?: throw OperationDeniedException("Nelze upravit fakturu - buď neexistuje, nebo není ve stavu DRAFT")).also {
+                it.updateFrom(
+                    request
+                )
+            }.let { repo.save(it) }
 
     @Transactional
-    fun deleteInvoice(id: Long): Int =
-        repo.deleteByIdIfDraft(id).takeIf { it > 0 }
-            ?: throw OperationDeniedException("Nelze smazat fakturu - buď neexistuje, nebo není ve stavu DRAFT")
+    fun deleteInvoice(id: Long): Int = repo.deleteByIdIfDraft(id).takeIf { it > 0 }
+        ?: throw OperationDeniedException("Nelze smazat fakturu - buď neexistuje, nebo není ve stavu DRAFT")
 }

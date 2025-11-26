@@ -27,9 +27,6 @@ class InvoiceServiceHandler(
 
         try {
             val invoice = invoiceService.getInvoice(request.targetId ?: -1, true)
-            if (invoice == null) {
-                throw NotFoundException("Invoice with id ${request.targetId} not found")
-            }
 
             val customer = customerServiceHandler.getCustomerById(invoice.customerId, request.apiSourceService)
             val xml = zugferdService.createInvoice(invoice, customer)

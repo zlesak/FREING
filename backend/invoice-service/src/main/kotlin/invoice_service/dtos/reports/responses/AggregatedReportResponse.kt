@@ -15,5 +15,7 @@ data class AggregatedReportResponse(
     @field:Schema(description = "Souhrn podle zákazníka")
     val perCustomer: List<CustomerInvoicesReportResponse>,
     @field:Schema(description = "Seznam základních informací o fakturách v reportu")
-    val invoices: List<AllInvoicesReportResponse>
+    val invoices: List<AllInvoicesReportResponse>,
+    @field:Schema(description = "Indikátor, zda byl dosažen maximální limit faktur (10 000)")
+    val limitReached: Boolean = false
 )

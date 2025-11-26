@@ -33,7 +33,7 @@ export class CustomersServiceController {
     );
   }
 
-  getCustomers(page = 0, size = 10): Observable<CustomerApi.PageableObject> {
+  getCustomers(page = 0, size = 10): Observable<CustomerApi.PagedModelCustomerDto> {
     return from(CustomerApi.CustomerControllerService.getAll({ page, size })).pipe(
       catchError(this.handleError)
     );

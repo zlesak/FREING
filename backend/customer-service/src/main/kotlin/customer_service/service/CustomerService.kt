@@ -22,26 +22,26 @@ class CustomerService(
 
     @Transactional
     fun create(customer: Customer): Customer {
-        getCustomerByEmailOrPhoneNumber(
-            customer.email,
-            customer.phoneNumber
-        )?.let { throw WrongDataException("Customer already exists!") }
+        when {
+            getCustomerByEmailOrPhoneNumber(customer.email, customer.phoneNumber) != null ->
+                throw WrongDataException("Customer already exists!")
 
-        if (customer.tradeName.isBlank() && (customer.name.isBlank() || customer.surname.isBlank())) {
-            throw WrongDataException("Musíte vyplnit buď jméno a příjmení, nebo obchodní jméno!")
+            !(customer.tradeName.isNotBlank() xor (customer.name.isNotBlank() && customer.surname.isNotBlank())) ->
+                throw WrongDataException("Fill in either the first name and last name, or the trade name, not both!")
+
+            customer.phoneNumber.isBlank() ->
+                throw WrongDataException("Customer phone must be fill!")
+
+            customer.email.isBlank() ->
+                throw WrongDataException("Customer email must be fill!")
         }
-        if (customer.tradeName.isNotBlank() && (customer.name.isNotBlank() || customer.surname.isNotBlank())) {
-            throw WrongDataException("Vyplňte buď jméno a příjmení, nebo obchodní jméno, ne obojí!")
-        }
-        if (customer.phoneNumber.isBlank()) throw WrongDataException("Customer phone must be fill!")
-        if (customer.email.isBlank()) throw WrongDataException("Customer email must be fill!")
 
         val savedCustomer = customerRepo.save(customer)
 
         val user = UserRepresentation().apply {
             username = savedCustomer.email
             email = savedCustomer.email
-            firstName = if (savedCustomer.tradeName.isNotBlank()) savedCustomer.tradeName else savedCustomer.name
+            firstName = savedCustomer.tradeName.ifBlank { savedCustomer.name }
             lastName = if (savedCustomer.tradeName.isNotBlank()) "" else savedCustomer.surname
             isEnabled = true
             attributes = mapOf("db_id" to listOf(savedCustomer.id.toString()))
@@ -50,25 +50,22 @@ class CustomerService(
         val userId: String = try {
             keycloakAdminClient.createUser(user)
         } catch (ex: Exception) {
-            // rollback DB change if Keycloak user creation fails
             customerRepo.deleteById(savedCustomer.id!!)
             throw RuntimeException("Failed to create user in Keycloak: ${ex.message}", ex)
         }
 
         try {
             keycloakAdminClient.addRealmRoleToUser(userId, "customer")
-            // send update password email so user can set password themselves
             keycloakAdminClient.sendUpdatePasswordEmail(userId)
         } catch (ex: Exception) {
-            // if role assignment or email fails, clean up created Keycloak user and DB
             try {
                 keycloakAdminClient.deleteUser(userId)
             } catch (_: Exception) {
-                // log cleanup failure but prefer to report original error
             }
             customerRepo.deleteById(savedCustomer.id!!)
             throw RuntimeException("Failed to assign role or send email to Keycloak user: ${ex.message}", ex)
         }
+
         return savedCustomer
     }
 
@@ -92,8 +89,10 @@ class CustomerService(
 
     fun getAllCustomers(pageable: Pageable): Page<Customer> = customerRepo.findAll(pageable)
 
-    fun getCustomersNotDeleted(pageable: Pageable): Page<Customer> = customerRepo.findAllByDeletedFalse(pageable)
+    fun getCustomersNotDeleted(pageable: Pageable): Page<Customer> =
+        customerRepo.findAllByDeletedFalse(pageable)
 
-    fun getCustomerFromAres(ico: String): Customer = aresClient.getSubjectByIcoARES(ico)?.toCustomerEntity()
-        ?: throw WrongDataException("Prázdné tělo odpovědi ARES pro ICO $ico")
+    fun getCustomerFromAres(ico: String): Customer =
+        aresClient.getSubjectByIcoARES(ico)?.toCustomerEntity()
+            ?: throw WrongDataException("Prázdné tělo odpovědi ARES pro ICO $ico")
 }
