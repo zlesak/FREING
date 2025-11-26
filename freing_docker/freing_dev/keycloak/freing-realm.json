@@ -1704,6 +1704,22 @@
           }
         },
         {
+          "id": "31c213cb-28fb-4447-9d9c-c9402a82cb27",
+          "name": "db_id",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "consentRequired": false,
+          "config": {
+            "introspection.token.claim": "true",
+            "userinfo.token.claim": "true",
+            "user.attribute": "db_id",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "db_id",
+            "jsonType.label": "String"
+          }
+        },
+        {
           "id": "33ce0b74-8caa-445d-87ce-7f57d44c6eb0",
           "name": "username",
           "protocol": "openid-connect",

@@ -49,6 +49,7 @@ class ReportingController(private val reportingService: ReportingSubService) {
         summary = "Získat filtrované faktury",
         description = "Vrátí stránkovaný seznam faktur odpovídajících zadaným filtrům."
     )
+    @PreAuthorize("hasAnyRole('MANAGER', 'ACCOUNTANT', 'CUSTOMER')")
     @PostMapping("/filter")
     fun getFilteredInvoices(
         @RequestBody request: InvoiceReportRequest,

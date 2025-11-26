@@ -6,18 +6,13 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor
-import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
-import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 
 interface InvoiceRepository : JpaRepository<Invoice, Long>, JpaSpecificationExecutor<Invoice> {
     fun existsByInvoiceNumber(invoiceNumber: String): Boolean
 
-    @Modifying
-    @Transactional
-    @Query("DELETE FROM Invoice i WHERE i.id = :id AND i.status = 'DRAFT'")
-    fun deleteByIdIfDraft(id: Long): Int
+    fun existsByInvoiceNumberAndIdNot(invoiceNumber: String, id: Long): Boolean
 
     fun findByIdAndStatus(id: Long, status: InvoiceStatusEnum): Invoice?
 

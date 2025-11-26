@@ -37,14 +37,20 @@ class InvoiceService(
 
     @Transactional
     fun updateInvoice(id: Long, request: InvoiceUpdateRequest): Invoice =
-        (repo.findByIdAndStatus(id, InvoiceStatusEnum.DRAFT)
-            ?: throw OperationDeniedException("Nelze upravit fakturu - buď neexistuje, nebo není ve stavu DRAFT")).also {
-                it.updateFrom(
-                    request
-                )
-            }.let { repo.save(it) }
+        repo.findByIdAndStatus(id, InvoiceStatusEnum.DRAFT)
+            ?.apply {
+                if (repo.existsByInvoiceNumberAndIdNot(request.invoiceNumber, id)) {
+                    throw OperationDeniedException("Faktura s tímto číslem již existuje.")
+                }
+                updateFrom(request)
+            }
+            ?.let { repo.save(it) }
+            ?: throw OperationDeniedException("Nelze upravit fakturu - buď neexistuje, nebo není ve stavu DRAFT")
 
     @Transactional
-    fun deleteInvoice(id: Long): Int = repo.deleteByIdIfDraft(id).takeIf { it > 0 }
-        ?: throw OperationDeniedException("Nelze smazat fakturu - buď neexistuje, nebo není ve stavu DRAFT")
+    fun deleteInvoice(id: Long) {
+        val invoice = repo.findByIdAndStatus(id, InvoiceStatusEnum.DRAFT)
+            ?: throw OperationDeniedException("Nelze smazat fakturu - buď neexistuje, nebo není ve stavu DRAFT")
+        repo.delete(invoice)
+    }
 }
