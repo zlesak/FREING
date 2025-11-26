@@ -24,6 +24,19 @@ class MessageSender(
         }
     }
 
+    fun sendTransactionValidationRequest(invoiceId: Long, requestId: String? = null, correlationId: String? = null, payload: Map<String, Any> = emptyMap(), timeoutSeconds: Long = 5, apiSourceService: SourceService = SourceService.PAYMENT): MessageResponse{
+        return activeMessagingManager.registerMessage(timeoutSeconds, correlationId, requestId) { messageIds ->
+            val request = InvoiceRequest(
+                apiSourceService = apiSourceService,
+                requestId = messageIds.requestId,
+                targetId = invoiceId,
+                action = MessageInvoiceAction.VALIDATE_TRANSACTION,
+                payload = payload
+            )
+            sendTransactionValidationRequest(request, messageIds.correlationId)
+        }
+    }
+
     fun sendRenderInvoiceRequest(invoiceId: Long, action: MessageInvoiceAction, requestId: String? = null, correlationId: String?= null, payload: Map<String, Any> = emptyMap(), timeoutSeconds: Long = 5, apiSourceService: SourceService = SourceService.PAYMENT): MessageResponse {
         return activeMessagingManager.registerMessage(timeoutSeconds = timeoutSeconds, requestId = requestId, correlationId = correlationId) { messageIds ->
             val request = InvoiceRequest(
@@ -42,6 +55,19 @@ class MessageSender(
         rabbitTemplate.convertAndSend(
             RabbitConfig.EXCHANGE,
             RabbitConfig.RENDERING_REQUESTS,
+            request
+        ) { message ->
+            message.messageProperties.replyTo = replyQueueName
+            message.messageProperties.correlationId = correlationId
+            message
+        }
+    }
+
+    private fun sendTransactionValidationRequest(request: InvoiceRequest, correlationId: String) {
+        println("[payment-service] Sending render invoice request for invoiceId=${request.targetId} with correlationId=$correlationId")
+        rabbitTemplate.convertAndSend(
+            RabbitConfig.EXCHANGE,
+            RabbitConfig.INVOICE_REQUESTS,
             request
         ) { message ->
             message.messageProperties.replyTo = replyQueueName

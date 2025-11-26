@@ -1,11 +1,11 @@
 package invoice_service.controllers
 
 import com.uhk.fim.prototype.common.messaging.enums.invoice.MessageInvoiceAction
+import com.uhk.fim.prototype.common.security.JwtUserPrincipal
 import invoice_service.dtos.invoices.requests.InvoiceCreateRequest
 import invoice_service.dtos.invoices.requests.InvoiceUpdateRequest
 import invoice_service.messaging.MessageSender
 import invoice_service.models.invoices.Invoice
-import com.uhk.fim.prototype.common.security.JwtUserPrincipal
 import invoice_service.services.InvoiceService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
@@ -19,11 +19,12 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.security.access.prepost.PostAuthorize
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.Authentication
+import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 
 @Tag(name = "Invoices", description = "API pro správu faktur")
 @RestController
-@RequestMapping("/api/invoices")
+@RequestMapping("/invoice")
 class InvoiceController(
     private val service: InvoiceService,
     private val messageSender: MessageSender
@@ -46,13 +47,12 @@ class InvoiceController(
     @PreAuthorize("hasRole('CUSTOMER')")
     @GetMapping("/get-my-invoices-pages")
     fun getMyInvoices(
-        authentication: Authentication,
+        @AuthenticationPrincipal principal: JwtUserPrincipal,
         @Parameter(description = "Číslo stránky", example = "0")
         @RequestParam(defaultValue = "0") page: Int,
         @Parameter(description = "Velikost stránky", example = "10")
         @RequestParam(defaultValue = "10") size: Int
     ): Page<Invoice>  {
-        val principal = authentication.principal as JwtUserPrincipal
         return service.getAllInvoicesForLoggedInCustomer(
             principal.id,
             PageRequest.of(page, size))

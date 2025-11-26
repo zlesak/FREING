@@ -45,11 +45,14 @@ class MessageListener (
 
         println("[invoice-service] Received invoice request: $request, replyTo=$replyTo, correlationId=$correlationId")
 
-        if (request.action == MessageInvoiceAction.RENDER) {
-            invoiceServiceHandler.createXmlInvoice(request, correlationId, replyTo)
-        } else {
-            invalidMessageActionHandler.handleInvalidMessageAction(request, correlationId, replyTo)
+
+        when(request.action){
+            MessageInvoiceAction.RENDER -> invoiceServiceHandler.createXmlInvoice(request, correlationId, replyTo)
+            MessageInvoiceAction.VALIDATE_TRANSACTION -> invoiceServiceHandler.validateInvoiceTransaction(request, correlationId, replyTo)
+            else -> invalidMessageActionHandler.handleInvalidMessageAction(request, correlationId, replyTo)
+
         }
+
         println("[invoice-service] End $request, replyTo=$replyTo, correlationId=$correlationId")
     }
 
