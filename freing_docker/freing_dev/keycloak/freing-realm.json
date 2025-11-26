@@ -1720,6 +1720,22 @@
           }
         },
         {
+          "id": "f18f6826-07a3-4f96-ade0-915b6e299fa7",
+          "name": "db_id",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "consentRequired": false,
+          "config": {
+            "introspection.token.claim": "true",
+            "userinfo.token.claim": "true",
+            "user.attribute": "db_id",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "db_id",
+            "jsonType.label": "String"
+          }
+        },
+        {
           "id": "260872a1-1a0e-4773-bdc1-8b8c1d334e62",
           "name": "updated at",
           "protocol": "openid-connect",
@@ -2774,7 +2790,7 @@
   "users" : [ {
     "id" : "05ba424c-01ba-4945-94c6-854289a7076d",
     "createdTimestamp" : 1760079775881,
-    "username" : "alice",
+    "username" : "§",
     "enabled" : true,
     "totp" : false,
     "emailVerified" : false,

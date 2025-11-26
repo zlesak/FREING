@@ -20,5 +20,5 @@ class JwtUserAuthenticationToken(
 
     override fun getTokenAttributes(): MutableMap<String, Any> = token.claims.toMutableMap()
     override fun getName(): String = principal.username
-    fun getUserId(): Long = principal.id
+    fun getUserId(): Long? = principal.id
 }

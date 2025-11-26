@@ -1,5 +1,6 @@
 package invoice_service.controllers
 
+import com.uhk.fim.prototype.common.exceptions.OperationDeniedException
 import com.uhk.fim.prototype.common.messaging.enums.invoice.MessageInvoiceAction
 import com.uhk.fim.prototype.common.security.JwtUserPrincipal
 import invoice_service.dtos.invoices.requests.InvoiceCreateRequest
@@ -27,7 +28,7 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("/invoice")
 class InvoiceController(
     private val service: InvoiceService,
-    private val messageSender: MessageSender
+    private val messageSender: MessageSender,
 ) {
 
     @Operation(summary = "Získat všechny faktury", description = "Vrací stránkovaný seznam všech faktur pro účetní.")
@@ -48,13 +49,14 @@ class InvoiceController(
     @GetMapping("/get-my-invoices-pages")
     fun getMyInvoices(
         @AuthenticationPrincipal principal: JwtUserPrincipal,
+        authentication: Authentication,
         @Parameter(description = "Číslo stránky", example = "0")
         @RequestParam(defaultValue = "0") page: Int,
         @Parameter(description = "Velikost stránky", example = "10")
         @RequestParam(defaultValue = "10") size: Int
     ): Page<Invoice>  {
-        return service.getAllInvoicesForLoggedInCustomer(
-            principal.id,
+         return service.getAllInvoicesForLoggedInCustomer(
+            principal.id ?:throw OperationDeniedException("Signed user ${principal.username} don't have id"),
             PageRequest.of(page, size))
     }
 

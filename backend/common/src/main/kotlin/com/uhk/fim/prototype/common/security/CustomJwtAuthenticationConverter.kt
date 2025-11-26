@@ -36,7 +36,7 @@ class CustomJwtAuthenticationConverter : Converter<Jwt, AbstractAuthenticationTo
             is Int -> rawId.toLong()
             is Long -> rawId
             is String -> rawId.toLong()
-            else -> 0
+            else -> null
         }
         val username = jwt.claims["preferred_username"] as? String
             ?: throw IllegalArgumentException("JWT token neobsahuje preferred_username")

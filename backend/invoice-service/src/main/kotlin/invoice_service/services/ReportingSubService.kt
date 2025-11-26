@@ -1,5 +1,7 @@
 package invoice_service.services
 
+import com.uhk.fim.prototype.common.exceptions.NotFoundException
+import com.uhk.fim.prototype.common.exceptions.OperationDeniedException
 import com.uhk.fim.prototype.common.security.JwtUserPrincipal
 import invoice_service.components.generators.CsvReportGenerator
 import invoice_service.components.mappers.InvoiceReportMapper
@@ -64,7 +66,7 @@ class ReportingSubService(
     private fun applyCustomerFilterIfNeeded(request: InvoiceReportRequest) {
         val authentication = SecurityContextHolder.getContext().authentication
         if (authentication.authorities.any { it.authority == "ROLE_CUSTOMER" }) {
-            (authentication.principal as? JwtUserPrincipal)?.let { request.customerId = it.id }
+            (authentication.principal as? JwtUserPrincipal)?.let { request.customerId = it.id  ?: throw OperationDeniedException("Signed user don't have id")}
         }
     }
 }

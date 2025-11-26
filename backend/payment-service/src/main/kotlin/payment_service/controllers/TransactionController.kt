@@ -1,5 +1,6 @@
 package payment_service.controllers
 
+import com.uhk.fim.prototype.common.exceptions.OperationDeniedException
 import com.uhk.fim.prototype.common.security.JwtUserPrincipal
 import org.springframework.data.repository.query.Param
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -18,7 +19,7 @@ class TransactionController(
     @PostMapping("/create/{id}")
     fun create(@PathVariable("id") invoiceId: Long, @AuthenticationPrincipal principal: JwtUserPrincipal) {
         println("actual user ${principal.username} with id ${principal.id}")
-        return transactionService.create(invoiceId, principal.id)
+        return transactionService.create(invoiceId, principal.id?: throw OperationDeniedException("Signed user ${principal.username} don't have id"))
     }
 
     @PostMapping("/capture")
