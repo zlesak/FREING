@@ -8,7 +8,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.stereotype.Component
 
 @Component
-class MessageSender(
+class RabbitMessageSender(
     rabbitTemplate: RabbitTemplate,
     val activeMessagingManager: ActiveMessagingManager
 ) {
