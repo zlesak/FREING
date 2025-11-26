@@ -23,24 +23,24 @@ export class InvoicesPageComponent implements OnInit {
     this.load();
   }
 
-  load(page: number = this.page): void {
-    this.loading = true;
-    this.error = undefined;
-    this.invoicesService.getInvoices(page, this.size).subscribe({
-      next: (resp: InvoiceApi.PageInvoice) => {
-        this.invoices = resp.content ?? [];
-        this.page = resp.number ?? 0;
-        this.size = resp.size ?? 10;
-        this.totalPages = resp.totalPages ?? 0;
-        this.totalElements = resp.totalElements ?? 0;
-        this.loading = false;
-      },
-      error: (err) => {
-        this.error = err.message || 'Nepodařilo se načíst faktury';
-        this.loading = false;
-      }
-    });
-  }
+load(page: number = this.page): void {
+  this.loading = true;
+  this.error = undefined;
+  this.invoicesService.getInvoices(page, this.size).subscribe({
+    next: (resp: InvoiceApi.PagedModelInvoice) => {
+      this.invoices = resp.content ?? [];
+      this.page = resp.page?.number ?? 0;
+      this.size = resp.page?.size ?? 10;
+      this.totalPages = resp.page?.totalPages ?? 0;
+      this.totalElements = resp.page?.totalPages ?? 0;
+      this.loading = false;
+    },
+    error: (err) => {
+      this.error = err.message || 'Nepodařilo se načíst faktury';
+      this.loading = false;
+    }
+  });
+}
 
   prev(): void {
     if (this.page > 0) {
