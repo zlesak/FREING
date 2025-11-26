@@ -21,6 +21,8 @@ repositories {
 dependencies {
 	implementation(project(":common"))
     implementation("org.mustangproject:validator:2.20.0:shaded")
+    implementation("org.keycloak:keycloak-admin-client:25.0.1")
+    implementation("org.jboss.resteasy:resteasy-client:6.2.8.Final")
 }
 
 kotlin {

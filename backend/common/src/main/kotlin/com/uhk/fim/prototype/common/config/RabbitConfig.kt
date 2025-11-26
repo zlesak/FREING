@@ -1,7 +1,8 @@
 package com.uhk.fim.prototype.common.config
 
-import kotlinx.coroutines.CoroutineScope
-import org.aopalliance.intercept.MethodInterceptor
+import com.uhk.fim.prototype.common.messaging.preprocessor.MessageExceptionPreprocessor
+import com.uhk.fim.prototype.common.messaging.preprocessor.MessageListenerPreprocessor
+import com.uhk.fim.prototype.common.messaging.preprocessor.MessageListenerProcessorChain
 import org.springframework.amqp.core.Binding
 import org.springframework.amqp.core.BindingBuilder
 import org.springframework.amqp.core.DirectExchange
@@ -15,9 +16,7 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
 
 @Configuration
-class RabbitConfig(
-    private val appScope: CoroutineScope,
-) {
+class RabbitConfig() {
     companion object {
         const val EXCHANGE = "freing.exchange"
         const val CUSTOMER_REQUESTS = "customer.requests"
@@ -66,12 +65,18 @@ class RabbitConfig(
     @Primary
     fun rabbitListenerContainerFactory(
         connectionFactory: CachingConnectionFactory,
-        rabbitListenerAdvice: MethodInterceptor
+        preprocessorChain: MessageListenerProcessorChain,
+        messageListenerProcessor: MessageListenerPreprocessor,
+        messageExceptionPreprocessor: MessageExceptionPreprocessor
     ): SimpleRabbitListenerContainerFactory {
         val factory = SimpleRabbitListenerContainerFactory()
         factory.setConnectionFactory(connectionFactory)
-        factory.setAdviceChain(rabbitListenerAdvice)
-        factory.setTaskExecutor { it.asCoroutine(appScope) }
+        factory.setAdviceChain(preprocessorChain
+            .registerProcessor(messageListenerProcessor)
+            .registerProcessor(messageExceptionPreprocessor)
+        )
+        factory.setConcurrentConsumers(3)
+        factory.setMaxConcurrentConsumers(6)
         return factory
     }
 }

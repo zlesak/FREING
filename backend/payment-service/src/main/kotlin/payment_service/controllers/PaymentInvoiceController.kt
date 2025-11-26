@@ -18,11 +18,7 @@ class PaymentInvoiceController(
 ) {
     @GetMapping("/invoice/{id}/render") //TODO: vyměnit za pořádný endpoint, tohle je jen testovací teď
     fun renderInvoice(@PathVariable id: Long): ResponseEntity<Any> {
-        val response = try {
-            messageSender.sendRenderInvoiceRequest(id, MessageInvoiceAction.RENDER, timeoutSeconds = 20)
-        } catch (e: Exception) {
-            return ResponseEntity.status(504).body(mapOf("error" to "Timeout waiting for rendering response"))
-        }
+        val response = messageSender.sendRenderInvoiceRequest(id, MessageInvoiceAction.RENDER, timeoutSeconds = 20)
 
         val pdfBase64 = (response.payload as? Map<*, *>)?.get("pdfBase64") as? String
         if (response.status == MessageStatus.OK && pdfBase64 != null) {
