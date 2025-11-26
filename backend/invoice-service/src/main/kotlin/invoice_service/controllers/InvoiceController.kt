@@ -52,7 +52,7 @@ class InvoiceController(
         @Parameter(description = "Velikost stránky", example = "10")
         @RequestParam(defaultValue = "10") size: Int
     ): Page<Invoice>  {
-        val principal = authentication.principal as JwtUserPrincipal
+        val principal = authentication.principal as? JwtUserPrincipal ?: throw IllegalStateException("Invalid principal type")
         return service.getAllInvoicesForLoggedInCustomer(
             principal.id,
             PageRequest.of(page, size))
@@ -67,7 +67,7 @@ class InvoiceController(
         @PathVariable id: Long
     ): Invoice = service.getInvoice(id)
 
-    @Operation(summary = "Získat fakturu podle ID", description = "Vrací detail faktury podle jejího ID.")
+    @Operation(summary = "Získat xml pro fakturu podle ID", description = "Vrací xml faktury podle jejího ID.")
 
     @PreAuthorize("hasRole('ACCOUNTANT') or hasRole('MANAGER')")
     @GetMapping("/get-by-id/{id}/xml")
@@ -79,7 +79,7 @@ class InvoiceController(
             invoiceId = id,
             action = MessageInvoiceAction.RENDER,
             timeoutSeconds = 10
-        ).payload["xml"].toString()
+        ).payload["xml"]?.toString() ?: throw IllegalStateException("XML payload not found")
     }
 
     @Operation(summary = "Vytvořit novou fakturu", description = "Vytvoří novou fakturu na základě požadavku.")
