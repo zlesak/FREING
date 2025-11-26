@@ -18,8 +18,8 @@ import java.math.BigDecimal
 @Tag(name = "Exchange", description = "Externí směnné kurzy - převod částek")
 @RestController
 @RequestMapping("/api/invoices/exchange")
+@PreAuthorize("hasRole('ACCOUNTANT') or hasRole('MANAGER')")
 class ExchangeController(private val exchangeRateService: ExchangeRateService) {
-
     @Operation(
         summary = "Převést částku",
         description = "Převede částku z jedné měny do druhé podle nejnovějšího kurzu."
@@ -29,7 +29,6 @@ class ExchangeController(private val exchangeRateService: ExchangeRateService) {
         description = "Úspěšná konverze",
         content = [Content(schema = Schema(implementation = CurrencyConversionResponse::class))]
     )
-    @PreAuthorize("hasRole('ACCOUNTANT') or hasRole('MANAGER')")
     @GetMapping("/convert")
     fun convert(
         @Parameter(description = "Zdrojová měna", example = "EUR")
@@ -39,5 +38,23 @@ class ExchangeController(private val exchangeRateService: ExchangeRateService) {
         @Parameter(description = "Částka k převedení", example = "100.0")
         @RequestParam amount: BigDecimal
     ): CurrencyConversionResponse =
-        exchangeRateService.convert(from, to, amount).toResponse(from, to, amount)
+        exchangeRateService.convert(from, to, amount).toResponse()
+
+    @Operation(
+        summary = "Získá kurz jednotlivých měn",
+        description = "Získá kurz z jedné měny do druhé podle nejnovějšího kurzu."
+    )
+    @ApiResponse(
+        responseCode = "200",
+        description = "Kurz",
+        content = [Content(schema = Schema(implementation = CurrencyConversionResponse::class))]
+    )
+    @GetMapping("/getRate")
+    fun getRate(
+        @Parameter(description = "Zdrojová měna", example = "EUR")
+        @RequestParam from: String,
+        @Parameter(description = "Cílová měna", example = "CZK")
+        @RequestParam to: String,
+    ): BigDecimal =
+        exchangeRateService.getRate(from, to)
 }

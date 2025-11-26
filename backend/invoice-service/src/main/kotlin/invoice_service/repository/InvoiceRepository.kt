@@ -24,4 +24,7 @@ interface InvoiceRepository : JpaRepository<Invoice, Long>, JpaSpecificationExec
     fun findAllByCustomerId(customerId: Long, pageable: Pageable): Page<Invoice>
 
     fun findAllByStatusAndDueDateBefore(status: InvoiceStatusEnum, dueDate: LocalDate): List<Invoice>
+
+    @Query("SELECT i FROM Invoice i WHERE i.id IN :ids")
+    fun findByIdInWithLimit(ids: List<Long>, pageable: Pageable): Page<Invoice>
 }
