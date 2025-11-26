@@ -11,12 +11,12 @@ import java.util.*
 
 @Tag(name = "Payments", description = "API pro správu platebních činností")
 @RestController
-@RequestMapping("/api/payments")
+@RequestMapping("/render")
 class PaymentInvoiceController(
     private val messageSender: MessageSender,
     private val messageListener: MessageListener,
 ) {
-    @GetMapping("/invoice/{id}/render") //TODO: vyměnit za pořádný endpoint, tohle je jen testovací teď
+    @GetMapping("/invoice/{id}") //TODO: vyměnit za pořádný endpoint, tohle je jen testovací teď
     fun renderInvoice(@PathVariable id: Long): ResponseEntity<Any> {
         val response = messageSender.sendRenderInvoiceRequest(id, MessageInvoiceAction.RENDER, timeoutSeconds = 20)
 

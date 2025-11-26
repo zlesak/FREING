@@ -1,6 +1,9 @@
 server:
   port: 8084
 spring:
+  mvc:
+    servlet:
+      path: /api/rendering
   application:
     name: rendering-service
   datasource:

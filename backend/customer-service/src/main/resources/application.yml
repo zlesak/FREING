@@ -1,6 +1,9 @@
 server:
   port: 8081
 spring:
+  mvc:
+    servlet:
+      path: /api/customers
   application:
     name: customer-service
   datasource:

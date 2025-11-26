@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*
 
 @Tag(name = "Reporting", description = "Endpoints pro generování a export reportů")
 @RestController
-@RequestMapping("/api/invoices")
+@RequestMapping("/reports")
 class ReportingController(private val reportingService: ReportingSubService) {
 
     @Operation(

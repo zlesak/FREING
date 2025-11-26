@@ -17,9 +17,10 @@ import java.math.BigDecimal
 
 @Tag(name = "Exchange", description = "Externí směnné kurzy - převod částek")
 @RestController
-@RequestMapping("/api/invoices/exchange")
 @PreAuthorize("hasAnyAuthority('SCOPE_service.call', 'ROLE_MANAGER', 'ROLE_ACCOUNTANT')")
+@RequestMapping("/exchange")
 class ExchangeController(private val exchangeRateService: ExchangeRateService) {
+
     @Operation(
         summary = "Převést částku",
         description = "Převede částku z jedné měny do druhé podle nejnovějšího kurzu."

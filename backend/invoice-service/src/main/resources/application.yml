@@ -1,6 +1,9 @@
 server:
   port: 8082
 spring:
+  mvc:
+    servlet:
+      path: /api/invoices
   application:
     name: invoice-service
   datasource:

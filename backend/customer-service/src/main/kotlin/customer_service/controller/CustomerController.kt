@@ -11,8 +11,8 @@ import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/api/customers")
 @PreAuthorize("hasAnyAuthority('SCOPE_service.call', 'ROLE_MANAGER', 'ROLE_ACCOUNTANT')")
+@RequestMapping("/customer")
 class CustomerController(
     private val customerService: CustomerService
 ) {
