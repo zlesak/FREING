@@ -1,25 +1,19 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
-import { environment } from '../../../../environments/environment';
-import { Observable, map } from 'rxjs';
+import { Observable, from } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { InvoiceApi } from '../../../api/generated';
+
 @Injectable({ providedIn: 'root' })
 export class ExchangeRatesController {
-  private baseUrl = environment.apiBase + '/api/invoices/exchange';
-  constructor(private http: HttpClient) {}
+  constructor() {}
 
-  convert(from: string, to: string, amount: number): Observable<InvoiceApi.CurrencyConversionResponse> {
-    const params = new HttpParams()
-      .set('from', from)
-      .set('to', to)
-      .set('amount', amount.toString());
-    return this.http.get<InvoiceApi.CurrencyConversionResponse>(`${this.baseUrl}/convert`, { params });
+  convert(fromCurrency: string, toCurrency: string, amount: number): Observable<InvoiceApi.CurrencyConversionResponse> {
+    return from(InvoiceApi.ExchangeService.convert({ from: fromCurrency, to: toCurrency, amount }));
   }
 
-  getRate(from: string, to: string): Observable<number> {
-    const params = new HttpParams()
-      .set('from', from)
-      .set('to', to);
-    return this.http.get<number>(`${this.baseUrl}/getRate`, { params });
+  getRate(fromCurrency: string, toCurrency: string): Observable<number> {
+    return from(InvoiceApi.ExchangeService.getRate({ from: fromCurrency, to: toCurrency })).pipe(
+      map(response => response.rate)
+    );
   }
 }

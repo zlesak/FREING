@@ -32,7 +32,7 @@ class CustomJwtAuthenticationConverter : Converter<Jwt, AbstractAuthenticationTo
                 ?.forEach { authorities.add(SimpleGrantedAuthority("ROLE_${it.uppercase()}")) }
         }
 
-        val idLong = when (val rawId = jwt.claims["id"]) {
+        val idLong = when (val rawId = jwt.claims["db_id"]) {
             is Int -> rawId.toLong()
             is Long -> rawId
             is String -> rawId.toLong()
