@@ -1,7 +1,6 @@
 package payment_service.services
 
 import com.uhk.fim.prototype.common.messaging.enums.TransactionPayloadType
-import com.uhk.fim.prototype.common.security.JwtUserPrincipal
 import org.springframework.stereotype.Service
 import payment_service.messaging.MessageSender
 
