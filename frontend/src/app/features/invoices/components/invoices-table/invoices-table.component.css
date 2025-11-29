@@ -1,11 +1,13 @@
 .invoices{
-  height: 90vw;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   align-content: space-between;
+  padding-bottom: 60px;
 }
+
 .invoices-table {
-  width: 100%;
+  width: 95vw;
   border-collapse: collapse;
 }
 
@@ -74,3 +76,13 @@ tr.table-row:active {
 .mat-row, .mat-header-row {
   align-items: center;
 }
+.paginator {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100vw;
+  background: white;
+  z-index: 1000;
+  padding-bottom: 5px;
+}
+

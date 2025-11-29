@@ -17,7 +17,7 @@
     <div class="error">{{ error }}</div>
   }
  @if(!loading() && !error && dataSource.data){
-
+  <div>
     <table mat-table [dataSource]="dataSource" class="invoices-table" matSort>
       @if (!loading() && !error && !dataSource.data.length) {
         <p>Žádné faktury k zobrazení.</p>
@@ -64,17 +64,16 @@
           (click)="onInvoiceClick(row)"
       ></tr>
     </table>
+    <mat-paginator #paginator class="paginator"
+                   [length]="totalElements"
+                   [pageSize]="currentSize"
+                   [pageSizeOptions]="[10, 25, 50, 100]"
+                   [showFirstLastButtons]="true"
+                   [disabled]="loading()"
+                   (page)="pageUpdate($event)"
+                   aria-label="Select page">
+    </mat-paginator>
+    </div>
  }
-  </div>
-  <div>
-  <mat-paginator #paginator
-                 [length]="totalElements"
-                 [pageSize]="currentSize"
-                 [pageSizeOptions]="[10, 25, 50, 100]"
-                 [showFirstLastButtons]="true"
-                 [disabled]="loading()"
-                 (page)="pageUpdate($event)"
-                 aria-label="Select page">
-  </mat-paginator>
   </div>
 </section>

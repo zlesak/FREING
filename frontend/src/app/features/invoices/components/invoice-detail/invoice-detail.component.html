@@ -1,5 +1,6 @@
-<mat-card class="invoice-detail">
-  @if(invoiceDetail()){
+<mat-card class="invoice-detail"
+          [ngClass]="responsiveService.isMobile ? 'mobile' : ''">
+@if(invoiceDetail()){
        <h2>Faktura č. {{invoiceDetail()?.invoiceNumber}}</h2>
     <mat-card-content>
 
@@ -117,18 +118,29 @@
       </div>
 
     </mat-card-content>
-
+    <!-- only admins can delete invoices -->
     <mat-card-actions align="end">
+      @if (keycloakService.hasAdminAccess){
+        <button mat-raised-button color="secondary" (click)="delete()">
+          <mat-icon>delete</mat-icon>
+          Smazat
+        </button>
+      }
+    <!-- only admins can edit invoices, only invoices in draft can be edited -->
       @if (keycloakService.hasAdminAccess && editStatuses.includes(invoiceDetail()?.status!)){
         <button mat-raised-button color="secondary" (click)="edit()">
           <mat-icon>edit</mat-icon>
           Editovat
         </button>
       }
+      <!-- invoices that cannot be edited are exportable -->
+      @if(!editStatuses.includes(invoiceDetail()?.status!)){
       <button mat-raised-button color="primary" (click)="generatePDF()">
         <mat-icon>picture_as_pdf</mat-icon>
         Export do PDF
       </button>
+      }
+      <!-- only customer can pay an invoice -->
       @if (
         !keycloakService.hasAdminAccess &&
         paymentStatuses.includes(invoiceDetail()?.status!)

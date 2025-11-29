@@ -12,6 +12,7 @@
 .customers-table {
   width: 100%;
   border-collapse: collapse;
+  padding-bottom: 60px
 }
 
 .customers-table th,
@@ -38,3 +39,12 @@
   color: white;
 }
 
+.paginator {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100vw;
+  background: white;
+  z-index: 1000;
+  padding-bottom: 5px;
+}

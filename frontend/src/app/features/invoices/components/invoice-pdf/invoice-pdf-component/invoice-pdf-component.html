@@ -1,1 +1,7 @@
-<p>Waiting for rendering api</p>
+<div class="pdf-container">
+  <iframe [ngClass]="responsiveService.isMobile ? 'mobile' : ''"
+    [src]="invoicePdfUrl"
+    style=""
+    title="Zobrazení PDF faktury">
+  </iframe>
+</div>

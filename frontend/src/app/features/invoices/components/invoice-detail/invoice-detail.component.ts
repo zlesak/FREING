@@ -4,7 +4,7 @@ import { Invoice } from '../../../../api/generated/invoice';
 import { firstValueFrom } from 'rxjs';
 import {MatCard, MatCardActions, MatCardContent} from '@angular/material/card';
 import {MatButton} from '@angular/material/button';
-import {CurrencyPipe, DatePipe, PercentPipe} from '@angular/common';
+import {CurrencyPipe, DatePipe, NgClass, PercentPipe} from '@angular/common';
 import {MatDivider} from '@angular/material/divider';
 import{MatIcon} from '@angular/material/icon';
 import {CustomerEntity} from '../../../../api/generated/customer';
@@ -12,6 +12,7 @@ import {CustomersServiceController} from '../../../customers/controller/customer
 import {InvoicesServiceController} from '../../../../controller/invoices.service';
 import {KeycloakService} from '../../../../keycloak.service';
 import {InvoiceStatus} from '../../../common/Enums.js';
+import {ResponsiveService} from '../../../../controller/common.service';
 
 @Component({
   selector: 'app-invoice-detail-component',
@@ -25,12 +26,14 @@ import {InvoiceStatus} from '../../../common/Enums.js';
     PercentPipe,
     MatDivider,
     DatePipe,
-    MatIcon
+    MatIcon,
+    NgClass
   ],
   templateUrl: './invoice-detail.component.html',
   styleUrls: ['./invoice-detail.component.css']
 })
 export class InvoiceDetailComponent implements OnInit {
+  protected readonly responsiveService = inject(ResponsiveService);
   protected readonly keycloakService = inject(KeycloakService);
   private readonly invoiceService = inject(InvoicesServiceController);
   private readonly customerService = inject(CustomersServiceController);
@@ -87,6 +90,10 @@ export class InvoiceDetailComponent implements OnInit {
 
   edit(){
     this.router.navigate([`/invoice/edit/`, this.invoiceId])
+  }
+  delete(){
+    console.log(`deleting invoice ${this.invoiceId}`); //not working, why?
+    this.invoiceService.deleteInvoice(this.invoiceId);
   }
   pay(){
 
