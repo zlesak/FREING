@@ -70,8 +70,39 @@
 .primary-btn:hover:not(:disabled) { background: #4f46e5; }
 .primary-btn:disabled { opacity: .55; cursor: not-allowed; }
 
-@media (max-width: 760px) {
-  .nav { display: none; }
-  .app-header { gap: 1rem; }
-  .title { font-size: 1rem; }
+@media (max-width: 768px) {
+  .app-header {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    height: auto;
+  }
+
+  .brand {
+    flex: 1 1 100%;
+    justify-content: center;
+  }
+
+  .nav {
+    flex: 1 1 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .nav a {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.9rem;
+  }
+
+  .actions {
+    flex: 1 1 100%;
+    display: flex;
+    justify-content: center;
+  }
+
+  .primary-btn {
+    width: 100%;
+    max-width: 220px;
+  }
 }

@@ -1,6 +1,6 @@
 <section class="page home">
   <form [formGroup]="filterForm">
-    <div class="filter">
+    <div class="filter" [ngClass]="responsiveService.isMobile ? 'mobile' : ''">
     <mat-form-field
     subscriptSizing="dynamic"
     [hideRequiredMarker]="true"
@@ -86,7 +86,7 @@
     </div>
   </form>
 
-  <div style="display: flex; flex-direction: row; justify-content: space-around; align-items: stretch; padding-top: 20px">
+  <div  class="overview" [ngClass]="responsiveService.isMobile ? 'mobile' : ''">
     <div>
     <invoice-chart-pie
       [data]="chartDataStatuses()"

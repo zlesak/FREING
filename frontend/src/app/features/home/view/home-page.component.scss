@@ -9,12 +9,31 @@
   background-color: #ecf0fd;
   align-items: center;
   align-content: space-around;
-  justify-content: space-between;
+  justify-content: flex-start;
   @include mat.form-field-density(-1);
   mat-form-field {
     flex: 1 1 100px;
   }
 }
+
+.filter.mobile {
+  flex-direction: column;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  align-items: stretch;
+  gap: 15px;
+  padding: 10px;
+}
+
+.filter.mobile mat-form-field {
+  width: 100%;
+  flex: 0 0 auto;
+}
+
+.filter.mobile button {
+  width: 100%;
+}
+
 .info-table{
   display: flex;
   padding: 5px;
@@ -25,4 +44,26 @@
   border-style: solid;
   justify-content: space-between;
 }
+
+.overview{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: stretch;
+  padding-top: 20px;
+}
+
+.overview.mobile {
+  flex-direction: column;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.overview.mobile div{
+  padding:10px;
+  justify-content: center;
+}
+
 

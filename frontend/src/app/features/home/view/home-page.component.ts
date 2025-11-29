@@ -16,6 +16,7 @@ import {CurrencyOptions, InvoiceStatus} from '../../common/Enums.js';
 import {MatSelectModule} from '@angular/material/select';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatButton} from '@angular/material/button';
+import {ResponsiveService} from '../../../controller/common.service';
 
 @Component({
   imports: [
@@ -39,6 +40,7 @@ export class HomePageComponent implements OnInit{
   private readonly invoicesService = inject(InvoicesServiceController);
   protected readonly keycloakService = inject(KeycloakService);
   private readonly customerService = inject(CustomersServiceController);
+  protected readonly responsiveService = inject(ResponsiveService);
   private fb = inject(FormBuilder);
   protected invoices = signal<Invoice[]>([]);
   protected filteredInvoices = signal<Invoice[]>([]);
@@ -199,9 +201,9 @@ export class HomePageComponent implements OnInit{
       if (amountFrom !== null && inv.amount < amountFrom) return false;
       if (amountTo !== null && inv.amount > amountTo) return false;
 
-      if (currency && inv.currency !== currency) return false;
+      return !(currency && inv.currency !== currency);
 
-      return true;
+
     });
 
     this.filteredInvoices.set(filtered);

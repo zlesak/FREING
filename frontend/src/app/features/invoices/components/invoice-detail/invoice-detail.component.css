@@ -1,11 +1,19 @@
 .invoice-detail{
-    max-width: 35vw; margin: 0 auto;
+    max-width: 40vw;
+    min-width: 450px;
+    margin: 0 auto;
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 0 6px 0 rgba(0, 0, 0, 0.53);
     -webkit-box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.53);
     -moz-box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.53);
     overflow-x: auto;
+}
+.invoice-detail.mobile {
+  max-width: 95vw;
+  margin: 0 auto;
+  min-width: auto;
+  padding: 5px;
 }
 
 .invoice-dates {

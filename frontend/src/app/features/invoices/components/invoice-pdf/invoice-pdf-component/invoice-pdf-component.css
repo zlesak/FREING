@@ -1,0 +1,15 @@
+
+.pdf-container iframe {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 60%;
+  height: 85vh;
+}
+.pdf-container.mobile iframe {
+  width: 100vw;
+  height: auto;
+}
+
+
+

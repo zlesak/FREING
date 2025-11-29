@@ -17,6 +17,7 @@
   }
 
   @if (!loading() && !error && dataSource.data.length) {
+    <div>
     <table mat-table [dataSource]="dataSource" matSort class="customers-table">
 
       <ng-container matColumnDef="index">
@@ -53,16 +54,18 @@
       <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
 
     </table>
+      <mat-paginator class="paginator"
+                     [length]="totalElements"
+                     [pageSize]="currentSize"
+                     [pageSizeOptions]="[5, 10, 25, 50]"
+                     [showFirstLastButtons]="true"
+                     [disabled]="loading()"
+                     (page)="pageUpdate($event)">
+      </mat-paginator>
+    </div>
   }
 
-  <mat-paginator #paginator
-                 [length]="totalElements"
-                 [pageSize]="currentSize"
-                 [pageSizeOptions]="[5, 10, 25, 50]"
-                 [showFirstLastButtons]="true"
-                 [disabled]="loading()"
-                 (page)="pageUpdate($event)">
-  </mat-paginator>
+
 
   @if (!loading() && !error && !dataSource.data.length) {
     <p>Žádní zákazníci k zobrazení.</p>
