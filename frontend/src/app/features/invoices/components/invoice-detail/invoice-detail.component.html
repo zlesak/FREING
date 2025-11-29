@@ -153,4 +153,7 @@
       }
     </mat-card-actions>
   }
+  @if(error()){
+   <div style="color:red">{{error()}}</div>
+  }
 </mat-card>

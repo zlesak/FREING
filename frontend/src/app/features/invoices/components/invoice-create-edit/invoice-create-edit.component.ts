@@ -304,14 +304,11 @@ export class InvoiceCreateEditComponent implements OnInit {
   }
 
   async loadUsersInfo(){
-    const userDetails =  await this.keycloakService.getAllUsers();
-
-    userDetails.forEach(user=> {
-      this.users.push({email: user.email, id: user.id});
-    })
     const usersFromDb = await firstValueFrom(this.customerService.getCustomers(0,999));
-    usersFromDb.content.forEach(user=>{
-      this.users.push({email: user.email, id: user.id!});
-    })
+    if(usersFromDb.content){
+      usersFromDb.content.forEach(user=>{
+        this.users.push({email: user.email, id: user.id!});
+      })
+    }
   }
 }

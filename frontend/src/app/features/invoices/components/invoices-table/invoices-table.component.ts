@@ -15,7 +15,7 @@ import {
 import {DatePipe} from '@angular/common';
 import {MatSort, MatSortModule} from '@angular/material/sort';
 import {MatPaginator, MatPaginatorModule, PageEvent} from '@angular/material/paginator';
-import {Invoice} from '../../../../api/generated/invoice';
+import {Invoice, PagedModelInvoice} from '../../../../api/generated/invoice';
 import {getStatusColor} from '../../../home/view/home-page.component';
 import {KeycloakService} from '../../../../keycloak.service';
 
@@ -76,12 +76,11 @@ export class InvoicesTableComponent implements OnInit, AfterViewChecked {
     this.loading.set(true);
     this.error = undefined;
     this.invoicesService.getInvoices(0, 999).subscribe({
-      next: (resp: InvoiceApi.InvoicesPagedResponse) => {
-
-        this.dataSource.data = resp.content;
-
-        this.totalElements = resp.totalElements;
-        this.outputData.emit(this.dataSource.data);
+      next: (resp: PagedModelInvoice) => {
+        if(resp.content){
+          this.dataSource.data = resp.content;
+          this.outputData.emit(this.dataSource.data);
+        }
         if (this.paginator) {
           this.paginator.length = this.totalElements;
           this.paginator.pageSize = this.currentSize;
@@ -99,37 +98,29 @@ export class InvoicesTableComponent implements OnInit, AfterViewChecked {
   }
 
   loadInvoicesForUser(){
-    this.loading.set(true);
-    this.error = undefined;
-    const userId = this.keycloakService.currentUser?.id;
-    if (!userId){
-      console.log('user ID missing!');
-      this.error = 'Error - user data missing';
-      this.loading.set(false);
-      return;
-    }
-    this.invoicesService.getInvoices(0, 999).subscribe({
-      next: (resp: InvoiceApi.InvoicesPagedResponse) => {
-        //TODO: get all invoices for user, when API is ready
-        this.dataSource.data = resp.content;
-
-        this.totalElements = resp.totalElements;
-        this.outputData.emit(this.dataSource.data);
-        if (this.paginator) {
-          this.paginator.length = this.totalElements;
-          this.paginator.pageSize = this.currentSize;
-          this.paginator.pageIndex = 0;
+      this.loading.set(true);
+      this.error = undefined;
+      this.invoicesService.getMyInvoices(0, 999).subscribe({
+        next: (resp: PagedModelInvoice) => {
+          if(resp.content){
+            this.dataSource.data = resp.content;
+            this.outputData.emit(this.dataSource.data);
+          }
+          if (this.paginator) {
+            this.paginator.length = this.totalElements;
+            this.paginator.pageSize = this.currentSize;
+            this.paginator.pageIndex = 0;
+          }
+          if (this.sort) this.dataSource.sort = this.sort;
+          if (this.paginator) this.dataSource.paginator = this.paginator;
+          this.loading.set(false);
+        },
+        error: (err) => {
+          this.error = err.message || 'Nepodařilo se načíst faktury';
+          this.loading.set(false);
         }
-        if (this.sort) this.dataSource.sort = this.sort;
-        if (this.paginator) this.dataSource.paginator = this.paginator;
-        this.loading.set(false);
-      },
-      error: (err) => {
-        this.error = err.message || 'Nepodařilo se načíst faktury';
-        this.loading.set(false);
-      }
-    });
-  }
+      });
+    }
 
   pageUpdate(event: PageEvent){
     this.currentPage = event.pageIndex;

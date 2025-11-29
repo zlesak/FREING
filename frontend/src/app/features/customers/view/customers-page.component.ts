@@ -8,6 +8,7 @@ import { MatProgressBar } from '@angular/material/progress-bar';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatPaginator, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatSort, MatSortModule } from '@angular/material/sort';
+import {Customer, CustomerDto} from '../../../api/generated/customer';
 
 @Component({
   selector: 'app-customers-page',
@@ -27,16 +28,13 @@ export class CustomersPageComponent implements OnInit, AfterViewChecked {
   private readonly customersService = inject(CustomersServiceController);
   protected readonly router = inject(Router);
 
-  protected dataSource = new MatTableDataSource<CustomerApi.CustomerEntity>([]);
+  protected dataSource = new MatTableDataSource<CustomerDto>([]);
   protected loading = signal<boolean>(false);
   protected error?: string;
-  customers: CustomerApi.CustomerDto[] = [];
-  loading = false;
-  error?: string;
+  customers: CustomerDto[] = [];
   page = 0;
   size = 10;
   totalPages = 0;
-  totalElements = 0;
 
   protected totalElements = 0;
   protected currentPage = 0;
@@ -69,14 +67,14 @@ export class CustomersPageComponent implements OnInit, AfterViewChecked {
   loadAllCustomers(): void {
     this.loading.set(true);
     this.error = undefined;
-    this.customersService.getCustomers(page, this.size).subscribe({
+    this.customersService.getCustomers(this.page, this.size).subscribe({
       next: (resp: CustomerApi.PagedModelCustomerDto) => {
-        this.customers = resp.content ?? [];
+        this.dataSource.data = resp.content ?? [];
         this.page = resp.page?.number ?? 0;
         this.size = resp.page?.size ?? 10;
         this.totalPages = resp.page?.totalPages ?? 0;
         this.totalElements = resp.page?.totalElements ?? 0;
-        this.loading = false;
+        this.loading.set(false);
       },
       error: (err) => {
         this.error = err?.message || 'Nepodařilo se načíst zákazníky';
