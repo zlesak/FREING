@@ -123,7 +123,16 @@
         }
       </div>
     } @else{
-      <!-- TODO: customer info -->
+      <div>
+        <invoice-chart-line
+          [data]="filteredInvoices()"
+        ></invoice-chart-line>
+      </div>
+      <div>
+        <invoice-chart-bar
+          [data]="filteredInvoices()"
+        ></invoice-chart-bar>
+      </div>
     }
 
   </div>

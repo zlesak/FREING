@@ -1,7 +1,15 @@
 <div class="pdf-container">
-  <iframe [ngClass]="responsiveService.isMobile ? 'mobile' : ''"
-    [src]="invoicePdfUrl"
-    style=""
-    title="Zobrazení PDF faktury">
-  </iframe>
+  @if(error()){
+    <div style="color:red">
+    {{error()}}
+    </div>
+  } @else if(loading()){
+    <mat-progress-bar style="width: 80%; margin: auto" mode="indeterminate"></mat-progress-bar>
+  } @else{
+    <iframe [ngClass]="responsiveService.isMobile ? 'mobile' : ''"
+            [src]="invoicePdfUrl"
+            style=""
+            title="Zobrazení PDF faktury">
+    </iframe>
+  }
 </div>

@@ -5,11 +5,13 @@ import {PaymentServiceController} from '../../../../../controller/payment.servic
 import {DomSanitizer, SafeResourceUrl} from '@angular/platform-browser';
 import {ResponsiveService} from '../../../../../controller/common.service';
 import {NgClass} from '@angular/common';
+import {MatProgressBar} from '@angular/material/progress-bar';
 
 @Component({
   selector: 'app-invoice-pdf-component',
   imports: [
-    NgClass
+    NgClass,
+    MatProgressBar
   ],
   templateUrl: './invoice-pdf-component.html',
   styleUrl: './invoice-pdf-component.css'
@@ -30,9 +32,10 @@ export class InvoicePdfComponent implements OnInit{
 
   async initLoading() {
     const idParam = this.route.snapshot.paramMap.get('id');
-
+    this.loading.set(true);
     if (!idParam) {
       this.error.set('Error - missing invoice ID in URL');
+      this.loading.set(false);
       return;
     }
 
@@ -40,16 +43,24 @@ export class InvoicePdfComponent implements OnInit{
 
     if (!this.invoiceId) {
       this.error.set('Invalid invoice ID');
+      this.loading.set(false);
       return;
     }
     await this.loadInvoicePDF(this.invoiceId);
+    this.loading.set(false);
   }
 
   async loadInvoicePDF(id: number){
-   const invoicePdf = await firstValueFrom(this.paymentService.getInvoicePdfAsBlob(id));
-   console.log(invoicePdf);
-    const url = URL.createObjectURL(invoicePdf);
-    this.invoicePdfUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
+    try{
+      const invoicePdf = await firstValueFrom(this.paymentService.getInvoicePdfAsBlob(id));
+      if(invoicePdf){
+        const url = URL.createObjectURL(invoicePdf);
+        this.invoicePdfUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
+      }
+    } catch{
+      this.error.set('Error fetching a PDF')
+    }
+    this.loading.set(false);
   }
 
 

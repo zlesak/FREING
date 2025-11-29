@@ -3,7 +3,10 @@ import {inject, Injectable} from '@angular/core';
 import { from, Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { CustomerApi } from '../../../api/generated';
-import {CustomerControllerService} from '../../../api/generated/customer';
+import {
+  CustomerControllerService,
+  CustomerDto,
+} from '../../../api/generated/customer';
 
 @Injectable({ providedIn: 'root' })
 export class CustomersServiceController {
@@ -12,7 +15,7 @@ export class CustomersServiceController {
     CustomerApi.OpenAPI.BASE = environment.apiBase;
   }
 
-  createCustomer(request: CustomerApi.CreateCustomerDto): Observable<CustomerApi.CustomerDto> {
+  createCustomer(request: CustomerApi.CreateCustomerDto): Observable<CustomerDto> {
     return from(this.customerControllerService.create({ requestBody: request })).pipe(
       catchError(this.handleError)
     );

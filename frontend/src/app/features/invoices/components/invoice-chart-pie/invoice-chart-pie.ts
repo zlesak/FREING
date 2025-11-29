@@ -1,7 +1,6 @@
 import { Component, AfterViewInit, OnChanges, SimpleChanges, ElementRef, ViewChild, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Chart, ChartConfiguration, ChartType, registerables } from 'chart.js';
-import {getStatusColor} from '../../../home/view/home-page.component';
 
 Chart.register(...registerables);
 

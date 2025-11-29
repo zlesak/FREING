@@ -7,12 +7,12 @@ import {MatButton} from '@angular/material/button';
 import {CurrencyPipe, DatePipe, NgClass, PercentPipe} from '@angular/common';
 import {MatDivider} from '@angular/material/divider';
 import{MatIcon} from '@angular/material/icon';
-import {CustomerEntity} from '../../../../api/generated/customer';
 import {CustomersServiceController} from '../../../customers/controller/customers.service';
 import {InvoicesServiceController} from '../../../../controller/invoices.service';
 import {KeycloakService} from '../../../../keycloak.service';
 import {InvoiceStatus} from '../../../common/Enums.js';
 import {ResponsiveService} from '../../../../controller/common.service';
+import {Customer} from '../../../../api/generated/customer';
 
 @Component({
   selector: 'app-invoice-detail-component',
@@ -41,7 +41,7 @@ export class InvoiceDetailComponent implements OnInit {
   private readonly router = inject(Router);
   protected invoiceId: number = 0;
   protected invoiceDetail = signal<Invoice | null>(null);
-  protected customerDetail = signal<CustomerEntity | null>(null);
+  protected customerDetail = signal<Customer | null>(null);
   protected error = signal<string | null>(null);
   protected loading = signal<boolean>(false);
 
@@ -80,13 +80,17 @@ export class InvoiceDetailComponent implements OnInit {
       const user = await firstValueFrom(this.customerService.getCustomer(userId));
       this.customerDetail.set(user);
 
-    } catch (err: any) {
-      console.error('API Call failed:', err);
+    } catch (error: any) {
+      console.error('API Call failed:', error);
+      this.error.set(error)
     } finally {
       this.loading.set(false);
     }
   }
 
+  loadSupplierData(){
+
+  }
 
   edit(){
     this.router.navigate([`/invoice/edit/`, this.invoiceId])

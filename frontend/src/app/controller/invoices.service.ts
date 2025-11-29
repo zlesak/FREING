@@ -1,6 +1,6 @@
 import { environment } from '../../environments/environment';
 import {inject, Injectable} from '@angular/core';
-import { from, Observable, throwError, map } from 'rxjs';
+import { from, Observable, map } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { InvoiceApi } from '../api/generated';
 import {InvoicesService, ReportingService} from '../api/generated/invoice';
@@ -16,6 +16,12 @@ export class InvoicesServiceController {
 
   getInvoices(page = 0, size = 10): Observable<InvoiceApi.PagedModelInvoice> {
     return from(this.invoicesService.getAllInvoices({ page, size })).pipe(
+      catchError(handleError)
+    );
+  }
+
+  getMyInvoices(page = 0, size = 10): Observable<InvoiceApi.PagedModelInvoice> {
+    return from(this.invoicesService.getMyInvoices({ page, size })).pipe(
       catchError(handleError)
     );
   }

@@ -1,7 +1,7 @@
 import {Component, computed, inject, OnInit, signal} from '@angular/core';
 import { KeycloakService } from '../../../keycloak.service';
 import { InvoiceChartPie } from '../../invoices/components/invoice-chart-pie/invoice-chart-pie';
-import {Invoice, InvoicesPagedResponse} from '../../../api/generated/invoice';
+import {Invoice, PagedModelInvoice} from '../../../api/generated/invoice';
 import { CommonModule } from '@angular/common';
 import {InvoicesServiceController} from '../../../controller/invoices.service';
 import {
@@ -17,7 +17,8 @@ import {MatSelectModule} from '@angular/material/select';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatButton} from '@angular/material/button';
 import {ResponsiveService} from '../../../controller/common.service';
-
+import {InvoiceChartLine} from '../../invoices/components/invoice-chart-line/invoice-chart-line.component';
+import {InvoiceChartBar} from '../../invoices/components/invoice-chart-bar/invoice-chart-bar';
 @Component({
   imports: [
     CommonModule,
@@ -30,6 +31,9 @@ import {ResponsiveService} from '../../../controller/common.service';
     MatOptionModule,
     ReactiveFormsModule,
     MatButton,
+    InvoiceChartLine,
+    InvoiceChartBar,
+
   ],
   selector: 'app-home-page',
   standalone: true,
@@ -123,12 +127,9 @@ export class HomePageComponent implements OnInit{
   ngOnInit(){
     if (this.keycloakService.hasAdminAccess){
       this.loadAllInvoices();
-      this.loadUsers().then(()=>
-        this.applyFilter()
-      );
+      this.loadUsers();
     } else {
       this.loadInvoicesForUser();
-      this.applyFilter()
     }
   }
 
@@ -136,9 +137,14 @@ export class HomePageComponent implements OnInit{
     this.loading.set(true);
     this.error = undefined;
     this.invoicesService.getInvoices(0, 999).subscribe({
-      next: (resp: InvoicesPagedResponse) => {
+      next: (resp: PagedModelInvoice) => {
         const invoices = resp.content;
-        this.invoices.set(invoices);
+        if(invoices){
+          this.invoices.set(invoices);
+        } else {
+          this.invoices.set([]);
+        }
+        this.applyFilter();
         this.loading.set(false);
       },
       error: (err) => {
@@ -151,18 +157,23 @@ export class HomePageComponent implements OnInit{
   loadInvoicesForUser(){
     this.loading.set(true);
     this.error = undefined;
-    const userId = this.keycloakService.currentUser?.id;
+    const userId = this.keycloakService.currentCustomerId;
     if (!userId){
       console.log('user ID missing!');
       this.error = 'Error - user data missing';
       this.loading.set(false);
       return;
     }
-    //TODO: load user invoices when api is ready
-    this.invoicesService.getInvoices(0, 999).subscribe({
-      next: (resp: InvoicesPagedResponse) => {
+    this.invoicesService.getMyInvoices(0, 999).subscribe({
+      next: (resp: PagedModelInvoice) => {
         const invoices = resp.content;
-        this.invoices.set(invoices);
+        if(invoices){
+          this.invoices.set(invoices);
+          console.log(`setting invoices! ${this.invoices()}`);
+        } else {
+          this.invoices.set([]);
+        }
+        this.applyFilter();
         this.loading.set(false);
       },
       error: (err) => {
@@ -173,19 +184,15 @@ export class HomePageComponent implements OnInit{
   }
 
   async loadUsers(){
-    //users from keycloak - need to set view users permission for manager and accountant
-    const userDetails =  await this.keycloakService.getAllUsers();
-
-    userDetails.forEach(user=> {
-      this.users.push({email: user.email, id: user.id});
-    })
     const usersFromDb = await firstValueFrom(this.customerService.getCustomers(0,999));
-    usersFromDb.content.forEach(user=>{
-      this.users.push({email: user.email, id: user.id!});
-    })
+    if(usersFromDb.content){
+      usersFromDb.content.forEach(user=>{
+        this.users.push({email: user.email, id: user.id!});
+      })
+    }
   }
+
   applyFilter() {
-    console.log(`loading filter for invoices ${this.invoices()}`);
     const { from, to, customerId, status, amountFrom, amountTo, currency } =
       this.filterForm.value;
 
@@ -194,7 +201,7 @@ export class HomePageComponent implements OnInit{
       if (from && new Date(inv.issueDate) < new Date(from)) return false;
       if (to && new Date(inv.dueDate) > new Date(to)) return false;
 
-      if (customerId && inv.customerId !== customerId) return false;
+      if (customerId && inv.customerId !== Number(customerId)) return false;
 
       if (status && inv.status !== status) return false;
 
@@ -203,13 +210,9 @@ export class HomePageComponent implements OnInit{
 
       return !(currency && inv.currency !== currency);
 
-
     });
-
     this.filteredInvoices.set(filtered);
-    console.log(filtered)
   }
-
 }
 
 export function getStatusColor(status: string): { background: string; color: string } {

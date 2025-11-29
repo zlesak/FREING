@@ -2,7 +2,6 @@
 import { Injectable } from '@angular/core';
 import Keycloak, {KeycloakInstance, KeycloakInitOptions, KeycloakProfile} from 'keycloak-js';
 import {HttpClient} from '@angular/common/http';
-import {firstValueFrom} from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class KeycloakService {
@@ -152,20 +151,11 @@ export class KeycloakService {
       });
   }
 
-  public async getAllUsers(): Promise<any[]> {
-    if (!this.hasAnyRole(['admin', 'manager', 'accountant'])) {
-      throw new Error("Access denied");
-    }
-
-    try {
-      const result = await firstValueFrom(
-        this.http.get<any[]>("http://auth.freing.test/admin/realms/freing/users")
-      );
-      return result;
-    } catch (err) {
-      console.error("Error loading users", err);
-      throw err;
-    }
+  get currentCustomerId(): number | null {
+    const tokenParsed: any = this.keycloakAuth.tokenParsed;
+    if (!tokenParsed) return null;
+    console.log(tokenParsed);
+    return Number(tokenParsed["db_id"] ?? null);
   }
 
 
