@@ -1,8 +1,9 @@
 # Software Architecture Document  
 
 ## FREING  
-### French E-invoicing system  
-![Logo](/Users/zlesak/IdeaProjects/FREING/docs/logo.png "Logo")
+### French E-invoicing system
+
+![Logo](./logo.png "Logo")
 
 team: Endor  
 členové:  
