@@ -1,7 +1,9 @@
 # Software Architecture Document  
 
 ## FREING  
-### French E-invoicing system  
+### French E-invoicing system
+
+![Logo](./logo.png "Logo")
 
 team: Endor  
 členové:  
@@ -31,7 +33,7 @@ verze: 1.0
 ## 1. Úvod a cíle
 Tato sekce se zaměří na účel dokumentu, cílovou skupinu a cíle systému.
 ### 1.1 Účel dokumentu
-Tento dokument popisuje softwarovou architekturu systému FREING, který je určen pro elektronickou fakturaci ve Francii.
+Tento dokument popisuje softwarovou architekturu systému FREING, který je určen pro elektronickou fakturaci.
 Dále popíše architekturu systému FREING, funkcionality, které systém poskytuje.
 Stejně tak dokument poopíše architekturu systému, jeho komponenty a jejich interakce.
 
@@ -59,10 +61,10 @@ Tato sekce popisuje technologická a organizační omezení systému. Tato omeze
 Tato sekce popisuje kontext systému, včetně jeho interakcí s externími systémy a uživateli.
 
 ### 3.1 Byznysový model systému
-Systém FREING je navržen tak, aby umožnil elektronickou fakturaci, která se od následujíchí roku (2026) postupně stane povinnou pro všechny státy v Evropsské unii, v čele s Francií.
+Systém FREING je navržen tak, aby umožnil elektronickou fakturaci, která se v následujících letech (již od 2026) postupně stane povinnou pro všechny státy v Evropsské unii, v čele s Francií a Belgií.
 Systém FREING bude poskytovat platformu pro elektronickou fakturaci mezi firmami nebo mezi firmou a jednotlivcem.
 Hlavními aktéry jsou firmy, které budou vytvářet a odesílat faktury, a koncoví zákazníci, kteří budou faktury přijímat. 
-Systém bude také poskytovat funkce pro správu uživatelských účtů, sledování stavu faktur a generování reportů.  
+Systém bude také poskytovat funkce pro správu zákazníků, sledování stavu faktur a generování reportů.  
 
 Systém FREING bude komunikovat s externími systémy, jako jsou bankovní systémy pro zpracování plateb, registry ekonomických subjektů pro ověřování firem nebo kurzovními systémy pro převod měn.
 ![Business Context](../diagrams/FREING_BUSINESS_CONTEXT_DIAGRAM.png "Business Context")
@@ -72,11 +74,11 @@ Use Case diagram zobrazuje hlavní funkce systému a interakce mezi uživateli a
 ![Use Case](../diagrams/FREING_USE_CASE_DIAGRAM.png "Use Case")  
 Role
 - Účetní (Accounting)
-- Finanční manager (Finance)
-- Koncový zákazník (Customer)
+- Manager (Manager)
+- Koncový zákazník (Customer) (Firma nebo jedinec)
 
 ## 4. Strategie řešení
-Tato sekce popisuje strategii řešení, která bude použita k dosažení cílů systému. Tato strategie může zahrnovat architektonické vzory, technologie a nástroje, které budou použity k vývoji systému.
+Tato sekce popisuje strategii řešení, která bude použita k dosažení cílů systému. Strategie bude zahrnovat architektonické vzory, technologie a nástroje, které budou použity k vývoji systému.
 ### 4.1 Struiktura systému
 - Frontend: Angular
 - Backend: Kotlin, Spring Boot
@@ -87,25 +89,29 @@ Tato sekce popisuje strategii řešení, která bude použita k dosažení cíl�
 ### 4.2 Architektonické vzory
 - Microservices
 - RESTful API
+- Messagging
 - MVC (Model-View-Controller)
 
 ### 4.3 Nástroje
 - IDE: IntelliJ IDEA, Visual Studio Code
-- Verzovací systém: Git, GitHub
-- Swagger pro dokumentaci API
-- PlantUML pro diagramy
+- Verzovací systém Git s uložištěm na platformě GitHub
+- Swagger pro dokumentaci API generované dle anotací jednotlivých přistupových bodů
+- PlantUML pro strojově zapisovatelné diagramy
 - Postman pro testování API
 - Docker pro kontejnerizaci a nasazení
 
 ### 4.4 Technologie
 - Kotlin pro backend vývoj
 - Angular pro frontend vývoj
-- PostgreSQL pro databázi
+- PostgreSQL pro databáze
 - Docker pro kontejnerizaci
 - Keycloak pro správu identit a přístupů
 - REST pro komunikaci mezi službami
 - OpenAPI pro dokumentaci API
 - Nginx jako reverzní proxy server
+- RabbitMQ pro mezislužební komunikaci
+- MailHog pro zachytávání a testování e-mailů během vývoje
+- PgAdmin pro správu PostgreSQL databází
 
 ## 5. Zobrazení stavebních bloků
 Tato sekce popisuje a dekomponuje hlavní stavební bloky systému. Každý blok je popsán z hlediska jeho odpovědností, rozhraní a interakcí s ostatními bloky.
@@ -137,7 +143,7 @@ Tato sekce popisuje a dekomponuje hlavní stavební bloky systému. Každý blok
 - Rozhraní: Docker CLI
 - Interakce: Správa kontejnerů pomocí Dockeru
 - Technologie: Docker
-- Nástroje: Docker CLI, Docker Compose
+- Nástroje: Docker CLI, Docker Compose, Shell skripty
 
 ## 6. Zobrazení běhů
 Tato sekce oproti sekci 5 popisuje dynamické chování systému. Popisuje, jak se stavební bloky chovají během různých scénářů použití.
@@ -159,6 +165,16 @@ Tato sekce oproti sekci 5 popisuje dynamické chování systému. Popisuje, jak 
 3. Backend: Přijme požadavek, zpracuje platbu a aktualizuje stav faktury v databázi.
 4. Backend: Vrátí potvrzení o úspěšné platbě frontendu.
 5. Frontend: Zobrazí potvrzení uživateli.
+### 6.4 Scénář: Autentizace uživatele
+1. Uživatelský vstup (Všichni uživatelé): Uživatel zadá své přihlašovací údaje ve webovém rozhraní.
+2. Frontend: Odeslá přihlašovací údaje na Keycloak server.
+3. Keycloak: Ověří přihlašovací údaje a vrátí autentizační token frontendu.
+4. Frontend: Uloží autentizační token a použije ho pro další požadavky na backend.
+5. Backend: Ověří autentizační token při každém požadavku a povolí nebo zamítne přístup na základě uživatelských rolí.
+### 6.5 Scénář: Vytvoření zákazníka
+1. Uživatelský vstup (Účetní): Uživatel vyplní formulář pro vytvoření nového zákazníka ve webovém rozhraní.
+2. Frontend: Odeslá data zákazníka na backend přes REST API.
+3. Backend: Přijme data zákazníka, zvaliduje je a uloží do databáze.
 
 ## 7. Zobrazení nasazení
 Tato sekce popisuje fyzické nasazení systému, včetně hardwarových a softwarových komponent, které tvoří systém.
@@ -213,24 +229,18 @@ Tato sekce dokumentuje klíčová architektonická rozhodnutí, která byla uči
 - Zvolené řešení: Docker pro kontejnerizaci, Docker Compose pro jednoduché nasazení
 - Důvody: Docker umožňuje snadnou kontejnerizaci aplikací, což usnadňuje vývoj, testování a nasazení. Docker Compose umožňuje jednoduché definování a spuštění více kontejnerů, což je vhodné pro menší projekty.
 
-## 10. Kvalitativní požadavky
-Tato sekce popisuje kvalitativní požadavky na systém, jako jsou výkon, bezpečnost, škálovatelnost a další.
-### 10.1 Výkon
- 
-
-## 11. Rizika a jejich zmírňování
+## 10. Rizika a jejich zmírňování
 Tato sekce identifikuje potenciální rizika spojená s architekturou systému a navrhuje strategie pro jejich zmírnění.
-### 11.1 Rizika
+### 10.1 Rizika
 - Bezpečnostní rizika: Únik citlivých dat, neoprávněný přístup
 - Výkonová rizika: Nedostatečný výkon při vysokém zatížení
 - Rizika škálovatelnosti: Neschopnost systému růst s rostoucím počtem uživatelů
-- Rizika spojená s technologií: Závislost na konkrétních technologiích, které mohou být zastaralé nebo nepodporované
-### 11.2 Strategie zmírňování rizik
-- Bezpečnostní opatření: Implementace silných autentizačních a autorizačních mechanismů, šifrování dat
+### 10.2 Strategie zmírňování rizik
+- Bezpečnostní opatření: Implementace autentizačních a autorizačních mechanismů
 - Výkonová optimalizace: Optimalizace kódu, použití caching, load balancing
 - Škálovatelnost: Návrh systému s ohledem na horizontální škálování, použití cloudových služeb
 
-## 12. Glosář
+## 11. Glosář
 - REST API: Representational State Transfer Application Programming Interface
 - MVC: Model-View-Controller
 - SQL: Structured Query Language

@@ -1,0 +1,121 @@
+@startuml
+title Infrastructure Diagram - FREING Platform
+top to bottom direction
+
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam roundCorner 10
+skinparam shadowing false
+
+skinparam component {
+  BackgroundColor WHITE
+  BorderColor #2C3E50
+  BorderThickness 2
+  FontSize 11
+  FontStyle bold
+}
+
+skinparam lineType ortho
+
+skinparam database {
+  BackgroundColor WHITE
+  BorderColor #2C3E50
+  BorderThickness 2
+}
+
+skinparam package {
+  BorderThickness 2
+  BorderColor #2C3E50
+}
+
+skinparam arrow {
+  Color #2C3E50
+  Thickness 2
+}
+
+package "Testing Services" #FFFDE7 {
+  component "MailHog\n(Email Testing)" as mailhog
+}
+
+package "Frontend Layer" #E8F5E9 {
+  component "Angular\nFrontend" as frontend
+}
+
+package "API Gateway" #E3F2FD {
+  component "Gateway" as gateway
+}
+
+package "Authentication" #F3E5F5 {
+  component "Keycloak\n(Auth)" as keycloak
+}
+
+package "Microservices Layer" #FCE4EC {
+  component "Customer\nService" as customer_service
+  component "Invoice\nService" as invoice_service
+  component "Payment\nService" as payment_service
+  component "Rendering\nService" as rendering_service
+  component "RabbitMQ" as rabbitmq
+}
+
+package "Data Layer" #F3E5F5 {
+  database "Customer DB" as db_customer
+  database "Invoice DB" as db_invoice
+  database "Payment DB" as db_payment
+  database "Rendering DB" as db_rendering
+  database "Keycloak DB" as db_keycloak
+}
+
+package "Utility Services" #FFFDE7 {
+  component "PgAdmin\n(DB Management)" as pgadmin
+}
+
+frontend -[hidden]down-> gateway
+'
+rabbitmq -[hidden]down-> db_customer
+rabbitmq -[hidden]down-> db_invoice
+rabbitmq -[hidden]down-> db_payment
+rabbitmq -[hidden]down-> db_rendering
+rabbitmq -[hidden]down-> db_keycloak
+
+rabbitmq -[hidden]up-> rendering_service
+rabbitmq -[hidden]up-> customer_service
+rabbitmq -[hidden]up-> payment_service
+rabbitmq -[hidden]up-> invoice_service
+keycloak -[hidden]left-> payment_service
+'
+mailhog -[hidden]right-> frontend
+'frontend -[hidden]right-> keycloak
+
+' ========== RELATIONSHIPS ==========
+frontend <-down-> gateway
+
+gateway <-down-> customer_service : /api/customers
+gateway <-down-> invoice_service : /api/invoices
+gateway <-down-> payment_service : /api/payments
+gateway <-down-> rendering_service : /api/rendering
+
+customer_service <-down-> db_customer
+invoice_service <-down-> db_invoice
+payment_service <-down-> db_payment
+rendering_service <-down-> db_rendering
+keycloak <-down-> db_keycloak
+
+gateway <-left-> keycloak : authenticate
+
+rabbitmq <-up-> customer_service
+rabbitmq <-up-> invoice_service
+rabbitmq <-up-> payment_service
+rabbitmq <-up-> rendering_service
+
+mailhog <-left- gateway : send emails
+
+pgadmin <-up-> db_keycloak
+pgadmin <-up-> db_customer
+pgadmin <-up-> db_invoice
+pgadmin <-up-> db_payment
+pgadmin <-up-> db_rendering
+
+
+@enduml
+
