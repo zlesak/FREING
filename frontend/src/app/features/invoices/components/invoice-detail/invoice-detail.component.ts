@@ -95,9 +95,15 @@ export class InvoiceDetailComponent implements OnInit {
   edit(){
     this.router.navigate([`/invoice/edit/`, this.invoiceId])
   }
-  delete(){
-    console.log(`deleting invoice ${this.invoiceId}`); //not working, why?
-    this.invoiceService.deleteInvoice(this.invoiceId);
+  async delete(){
+    console.log(`deleting invoice ${this.invoiceId}`);
+    try {
+      await firstValueFrom(this.invoiceService.deleteInvoice(this.invoiceId));
+      this.router.navigate(['/invoices']);
+    } catch (error) {
+      console.error('Smazání faktury selhalo:', error);
+      this.error.set('Smazání faktury selhalo');
+    }
   }
   pay(){
 
