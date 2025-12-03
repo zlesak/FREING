@@ -1,46 +1,44 @@
 package customer_service.messaging
 
-import com.uhk.fim.prototype.common.config.RabbitConfig
-import com.uhk.fim.prototype.common.extensions.processInCoroutine
-import com.uhk.fim.prototype.common.messaging.dto.CustomerRequest
-import com.uhk.fim.prototype.common.messaging.enums.customer.MessageCustomerAction
-import customer_service.messaging.handlers.CustomerServiceHandler
-import customer_service.messaging.handlers.InvalidMessageActionHandler
+import com.uhk.fim.prototype.common.messaging.ActiveMessagingManager
+import com.uhk.fim.prototype.common.messaging.InvalidMessageActionHandler
+import com.uhk.fim.prototype.common.messaging.MessageSender
+import com.uhk.fim.prototype.common.messaging.dto.MessageRequest
+import com.uhk.fim.prototype.common.messaging.enums.actions.CustomerMessageAction
+import customer_service.dto.customer.response.CustomerDto
+import customer_service.service.CustomerService
+import com.uhk.fim.prototype.common.messaging.AbstractMessageListener
 import kotlinx.coroutines.CoroutineScope
-import org.springframework.amqp.core.Message
-import org.springframework.amqp.rabbit.annotation.RabbitListener
 import org.springframework.amqp.support.converter.MessageConverter
 import org.springframework.stereotype.Component
 
 @Component
-class MessageListener (
-    private val messageConverter: MessageConverter,
-    private val invalidMessageActionHandler: InvalidMessageActionHandler,
-    private val customerServiceHandler: CustomerServiceHandler,
-    private val rabbitScope: CoroutineScope
+class MessageListener(
+    messageConverter: MessageConverter,
+    messageSender: MessageSender,
+    invalidMessageActionHandler: InvalidMessageActionHandler,
+    activeMessagingManager: ActiveMessagingManager,
+    rabbitScope: CoroutineScope,
+    private val customerService: CustomerService
+) : AbstractMessageListener<CustomerMessageAction>(
+    messageConverter,
+    messageSender,
+    invalidMessageActionHandler,
+    activeMessagingManager,
+    rabbitScope,
+    CustomerMessageAction::class.java
 ) {
-
-    @RabbitListener(queues = [RabbitConfig.CUSTOMER_REQUESTS])
-    fun receiveCustomerRequest(message: Message) {
-       message.processInCoroutine(rabbitScope){
-           processCustomerRequest(it)
-       }
-    }
-
-    suspend fun processCustomerRequest(message: Message) {
-        val request = messageConverter.fromMessage(message) as CustomerRequest
-        val correlationId = message.messageProperties.correlationId ?: request.requestId
-        val replyTo = message.messageProperties.replyTo ?: run {
-            println("[customer-service] No replyTo in request: $request")
-            return
-        }
-
-        println("[customer-service] Received customer request: $request, replyTo=$replyTo, correlationId=$correlationId")
-
-        if (request.action == MessageCustomerAction.GET) {
-            customerServiceHandler.getCustomer(request, correlationId, replyTo)
-        } else {
-            invalidMessageActionHandler.handleInvalidMessageAction(request, correlationId, replyTo)
+    override fun processRequest(
+        request: MessageRequest<CustomerMessageAction>,
+        correlationId: String,
+        replyTo: String?
+    ): CustomerDto {
+        when (request.action) {
+            CustomerMessageAction.GET -> {
+                val customer = customerService.getCustomerById(request.targetId ?: -1, true)
+                println(customer.email)
+                return customer.toDto()
+            }
         }
     }
 }

@@ -9,13 +9,20 @@ class MessageExceptionPreprocessor(
     private val activeMessagingManager: ActiveMessagingManager
 ) : MessageListenerProcessor {
 
-
-    //handle all error from messages
     override fun process(message: MessageProcess): MessageProcess {
-        println("[MessageExceptionHandler] handling message errors")
-        if (message.messageResponse == null || message.messageResponse?.error == null) return message
+        if (!message.isResponse()) {
+            println("[MessageExceptionHandler] Skipping non-response message")
+            return message
+        }
 
-        activeMessagingManager.completeExceptionally(message.correlationId, message.messageResponse!!.error!!.buildException())
+        val response = message.messageResponse
+        if (response?.error == null) {
+            println("[MessageExceptionHandler] No error in response")
+            return message
+        }
+
+        println("[MessageExceptionHandler] Handling message error: ${response.error.message}")
+        activeMessagingManager.completeExceptionally(message.correlationId, response.error.buildException())
         return message
     }
 }
