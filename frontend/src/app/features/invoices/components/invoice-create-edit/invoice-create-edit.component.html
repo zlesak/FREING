@@ -103,102 +103,77 @@
         </div>
 
         <h3>Položky</h3>
-        <table class="items">
-          <thead>
-          <tr>
-            <th>Název</th>
-            <th>Popis</th>
-            <th>Jednotka</th>
-            <th>Množství</th>
-            <th>Jedn. cena</th>
-            <th>Celkem bez daně</th>
-            <th>DPH</th>
-            <th>Celkem s daní</th>
-            <th></th>
-          </tr>
-          </thead>
+        <table class="items" [ngClass]="responsiveService.isMobile ? 'mobile' : ''">
+          @if(!responsiveService.isMobile){
+            <thead>
+            <tr>
+              <th>Název</th>
+              <th>Popis</th>
+              <th>Jednotka</th>
+              <th>Množství</th>
+              <th>Jedn. cena</th>
+              <th>Celkem bez daně</th>
+              <th>DPH</th>
+              <th>Celkem s daní</th>
+              <th></th>
+            </tr>
+            </thead>
+          }
 
-          <tbody formArrayName="items">
+          <tbody formArrayName="items" [ngClass]="responsiveService.isMobile ? 'mobile' : ''">
             @for (item of items.controls; track item; let i = $index) {
               <tr [formGroupName]="i">
-                <td>
+                <td data-label="Název">
                   <mat-form-field>
-                    <input
-                      matInput
-                      formControlName="name"
-                      required
-                    />
+                    <input matInput formControlName="name" required />
                   </mat-form-field>
                   @if (item.get('name')?.touched && item.get('name')?.invalid) {
                     <mat-error>Název je povinný</mat-error>
                   }
                 </td>
-                <td>
+                <td data-label="Popis">
                   <mat-form-field>
-                    <input
-                      matInput
-                      formControlName="description"
-                      required
-                    />
+                    <input matInput formControlName="description" required />
                   </mat-form-field>
                   @if (item.get('description')?.touched && item.get('description')?.invalid) {
                     <mat-error class="invalid">Popis je povinný</mat-error>
                   }
                 </td>
-                <td>
+                <td data-label="Jednotka">
                   <mat-form-field>
-                    <input
-                      matInput
-                      formControlName="unit"
-                      required
-                      (input)="recalcItemTotal(i)"
-                    />
+                    <input matInput formControlName="unit" required (input)="recalcItemTotal(i)" />
                   </mat-form-field>
                   @if (item.get('unit')?.touched && item.get('unit')?.invalid) {
                     <mat-error>Jednotka je povinná</mat-error>
                   }
                 </td>
-                <td>
+                <td data-label="Množství">
                   <mat-form-field>
-                    <input
-                      matInput
-                      formControlName="quantity"
-                      type="number"
-                      min="0"
-                      (input)="recalcItemTotal(i)"
-                    />
+                    <input matInput formControlName="quantity" type="number" min="0" (input)="recalcItemTotal(i)" />
                   </mat-form-field>
                   @if (item.get('quantity')?.touched && item.get('quantity')?.invalid) {
                     <mat-error>Zadejte množství</mat-error>
                   }
                 </td>
-                <td>
+                <td data-label="Jedn. cena">
                   <mat-form-field>
-                    <input
-                      matInput
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      formControlName="unitPrice"
-                      required
-                      (input)="recalcItemTotal(i)"
-                    />
+                    <input matInput type="number" step="0.01" min="0" formControlName="unitPrice" required (input)="recalcItemTotal(i)" />
                   </mat-form-field>
                 </td>
-                <td>
+                <td data-label="Celkem bez daně">
                   <mat-form-field>
                     <input matInput formControlName="subTotalPrice" readonly />
                   </mat-form-field>
                 </td>
-                <td>
+                <td data-label="DPH">
                   <mat-form-field>
-                  <input matInput formControlName="vat" type="number" min="0" (input)="recalcItemTotal(i)" />
-                  @if (item.get('vat')?.touched && item.get('vat')?.invalid) {
-                    <mat-error class="invalid">Zadejte DPH</mat-error>
-                  }
+                    <input matInput formControlName="vat" type="number" min="0" (input)="recalcItemTotal(i)" />
+                    @if (item.get('vat')?.touched && item.get('vat')?.invalid) {
+                      <mat-error class="invalid">Zadejte DPH</mat-error>
+                    }
                   </mat-form-field>
                 </td>
-                <td>
+                <td data-label="Celkem s daní">
                   <mat-form-field>
                     <input matInput formControlName="totalPrice" readonly />
                   </mat-form-field>

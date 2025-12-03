@@ -30,6 +30,8 @@ import {distinctUntilChanged, firstValueFrom} from 'rxjs';
 import {CurrencyOptions, InvoiceStatus} from '../../../common/Enums.js';
 import {KeycloakService} from '../../../../keycloak.service';
 import {CustomersServiceController} from '../../../customers/controller/customers.service';
+import {ResponsiveService} from '../../../../controller/common.service';
+import {NgClass} from '@angular/common';
 
 @Component({
   selector: 'app-invoice-create',
@@ -55,6 +57,7 @@ import {CustomersServiceController} from '../../../customers/controller/customer
     MatDatepicker,
     MatDatepickerModule,
     MatInputModule,
+    NgClass,
   ],
   providers: [
     provideNativeDateAdapter(),
@@ -63,6 +66,7 @@ import {CustomersServiceController} from '../../../customers/controller/customer
 export class InvoiceCreateEditComponent implements OnInit {
   private readonly keycloakService = inject(KeycloakService);
   private readonly customerService = inject(CustomersServiceController);
+  protected readonly responsiveService = inject(ResponsiveService);
   protected readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   protected editMode = signal(false);
@@ -272,7 +276,7 @@ export class InvoiceCreateEditComponent implements OnInit {
       this.invoicesService.updateInvoice(this.editInvoiceId, request).subscribe({
         next: () => {
           this.submitting = false;
-          this.success = 'Faktura byla updavena';
+          this.success = 'Faktura byla upravena';
           setTimeout(() => this.router.navigate(['/invoices']), 800);
         },
         error: err => {

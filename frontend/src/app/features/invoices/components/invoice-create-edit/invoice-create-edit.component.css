@@ -52,3 +52,50 @@
    opacity: 0.8;
  }
 
+ .items thead {
+   display: table-header-group;
+ }
+
+ .items tbody.mobile {
+   display: block;
+   width: 100%;
+ }
+
+ .items tbody.mobile tr {
+   display: block;
+   width: 100%;
+   margin-bottom: 15px;
+   border: 1px solid #ccc;
+   border-radius: 4px;
+   padding: 10px;
+ }
+
+ .items tbody.mobile td {
+   display: block;
+   border: none;
+   text-align: right;
+   padding: 5px 0;
+ }
+
+ .items tbody.mobile td::before {
+   content: attr(data-label);
+   float: left;
+   font-weight: bold;
+   text-transform: uppercase;
+   margin-right: 10px;
+   margin-top: 5px;
+ }
+
+ .items tbody.mobile td mat-form-field {
+   margin-top: 5px;
+   margin-bottom: 5px;
+ }
+
+ .items tbody.mobile tr td:last-child {
+   text-align: center;
+   padding-top: 10px;
+ }
+
+ .items tbody.mobile tr td:last-child::before {
+   content: none;
+ }
