@@ -15,7 +15,9 @@ class MessageListenerProcessorChain(
     override fun invoke(invocation: MethodInvocation): Any? {
         val inputData = messageExtractor.extractMessage(invocation.arguments)?: return invocation.proceed()
 
-        processors.forEach { it.process(inputData) }
+        inputData.messageResponse?.let {
+            processors.forEach { it.process(inputData) }
+        }
 
         return invocation.proceed()
     }

@@ -4,6 +4,7 @@ import com.uhk.fim.prototype.common.config.RabbitConfig
 import com.uhk.fim.prototype.common.exceptions.NotFoundException
 import com.uhk.fim.prototype.common.exceptions.getErrorProps
 import com.uhk.fim.prototype.common.extensions.processInCoroutine
+import com.uhk.fim.prototype.common.messaging.ObjectMapperMessageConverter
 import com.uhk.fim.prototype.common.messaging.dto.ErrorProps
 import com.uhk.fim.prototype.common.messaging.dto.InvoiceRequest
 import com.uhk.fim.prototype.common.messaging.dto.MessageResponse
@@ -13,7 +14,6 @@ import com.uhk.fim.prototype.common.messaging.enums.invoice.MessageInvoiceAction
 import kotlinx.coroutines.CoroutineScope
 import org.springframework.amqp.core.Message
 import org.springframework.amqp.rabbit.annotation.RabbitListener
-import org.springframework.amqp.support.converter.MessageConverter
 import org.springframework.stereotype.Component
 import rendering_service.services.PdfRenderingService
 import java.util.*
@@ -22,7 +22,7 @@ import java.util.concurrent.ConcurrentHashMap
 @Component
 class MessageListener (
     private val messageSender: MessageSender,
-    private val messageConverter: MessageConverter,
+    private val messageConverter: ObjectMapperMessageConverter,
     private val pdfRenderingService: PdfRenderingService,
     private val rabbitScope: CoroutineScope
     ) {

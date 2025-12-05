@@ -2,6 +2,7 @@ package customer_service.messaging
 
 import com.uhk.fim.prototype.common.config.RabbitConfig
 import com.uhk.fim.prototype.common.extensions.processInCoroutine
+import com.uhk.fim.prototype.common.messaging.ObjectMapperMessageConverter
 import com.uhk.fim.prototype.common.messaging.dto.CustomerRequest
 import com.uhk.fim.prototype.common.messaging.enums.customer.MessageCustomerAction
 import customer_service.messaging.handlers.CustomerServiceHandler
@@ -9,12 +10,11 @@ import customer_service.messaging.handlers.InvalidMessageActionHandler
 import kotlinx.coroutines.CoroutineScope
 import org.springframework.amqp.core.Message
 import org.springframework.amqp.rabbit.annotation.RabbitListener
-import org.springframework.amqp.support.converter.MessageConverter
 import org.springframework.stereotype.Component
 
 @Component
 class MessageListener (
-    private val messageConverter: MessageConverter,
+    private val messageConverter: ObjectMapperMessageConverter,
     private val invalidMessageActionHandler: InvalidMessageActionHandler,
     private val customerServiceHandler: CustomerServiceHandler,
     private val rabbitScope: CoroutineScope

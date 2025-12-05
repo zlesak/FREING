@@ -7,12 +7,17 @@ import kotlin.reflect.full.primaryConstructor
 class MessageResponse(
     val apiSourceService: SourceService,
     val sourceService: SourceService,
-    val requestId: String,
+    override val requestId: String,
     val targetId: Long? = null, //customerId, invoiceId etc.
     val status: MessageStatus,
     val payload: Map<String, Any?> = emptyMap(),
     val error: ErrorProps? = null
-)
+): CommonMessage<MessageResponse>(requestId) {
+    override fun copy(requestId: String): MessageResponse {
+        return MessageResponse(apiSourceService, sourceService, requestId, targetId, status, payload, error)
+    }
+
+}
 
 class ErrorProps(
     val message: String,

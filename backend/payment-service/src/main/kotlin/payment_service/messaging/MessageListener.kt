@@ -3,17 +3,17 @@ package payment_service.messaging
 import com.uhk.fim.prototype.common.extensions.processInCoroutine
 import com.uhk.fim.prototype.common.handlers.GlobalExceptionHandler
 import com.uhk.fim.prototype.common.messaging.ActiveMessagingManager
+import com.uhk.fim.prototype.common.messaging.ObjectMapperMessageConverter
 import com.uhk.fim.prototype.common.messaging.dto.MessageResponse
 import kotlinx.coroutines.CoroutineScope
 import org.slf4j.LoggerFactory
 import org.springframework.amqp.core.Message
 import org.springframework.amqp.rabbit.annotation.RabbitListener
-import org.springframework.amqp.support.converter.MessageConverter
 import org.springframework.stereotype.Component
 
 @Component
 class MessageListener(
-    private val messageConverter: MessageConverter,
+    private val messageConverter: ObjectMapperMessageConverter,
     protected val activeMessagingManager: ActiveMessagingManager,
     private val rabbitScope: CoroutineScope
 ){

@@ -1,5 +1,6 @@
 package com.uhk.fim.prototype.common.config
 
+import com.uhk.fim.prototype.common.messaging.ObjectMapperMessageConverter
 import com.uhk.fim.prototype.common.messaging.preprocessor.MessageExceptionPreprocessor
 import com.uhk.fim.prototype.common.messaging.preprocessor.MessageListenerPreprocessor
 import com.uhk.fim.prototype.common.messaging.preprocessor.MessageListenerProcessorChain
@@ -10,7 +11,6 @@ import org.springframework.amqp.core.Queue
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory
 import org.springframework.amqp.rabbit.core.RabbitTemplate
-import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
@@ -51,13 +51,11 @@ class RabbitConfig() {
     fun renderingRequestsBinding(exchange: DirectExchange, renderingRequestsQueue: Queue): Binding =
         BindingBuilder.bind(renderingRequestsQueue).to(exchange).with(RENDERING_REQUESTS)
 
-    @Bean
-    fun messageConverter() = Jackson2JsonMessageConverter()
 
     @Bean
-    fun rabbitTemplate(connectionFactory: CachingConnectionFactory, messageConverter: Jackson2JsonMessageConverter): RabbitTemplate {
+    fun rabbitTemplate(connectionFactory: CachingConnectionFactory, converter: ObjectMapperMessageConverter): RabbitTemplate {
         val template = RabbitTemplate(connectionFactory)
-        template.messageConverter = messageConverter
+        template.messageConverter = converter
         return template
     }
 

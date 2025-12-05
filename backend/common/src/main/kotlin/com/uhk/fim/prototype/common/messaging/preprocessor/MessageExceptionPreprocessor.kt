@@ -12,9 +12,9 @@ class MessageExceptionPreprocessor(
 
     //handle all error from messages
     override fun process(message: MessageProcess): MessageProcess {
-        println("[MessageExceptionHandler] handling message errors")
         if (message.messageResponse == null || message.messageResponse?.error == null) return message
 
+        println("[MessageExceptionHandler] handling message errors")
         activeMessagingManager.completeExceptionally(message.correlationId, message.messageResponse!!.error!!.buildException())
         return message
     }

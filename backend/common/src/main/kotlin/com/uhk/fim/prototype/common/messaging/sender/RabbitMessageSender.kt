@@ -1,8 +1,10 @@
 package com.uhk.fim.prototype.common.messaging.sender
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.node.ObjectNode
 import com.uhk.fim.prototype.common.config.RabbitConfig
 import com.uhk.fim.prototype.common.messaging.ActiveMessagingManager
-import com.uhk.fim.prototype.common.messaging.dto.CommonMessageRequest
+import com.uhk.fim.prototype.common.messaging.dto.CommonMessage
 import com.uhk.fim.prototype.common.messaging.dto.MessageResponse
 import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.stereotype.Component
@@ -10,50 +12,52 @@ import org.springframework.stereotype.Component
 @Component
 class RabbitMessageSender(
     rabbitTemplate: RabbitTemplate,
-    val activeMessagingManager: ActiveMessagingManager
+    val activeMessagingManager: ActiveMessagingManager,
+    private val objectMapper: ObjectMapper
 ) {
-    val rabbitSender = RabbitSender(rabbitTemplate)
+    val rabbitSender = RabbitSender(rabbitTemplate, objectMapper)
 
-    final inline fun <reified T : CommonMessageRequest> sendRequest(
+    final inline fun <reified T : CommonMessage<T>> sendRequest(
         request: T,
-        requestId: String,
         destination: String,
-        correlationId: String,
         replyQueueName: String,
+        correlationId: String? = null,
         timeoutSeconds: Long = 5
     ): MessageResponse {
         return activeMessagingManager.registerMessage(
             timeoutSeconds = timeoutSeconds,
-            requestId = requestId,
+            requestId = request.requestId,
             correlationId = correlationId
         ) { messageIds ->
-            println("[invoice-service] Sending invoice requestId: ${messageIds.requestId} with correlationId=${messageIds.correlationId}")
+            println("Sending requestId: ${messageIds.requestId} with correlationId=${messageIds.correlationId}")
             rabbitSender.sendCommonRequest(request.copy(messageIds.requestId), destination, messageIds.correlationId, replyQueueName)
         }
 
     }
 
-    final inline fun <reified T : Any> sendResponse(
+    final inline fun <reified T : CommonMessage<T>> sendResponse(
         request: T,
-        destination: String,
+        replyTo: String,
         correlationId: String,
     ) {
-        rabbitSender.sendCommonResponse(request, destination, correlationId)
+        rabbitSender.sendCommonResponse(request, correlationId, replyTo)
     }
 
 
-    class RabbitSender(private val rabbitTemplate: RabbitTemplate) {
-        fun <T : Any> send(
+    class RabbitSender(val rabbitTemplate: RabbitTemplate, val objectMapper: ObjectMapper) {
+       inline fun <reified T : CommonMessage<T>> send(
             request: T,
             exchange: String,
             destination: String,
             correlationId: String,
             replyQueueName: String?= null
         ) {
+            val jsonNode = objectMapper.valueToTree<ObjectNode>(request)
+            jsonNode.put("@class", request::class.java.name)
             rabbitTemplate.convertAndSend(
                 exchange,
                 destination,
-                request
+                jsonNode
             ) { message ->
                 message.messageProperties.correlationId = correlationId
                 replyQueueName?.let { message.messageProperties.replyTo = replyQueueName }
@@ -61,7 +65,7 @@ class RabbitMessageSender(
             }
         }
 
-        inline fun <reified T : Any> sendCommonRequest(
+        inline fun <reified T : CommonMessage<T>> sendCommonRequest(
             request: T,
             destination: String,
             correlationId: String,
@@ -71,7 +75,7 @@ class RabbitMessageSender(
             send(request, RabbitConfig.EXCHANGE, destination, correlationId, replyQueueName)
         }
 
-        inline fun <reified T : Any> sendCommonResponse(
+        inline fun <reified T : CommonMessage<T>> sendCommonResponse(
             request: T,
             correlationId: String,
             replyTo: String

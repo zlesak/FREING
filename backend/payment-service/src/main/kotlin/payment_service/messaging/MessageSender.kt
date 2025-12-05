@@ -6,6 +6,7 @@ import com.uhk.fim.prototype.common.messaging.dto.InvoiceRequest
 import com.uhk.fim.prototype.common.messaging.dto.MessageResponse
 import com.uhk.fim.prototype.common.messaging.enums.SourceService
 import com.uhk.fim.prototype.common.messaging.enums.invoice.MessageInvoiceAction
+import com.uhk.fim.prototype.common.messaging.sender.RabbitMessageSender
 import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.stereotype.Component
 import java.util.*
@@ -13,7 +14,8 @@ import java.util.*
 @Component
 class MessageSender(
     private val rabbitTemplate: RabbitTemplate,
-    private val activeMessagingManager: ActiveMessagingManager) {
+    private val rabbitMessageSender: RabbitMessageSender
+) {
     val replyQueueName: String = "payment.responses.payment-service-" + UUID.randomUUID().toString()
 
     init {
@@ -24,57 +26,34 @@ class MessageSender(
         }
     }
 
-    fun sendTransactionValidationRequest(invoiceId: Long, requestId: String? = null, correlationId: String? = null, payload: Map<String, Any> = emptyMap(), timeoutSeconds: Long = 5, apiSourceService: SourceService = SourceService.PAYMENT): MessageResponse{
-        return activeMessagingManager.registerMessage(timeoutSeconds, correlationId, requestId) { messageIds ->
-            val request = InvoiceRequest(
-                apiSourceService = apiSourceService,
-                requestId = messageIds.requestId,
-                targetId = invoiceId,
-                action = MessageInvoiceAction.VALIDATE_TRANSACTION,
-                payload = payload
-            )
-            sendTransactionValidationRequest(request, messageIds.correlationId)
-        }
+    fun sendTransactionValidationRequest(invoiceId: Long, requestId: String? = null, correlationId: String? = null, payload: Map<String, Any> = emptyMap(), timeoutSeconds: Long = 5, apiSourceService: SourceService = SourceService.PAYMENT): MessageResponse {
+        return sendInvoiceRequest(invoiceId, MessageInvoiceAction.VALIDATE_TRANSACTION, requestId, correlationId, payload, timeoutSeconds, apiSourceService)
     }
 
     fun sendRenderInvoiceRequest(invoiceId: Long, action: MessageInvoiceAction, requestId: String? = null, correlationId: String?= null, payload: Map<String, Any> = emptyMap(), timeoutSeconds: Long = 5, apiSourceService: SourceService = SourceService.PAYMENT): MessageResponse {
-        return activeMessagingManager.registerMessage(timeoutSeconds = timeoutSeconds, requestId = requestId, correlationId = correlationId) { messageIds ->
-            val request = InvoiceRequest(
-            apiSourceService = apiSourceService,
-            requestId = messageIds.requestId,
-            targetId = invoiceId,
-            action = action,
-            payload = payload
-            )
-            sendRenderInvoiceRequest(request, messageIds.correlationId)
-        }
+        return sendRenderRequest(invoiceId, MessageInvoiceAction.RENDER, requestId, correlationId, payload, timeoutSeconds, apiSourceService)
     }
 
-    private fun sendRenderInvoiceRequest(request: InvoiceRequest, correlationId: String) {
-        println("[payment-service] Sending render invoice request for invoiceId=${request.targetId} with correlationId=$correlationId")
-        rabbitTemplate.convertAndSend(
-            RabbitConfig.EXCHANGE,
-            RabbitConfig.RENDERING_REQUESTS,
-            request
-        ) { message ->
-            message.messageProperties.replyTo = replyQueueName
-            message.messageProperties.correlationId = correlationId
-            message
-        }
+    private fun sendRenderRequest(invoiceId: Long, action: MessageInvoiceAction, requestId: String? = null, correlationId: String? = null, payload: Map<String, Any> = emptyMap(), timeoutSeconds: Long = 5, apiSourceService: SourceService = SourceService.PAYMENT): MessageResponse {
+        return rabbitMessageSender.sendRequest(
+            InvoiceRequest(
+                apiSourceService = apiSourceService,
+                requestId = requestId ?: "",
+                targetId = invoiceId,
+                action = action,
+                payload = payload
+            ), RabbitConfig.RENDERING_REQUESTS, replyQueueName, correlationId, timeoutSeconds)
     }
 
-    private fun sendTransactionValidationRequest(request: InvoiceRequest, correlationId: String) {
-        println("[payment-service] Sending render invoice request for invoiceId=${request.targetId} with correlationId=$correlationId")
-        rabbitTemplate.convertAndSend(
-            RabbitConfig.EXCHANGE,
-            RabbitConfig.INVOICE_REQUESTS,
-            request
-        ) { message ->
-            message.messageProperties.replyTo = replyQueueName
-            message.messageProperties.correlationId = correlationId
-            message
-        }
+    private fun sendInvoiceRequest(invoiceId: Long, action: MessageInvoiceAction, requestId: String? = null, correlationId: String? = null, payload: Map<String, Any> = emptyMap(), timeoutSeconds: Long = 5, apiSourceService: SourceService = SourceService.PAYMENT): MessageResponse {
+        return rabbitMessageSender.sendRequest(
+            InvoiceRequest(
+                apiSourceService = apiSourceService,
+                requestId = requestId ?: "",
+                targetId = invoiceId,
+                action = action,
+                payload = payload
+            ), RabbitConfig.INVOICE_REQUESTS, replyQueueName, correlationId, timeoutSeconds)
     }
-
 }
 

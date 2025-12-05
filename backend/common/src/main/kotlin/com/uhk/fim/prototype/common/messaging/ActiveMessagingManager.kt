@@ -33,7 +33,7 @@ class ActiveMessagingManager(
        println("Unregistering message with correlationId: $correlationId")
        val message = activeMessageRegistry.unregister(correlationId)
 
-        if (message != null){
+        if (message == null){
          println("unregistering was not successful because there was no active message for $correlationId")
        }
 

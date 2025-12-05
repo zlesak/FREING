@@ -9,4 +9,8 @@ data class CustomerRequest(
     override val targetId: Long? = null, //customerId, invoiceId etc.
     override val action: MessageCustomerAction,
     override val payload: Map<String, Any>? = null
-) : MessageRequest<MessageCustomerAction>(apiSourceService, requestId, targetId, action, payload)
+) : MessageRequest<MessageCustomerAction>(apiSourceService, requestId, targetId, action, payload) {
+    override fun copy(requestId: String): CustomerRequest {
+        return CustomerRequest(apiSourceService, requestId, targetId, action, payload)
+    }
+}
