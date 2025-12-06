@@ -30,23 +30,24 @@
       </mat-card-header>
 
       <mat-card-content>
-        <div class="payment-summary">
-          <h3>Souhrn platby</h3>
-          <div class="summary-row">
-            <span class="label">Faktura č.:</span>
-            <span class="value">{{ orderInfo()?.invoiceId }}</span>
+        <div class="payment-content-wrapper">
+          <div class="payment-summary">
+            <h3>Souhrn platby</h3>
+            <div class="summary-row">
+              <span class="label">Faktura č.:</span>
+              <span class="value">{{ orderInfo()?.invoiceId }}</span>
+            </div>
+            <div class="summary-row">
+              <span class="label">Popis:</span>
+              <span class="value">{{ orderInfo()?.description }}</span>
+            </div>
+            <div class="summary-row total">
+              <span class="label">Celková částka:</span>
+              <span class="value">{{ orderInfo()?.amount }} {{ orderInfo()?.currency }}</span>
+            </div>
           </div>
-          <div class="summary-row">
-            <span class="label">Popis:</span>
-            <span class="value">{{ orderInfo()?.description }}</span>
-          </div>
-          <div class="summary-row total">
-            <span class="label">Celková částka:</span>
-            <span class="value">{{ orderInfo()?.amount }} {{ orderInfo()?.currency }}</span>
-          </div>
-        </div>
 
-        <div class="payment-form">
+          <div class="payment-form">
           <h3>
             <mat-icon>payment</mat-icon>
             Platební údaje
@@ -126,9 +127,10 @@
             </div>
           </form>
 
-          <div class="security-info">
-            <mat-icon>security</mat-icon>
-            <p>Toto je testovací platební brána. Žádné skutečné platby nebudou provedeny.</p>
+            <div class="security-info">
+              <mat-icon>security</mat-icon>
+              <p>Toto je testovací platební brána. Žádné skutečné platby nebudou provedeny.</p>
+            </div>
           </div>
         </div>
       </mat-card-content>
@@ -140,7 +142,7 @@
           [disabled]="processing()"
         >
           <mat-icon>close</mat-icon>
-          Zrušit
+          <span>Zrušit</span>
         </button>
         <button
           mat-raised-button
@@ -152,12 +154,11 @@
             <mat-progress-spinner
               mode="indeterminate"
               diameter="20"
-              style="display: inline-block; margin-right: 8px;"
             ></mat-progress-spinner>
-            Zpracovávám...
+            <span>Zpracovávám...</span>
           } @else {
             <mat-icon>check_circle</mat-icon>
-            Schválit platbu
+            <span>Schválit platbu</span>
           }
         </button>
       </mat-card-actions>

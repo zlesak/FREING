@@ -34,6 +34,7 @@ import {SuppliersServiceController} from '../../../suppliers/controller/supplier
 import {ResponsiveService} from '../../../../controller/common.service';
 import {NgClass} from '@angular/common';
 import { PageTitleService } from '../../../../services/page-title.service';
+import { InvoiceStatusTranslationService } from '../../../../services/invoice-status-translation.service';
 
 @Component({
   selector: 'app-invoice-create',
@@ -70,6 +71,7 @@ export class InvoiceCreateEditComponent implements OnInit {
   private readonly customerService = inject(CustomersServiceController);
   private readonly supplierService = inject(SuppliersServiceController);
   protected readonly responsiveService = inject(ResponsiveService);
+  protected readonly statusTranslation = inject(InvoiceStatusTranslationService);
   protected readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   protected editMode = signal(false);

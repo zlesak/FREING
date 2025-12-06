@@ -1,7 +1,8 @@
-import { Component, AfterViewInit, OnChanges, SimpleChanges, ElementRef, ViewChild, input } from '@angular/core';
+import { Component, AfterViewInit, OnChanges, SimpleChanges, ElementRef, ViewChild, input, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Chart, ChartConfiguration, ChartType, registerables } from 'chart.js';
 import { Invoice } from '../../../../api/generated/invoice';
+import { InvoiceStatusTranslationService } from '../../../../services/invoice-status-translation.service';
 
 Chart.register(...registerables);
 
@@ -19,6 +20,7 @@ interface MonthlyData {
   styleUrls: ['./invoice-chart-stacked-bar.css']
 })
 export class InvoiceChartStackedBar implements AfterViewInit, OnChanges {
+  private readonly statusTranslation = inject(InvoiceStatusTranslationService);
   data = input.required<Invoice[]>();
   statusColors = input.required<{ [status: string]: string }>();
   @ViewChild('chartCanvas') chartCanvas!: ElementRef<HTMLCanvasElement>;
@@ -59,7 +61,7 @@ export class InvoiceChartStackedBar implements AfterViewInit, OnChanges {
     const colors = this.statusColors();
 
     const datasets = statuses.map(status => ({
-      label: status,
+      label: this.statusTranslation.getStatusLabel(status as any),
       data: labels.map(month => monthlyData[month][status] || 0),
       backgroundColor: colors[status] || '#b0bec5',
       borderColor: this.darkenColor(colors[status] || '#b0bec5'),

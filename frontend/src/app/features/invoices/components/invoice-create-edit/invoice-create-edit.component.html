@@ -98,7 +98,7 @@
             <mat-label>Stav</mat-label>
             <mat-select formControlName="status">
               @for (s of statusOptions; track s) {
-                <mat-option [value]="s">{{ s }}</mat-option>
+                <mat-option [value]="s">{{ statusTranslation.getStatusLabel(s) }}</mat-option>
               }
             </mat-select>
           </mat-form-field>

@@ -23,6 +23,7 @@ import {InvoiceChartBar} from '../../invoices/components/invoice-chart-bar/invoi
 import {InvoiceChartDoughnut} from '../../invoices/components/invoice-chart-doughnut/invoice-chart-doughnut';
 import {InvoiceChartStackedBar} from '../../invoices/components/invoice-chart-stacked-bar/invoice-chart-stacked-bar';
 import {InvoiceChartHorizontalBar} from '../../invoices/components/invoice-chart-horizontal-bar/invoice-chart-horizontal-bar';
+import { InvoiceStatusTranslationService } from '../../../services/invoice-status-translation.service';
 @Component({
   imports: [
     CommonModule,
@@ -51,6 +52,7 @@ export class HomePageComponent implements OnInit{
   protected readonly keycloakService = inject(KeycloakService);
   private readonly customerService = inject(CustomersServiceController);
   protected readonly responsiveService = inject(ResponsiveService);
+  protected readonly statusTranslation = inject(InvoiceStatusTranslationService);
   private fb = inject(FormBuilder);
   protected invoices = signal<Invoice[]>([]);
   protected filteredInvoices = signal<Invoice[]>([]);
@@ -84,7 +86,7 @@ export class HomePageComponent implements OnInit{
     });
 
     return Object.entries(statusCount).map(([status, { occurrence, color }]) => ({
-      itemName: status,
+      itemName: this.statusTranslation.getStatusLabel(status as any),
       occurrence,
       color,
     }));
@@ -137,7 +139,7 @@ export class HomePageComponent implements OnInit{
     });
 
     return Object.entries(statusAmount).map(([status, { amount, color }]) => ({
-      itemName: status,
+      itemName: this.statusTranslation.getStatusLabel(status as any),
       amount,
       color,
     }));

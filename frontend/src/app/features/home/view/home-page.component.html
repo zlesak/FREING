@@ -46,7 +46,7 @@
       <mat-select formControlName="status">
         <mat-option [value]="null"> zrušit výběr</mat-option>
         @for (s of statusOptions; track s) {
-          <mat-option [value]="s">{{ s }}</mat-option>
+          <mat-option [value]="s">{{ statusTranslation.getStatusLabel(s) }}</mat-option>
         }
       </mat-select>
     </mat-form-field>

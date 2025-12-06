@@ -4,7 +4,7 @@ import { Invoice } from '../../../../api/generated/invoice';
 import { firstValueFrom } from 'rxjs';
 import {MatCard, MatCardActions, MatCardContent} from '@angular/material/card';
 import {MatButton} from '@angular/material/button';
-import {CurrencyPipe, DatePipe, NgClass, PercentPipe} from '@angular/common';
+import {CurrencyPipe, DatePipe, NgClass, NgStyle, PercentPipe} from '@angular/common';
 import {MatDivider} from '@angular/material/divider';
 import{MatIcon} from '@angular/material/icon';
 import {CustomersServiceController} from '../../../customers/controller/customers.service';
@@ -15,6 +15,7 @@ import {InvoiceStatus} from '../../../common/Enums.js';
 import {ResponsiveService} from '../../../../controller/common.service';
 import { PageTitleService } from '../../../../services/page-title.service';
 import {Customer, Supplier} from '../../../../api/generated/customer';
+import { InvoiceStatusTranslationService } from '../../../../services/invoice-status-translation.service';
 
 @Component({
   selector: 'app-invoice-detail-component',
@@ -29,7 +30,8 @@ import {Customer, Supplier} from '../../../../api/generated/customer';
     MatDivider,
     DatePipe,
     MatIcon,
-    NgClass
+    NgClass,
+    NgStyle
   ],
   templateUrl: './invoice-detail.component.html',
   styleUrls: ['./invoice-detail.component.css']
@@ -37,6 +39,7 @@ import {Customer, Supplier} from '../../../../api/generated/customer';
 export class InvoiceDetailComponent implements OnInit {
   protected readonly responsiveService = inject(ResponsiveService);
   protected readonly keycloakService = inject(KeycloakService);
+  protected readonly statusTranslation = inject(InvoiceStatusTranslationService);
   private readonly invoiceService = inject(InvoicesServiceController);
   private readonly customerService = inject(CustomersServiceController);
   private readonly supplierService = inject(SuppliersServiceController);
@@ -160,5 +163,40 @@ export class InvoiceDetailComponent implements OnInit {
       const vatAmount = item.totalPrice - (item.totalPrice / (1 + item.vatRate / 100));
       return total + vatAmount;
     }, 0);
+  }
+
+  getStatusStyle() {
+    const status = this.invoiceDetail()?.status;
+    const styles: { [key: string]: any } = {
+      [InvoiceStatus.DRAFT]: {
+        'background-color': '#e3f2fd',
+        'color': '#1565c0'
+      },
+      [InvoiceStatus.SENT]: {
+        'background-color': '#fff3e0',
+        'color': '#e65100'
+      },
+      [InvoiceStatus.PENDING]: {
+        'background-color': '#fff9c4',
+        'color': '#f57f17'
+      },
+      [InvoiceStatus.PAID]: {
+        'background-color': '#e8f5e9',
+        'color': '#2e7d32'
+      },
+      [InvoiceStatus.OVERDUE]: {
+        'background-color': '#ffebee',
+        'color': '#c62828'
+      },
+      [InvoiceStatus.CANCELLED]: {
+        'background-color': '#f5f5f5',
+        'color': '#616161'
+      }
+    };
+    return status ? styles[status] : {};
+  }
+
+  getStatusLabel(status: InvoiceStatus | undefined): string {
+    return this.statusTranslation.getStatusLabel(status);
   }
 }

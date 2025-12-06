@@ -1,7 +1,13 @@
 <mat-card class="invoice-detail"
           [ngClass]="responsiveService.isMobile ? 'mobile' : ''">
 @if(invoiceDetail()){
-       <h2>Faktura č. {{invoiceDetail()?.invoiceNumber}}</h2>
+    <div class="invoice-header">
+      <h2>Faktura č. {{invoiceDetail()?.invoiceNumber}}</h2>
+      <span class="status-badge" [ngStyle]="getStatusStyle()">
+        {{ getStatusLabel(invoiceDetail()?.status) }}
+      </span>
+    </div>
+
     <mat-card-content>
 
       <div class="invoice-dates">
@@ -98,8 +104,6 @@
         </div>
       </div>
 
-      <mat-divider></mat-divider>
-      <h3>Stav</h3> {{ invoiceDetail()?.status}}
 
       <mat-divider></mat-divider>
 

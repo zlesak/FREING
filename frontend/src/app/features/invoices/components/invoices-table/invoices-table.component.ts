@@ -19,6 +19,7 @@ import {Invoice, PagedModelInvoice} from '../../../../api/generated/invoice';
 import {getStatusColor} from '../../../home/view/home-page.component';
 import {KeycloakService} from '../../../../keycloak.service';
 import { PageTitleService } from '../../../../services/page-title.service';
+import { InvoiceStatusTranslationService } from '../../../../services/invoice-status-translation.service';
 
 export enum InvoiceStatus {
   DRAFT = 'DRAFT',
@@ -39,6 +40,7 @@ export class InvoicesTableComponent implements OnInit, AfterViewChecked {
   private readonly invoicesService = inject( InvoicesServiceController);
   private readonly pageTitleService = inject(PageTitleService);
   protected readonly keycloakService = inject( KeycloakService );
+  protected readonly statusTranslation = inject(InvoiceStatusTranslationService);
   protected readonly router = inject(Router);
   outputData = output<Invoice[]>()
   protected dataSource = new MatTableDataSource<InvoiceApi.Invoice>([]);
