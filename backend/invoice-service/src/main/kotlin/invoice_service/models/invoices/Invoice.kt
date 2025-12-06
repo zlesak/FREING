@@ -27,6 +27,10 @@ data class Invoice(
     @Column(nullable = false)
     var customerId: Long = 0,
 
+    @field:Schema(description = "ID dodavatele", example = "42")
+    @Column(nullable = false)
+    var supplierId: Long = 0,
+
     @field:Schema(description = "Datum vystavení faktury", example = "2025-10-05")
     @Column(nullable = false)
     var issueDate: LocalDate = LocalDate.now(),

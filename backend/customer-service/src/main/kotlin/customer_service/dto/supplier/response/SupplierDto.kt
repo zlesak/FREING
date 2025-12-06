@@ -1,17 +1,13 @@
-package customer_service.dto.customer.response
+package customer_service.dto.supplier.response
 
 import customer_service.dto.common.SubjectDto
-import customer_service.models.Customer
-import java.util.Date
+import customer_service.models.Supplier
 
-data class CustomerDto(
+data class SupplierDto(
     override val id: Long,
-    val name: String,
-    val surname: String,
     override val tradeName: String,
     override val email: String,
     override val phoneNumber: String,
-    val birthDate: Date?,
     val street: String,
     val houseNumber: String,
     val city: String,
@@ -24,15 +20,12 @@ data class CustomerDto(
     val currency: String? = null
 ) : SubjectDto
 {
-    fun toEntity(): Customer {
-        return Customer(
+    fun toEntity(): Supplier {
+        return Supplier(
             id = id,
-            name = name,
-            surname = surname,
             tradeName = tradeName,
             email = email,
             phoneNumber = phoneNumber,
-            birthDate = birthDate,
             street = street,
             houseNumber = houseNumber,
             city = city,

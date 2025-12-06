@@ -5,9 +5,10 @@ import com.uhk.fim.prototype.common.messaging.InvalidMessageActionHandler
 import com.uhk.fim.prototype.common.messaging.MessageSender
 import com.uhk.fim.prototype.common.messaging.dto.MessageRequest
 import com.uhk.fim.prototype.common.messaging.enums.actions.CustomerMessageAction
-import customer_service.dto.customer.response.CustomerDto
+import customer_service.dto.common.SubjectDto
 import customer_service.service.CustomerService
 import com.uhk.fim.prototype.common.messaging.AbstractMessageListener
+import customer_service.service.SupplierService
 import kotlinx.coroutines.CoroutineScope
 import org.springframework.amqp.support.converter.MessageConverter
 import org.springframework.stereotype.Component
@@ -19,7 +20,8 @@ class MessageListener(
     invalidMessageActionHandler: InvalidMessageActionHandler,
     activeMessagingManager: ActiveMessagingManager,
     rabbitScope: CoroutineScope,
-    private val customerService: CustomerService
+    private val customerService: CustomerService,
+    private val supplierService: SupplierService
 ) : AbstractMessageListener<CustomerMessageAction>(
     messageConverter,
     messageSender,
@@ -32,12 +34,16 @@ class MessageListener(
         request: MessageRequest<CustomerMessageAction>,
         correlationId: String,
         replyTo: String?
-    ): CustomerDto {
-        when (request.action) {
-            CustomerMessageAction.GET -> {
+    ): SubjectDto {
+        return when (request.action) {
+            CustomerMessageAction.GET_CUSTOMER_BY_ID -> {
                 val customer = customerService.getCustomerById(request.targetId ?: -1, true)
-                println(customer.email)
-                return customer.toDto()
+                customer.toDto()
+            }
+
+            CustomerMessageAction.GET_SUPPLIER_BY_ID -> {
+                val supplier = supplierService.getSupplierById(request.targetId ?: -1)
+                supplier.toDto()
             }
         }
     }

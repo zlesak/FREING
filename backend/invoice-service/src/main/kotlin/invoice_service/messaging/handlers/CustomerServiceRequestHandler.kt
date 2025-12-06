@@ -42,6 +42,24 @@ class CustomerServiceRequestHandler(
         }
     }
 
+    @Throws(NotFoundException::class)
+    fun getSupplierById(
+        supplierId: Long
+    ): Map<String, Any> {
+        val response = sendSupplierRequestAndReturnResponse(supplierId)
+        if (response.status == MessageStatus.OK) {
+            @Suppress("UNCHECKED_CAST")
+            val outerPayload = response.payload as Map<String, Any>
+
+            @Suppress("UNCHECKED_CAST")
+            val supplierData = outerPayload["payload"] as? Map<String, Any>
+                ?: throw NotFoundException("Supplier data not found in response payload")
+            return supplierData
+        } else {
+            throw NotFoundException("Failed to get supplier: ${response.error ?: "Unknown error"}")
+        }
+    }
+
     fun sendCustomerRequestAndReturnResponse(
         customerId: Long
     ): MessageResponse {
@@ -50,7 +68,20 @@ class CustomerServiceRequestHandler(
                 route = RabbitConfig.CUSTOMER_REQUESTS,
                 requestId = UUID.randomUUID().toString(),
                 targetId = customerId,
-                action = CustomerMessageAction.GET,
+                action = CustomerMessageAction.GET_CUSTOMER_BY_ID,
+                payload = null
+            )
+        )
+    }
+    fun sendSupplierRequestAndReturnResponse(
+        supplierId: Long
+    ): MessageResponse {
+        return messageSender.sendRequest(
+            MessageRequest(
+                route = RabbitConfig.CUSTOMER_REQUESTS,
+                requestId = UUID.randomUUID().toString(),
+                targetId = supplierId,
+                action = CustomerMessageAction.GET_SUPPLIER_BY_ID,
                 payload = null
             )
         )

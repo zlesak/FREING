@@ -27,6 +27,7 @@ class ZugferdService (
 
         val invoice = invoiceService.getInvoice(invoiceId, true)
         val customer = customerServiceRequestHandler.getCustomerById(invoice.customerId)
+        val supplier = customerServiceRequestHandler.getSupplierById(invoice.customerId)
 
         val i = Invoice()
 
@@ -36,7 +37,7 @@ class ZugferdService (
             .setDueDate(Date.from(invoice.dueDate.atStartOfDay(ZoneId.systemDefault()).toInstant()))
             .setCurrency(invoice.currency)
             .setSender(
-                getSupplierTradeParty()
+                toTradeParty(supplier)
             )
             .setRecipient(
                 toTradeParty(customer)
@@ -80,25 +81,6 @@ class ZugferdService (
         }
     }
 
-    private fun getSupplierTradeParty(): TradeParty {
-        val fullName = "Default Supplier Name"
-        val streetWithNumber = ("Národní 15").trim()
-
-        val tp = TradeParty(
-            fullName,
-            streetWithNumber,
-            "500 03",
-            "Hradec Králové",
-            "Czech Republic"
-        )
-            .addTaxID("Danove cislo ICO")
-            .addVATID("Danove cislo DIC")
-            .setContact(Contact(fullName, "+420 700 000 000", "test@example.com"))
-            .addBankDetails(BankDetails("CZ7450515657766535784736", ""))
-
-        return tp
-    }
-
     private fun generateQR(text: String): String {
         val width = 500
         val height = 500
@@ -131,24 +113,27 @@ class ZugferdService (
         }
     }
 
-    fun toTradeParty(customer: Map<String, Any>): TradeParty {
-        val name = customer["name"] as? String ?: ""
-        val surname = customer["surname"] as? String ?: ""
-        val email = customer["email"] as? String ?: ""
-        val phoneNumber = customer["phoneNumber"] as? String ?: ""
-        val street = customer["street"] as? String ?: ""
-        val houseNumber = customer["houseNumber"] as? String ?: ""
-        val city = customer["city"] as? String ?: ""
-        val zip = customer["zip"] as? String ?: ""
-        val country = customer["country"] as? String ?: ""
-        val ico = customer["ico"] as? String
-        val dic = customer["dic"] as? String
-        val bankCode = customer["bankCode"] as? String
-        val bankAccount = customer["bankAccount"] as? String
-        val currency = customer["currency"] as? String
-        val fullName =
-            listOfNotNull(name.takeIf { it.isNotBlank() }, surname.takeIf { it.isNotBlank() }).joinToString(" ")
+  fun toTradeParty(party: Map<String, Any>): TradeParty {
+        val tradeName = party["tradeName"] as? String
+        val name = party["name"] as? String ?: ""
+        val surname = party["surname"] as? String ?: ""
+        val email = party["email"] as? String ?: ""
+        val phoneNumber = party["phoneNumber"] as? String ?: ""
+        val street = party["street"] as? String ?: ""
+        val houseNumber = party["houseNumber"] as? String ?: ""
+        val city = party["city"] as? String ?: ""
+        val zip = party["zip"] as? String ?: ""
+        val country = party["country"] as? String ?: ""
+        val ico = party["ico"] as? String
+        val dic = party["dic"] as? String
+        val bankCode = party["bankCode"] as? String
+        val bankAccount = party["bankAccount"] as? String
+        val currency = party["currency"] as? String
+
+        val fullName = tradeName?.takeIf { it.isNotBlank() }
+            ?: listOfNotNull(name.takeIf { it.isNotBlank() }, surname.takeIf { it.isNotBlank() }).joinToString(" ")
                 .ifBlank { name }
+
         val streetWithNumber = ("$street $houseNumber").trim()
 
         val tp = TradeParty(

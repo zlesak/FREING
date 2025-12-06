@@ -16,36 +16,36 @@ export class CustomersServiceController {
   }
 
   createCustomer(request: CustomerApi.CreateCustomerDto): Observable<CustomerDto> {
-    return from(this.customerControllerService.create({ requestBody: request })).pipe(
+    return from(this.customerControllerService.createCustomer({ requestBody: request })).pipe(
       catchError(this.handleError)
     );
   }
 
   updateCustomer(request: CustomerApi.CustomerDto): Observable<CustomerApi.CustomerDto> {
-    return from(this.customerControllerService.update({ requestBody: request })).pipe(
+    return from(this.customerControllerService.updateCustomer({ requestBody: request })).pipe(
       catchError(this.handleError)
     );
   }
 
   getCustomer(id: number): Observable<CustomerApi.Customer> {
-    return from(this.customerControllerService.getById({ id })).pipe(catchError(this.handleError));
+    return from(this.customerControllerService.getCustomerById({ id })).pipe(catchError(this.handleError));
   }
 
   deleteCustomer(id: number): Observable<void> {
-    return from(this.customerControllerService.delete({ id })).pipe(
+    return from(this.customerControllerService.deleteCustomer({ id })).pipe(
       map(() => void 0),
       catchError(this.handleError)
     );
   }
 
   getCustomers(page = 0, size = 10): Observable<CustomerApi.PagedModelCustomerDto> {
-    return from(this.customerControllerService.getAll({ page, size })).pipe(
+    return from(this.customerControllerService.getAllCustomers({ page, size })).pipe(
       catchError(this.handleError)
     );
   }
 
   getCustomerInfoFromAres(ico: string): Observable<CustomerApi.Customer> {
-    return from(this.customerControllerService.getCustomerInfoFromAresByIco({ ico })).pipe(
+    return from(this.customerControllerService.getCustomerInfoFromAres({ ico })).pipe(
       catchError(this.handleError)
     );
   }
