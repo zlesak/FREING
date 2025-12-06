@@ -19,4 +19,36 @@ export class HeaderComponent {
   logout(): void {
     this.keycloakService.logout();
   }
+
+  getUserRole(): string {
+    const roles = this.keycloakService.getUserRoles();
+
+    if (roles.includes('manager')) {
+      return 'Manažer';
+    }
+    if (roles.includes('accountant')) {
+      return 'Účetní';
+    }
+    if (roles.includes('customer')) {
+      return 'Zákazník';
+    }
+
+    return 'Uživatel';
+  }
+
+  getUserName(): string {
+    const user = this.keycloakService.currentUser;
+    if (!user) return 'Nepřihlášen';
+
+    if (user.firstName && user.lastName) {
+      return `${user.firstName} ${user.lastName}`;
+    }
+    if (user.username) {
+      return user.username;
+    }
+    if (user.email) {
+      return user.email;
+    }
+    return 'Uživatel';
+  }
 }
