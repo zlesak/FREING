@@ -1,6 +1,6 @@
 /* ...existing code... */
 
-.page.customers {
+.page.suppliers {
   width: 100%;
   margin: 0 auto;
 }
@@ -9,20 +9,20 @@
   margin-bottom: 0.8rem;
 }
 
-.customers-table {
+.suppliers-table {
   width: 100%;
   border-collapse: collapse;
   padding-bottom: 60px
 }
 
-.customers-table th,
-.customers-table td {
+.suppliers-table th,
+.suppliers-table td {
   padding: 0.5rem 0.75rem;
   border-bottom: 1px solid #e4e7ec;
   text-align: left;
 }
 
-.customers-table tbody tr:hover {
+.suppliers-table tbody tr:hover {
   background: #f9fafb;
 }
 
@@ -30,9 +30,9 @@
   color: #b30000;
   margin-bottom: 0.5rem;
 }
+
 .add-button {
   background-color: #99fb9f;
-
   cursor: pointer;
   border-radius: 10px;
   margin: 10px;

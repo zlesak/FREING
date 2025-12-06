@@ -181,7 +181,7 @@ export class InvoiceCreateEditComponent implements OnInit {
       amount: [0, [Validators.required, Validators.min(0)]],
       subAmount: [0],
       currency: ['CZK', Validators.required],
-      status: ['DRAFT', Validators.required],
+      status: ['DRAFT'],
       items: this.fb.array([])
     });
   }
@@ -260,6 +260,14 @@ export class InvoiceCreateEditComponent implements OnInit {
     }, 0);
     this.form.get('subAmount')?.setValue(+subAmount.toFixed(2));
     this.form.get('amount')?.setValue(+sum.toFixed(2));
+  }
+  submitAsDraft(): void {
+    this.form.patchValue({ status: 'DRAFT' });
+    this.submit();
+  }
+  submitAndSend(): void {
+    this.form.patchValue({ status: 'SENT' });
+    this.submit();
   }
 
   submit(): void {

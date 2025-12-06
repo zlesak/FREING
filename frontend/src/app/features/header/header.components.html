@@ -10,6 +10,9 @@
     @if(keycloakService.hasAdminAccess){
       <a routerLink="/customers" routerLinkActive="active">Zákazníci</a>
     }
+    @if(isManager()){
+      <a routerLink="/suppliers" routerLinkActive="active">Dodavatelé</a>
+    }
 
   </nav>
 

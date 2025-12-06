@@ -51,4 +51,9 @@ export class HeaderComponent {
     }
     return 'Uživatel';
   }
+
+  isManager(): boolean {
+    const roles = this.keycloakService.getUserRoles();
+    return roles.includes('manager');
+  }
 }

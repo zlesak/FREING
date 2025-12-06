@@ -94,14 +94,6 @@
             </mat-select>
           </mat-form-field>
 
-          <mat-form-field>
-            <mat-label>Stav</mat-label>
-            <mat-select formControlName="status">
-              @for (s of statusOptions; track s) {
-                <mat-option [value]="s">{{ statusTranslation.getStatusLabel(s) }}</mat-option>
-              }
-            </mat-select>
-          </mat-form-field>
 
           <mat-form-field>
             <mat-label>Celková částka bez daně</mat-label>
@@ -222,16 +214,40 @@
           @if(editMode()){
             <button
               mat-flat-button
-              type="submit"
+              color="accent"
+              type="button"
+              (click)="submitAsDraft()"
               [disabled]="submitting || form.invalid">
-              Editovat
+              <mat-icon>drafts</mat-icon>
+              Uložit jako koncept
+            </button>
+            <button
+              mat-flat-button
+              color="primary"
+              type="button"
+              (click)="submitAndSend()"
+              [disabled]="submitting || form.invalid">
+              <mat-icon>send</mat-icon>
+              Uložit a odeslat
             </button>
           } @else {
             <button
               mat-flat-button
-              type="submit"
+              color="accent"
+              type="button"
+              (click)="submitAsDraft()"
               [disabled]="submitting || form.invalid">
-              Vytvořit
+              <mat-icon>drafts</mat-icon>
+              Vytvořit jako koncept
+            </button>
+            <button
+              mat-flat-button
+              color="primary"
+              type="button"
+              (click)="submitAndSend()"
+              [disabled]="submitting || form.invalid">
+              <mat-icon>send</mat-icon>
+              Vytvořit a odeslat
             </button>
           }
           <a mat-button routerLink="/invoices">Zpět</a>

@@ -1,67 +1,37 @@
-import { environment } from '../../../../environments/environment';
 import { inject, Injectable } from '@angular/core';
-import { from, Observable, throwError } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
-import { CustomerApi } from '../../../api/generated';
+import { Observable } from 'rxjs';
+import { SupplierControllerService } from '../../../api/generated/customer/services/SupplierControllerService';
 import {
-  SupplierControllerService,
-  SupplierDto,
   CreateSupplierDto,
-  Supplier,
   PagedModelSupplierDto,
+  Supplier,
+  SupplierDto
 } from '../../../api/generated/customer';
 
-@Injectable({ providedIn: 'root' })
+@Injectable({
+  providedIn: 'root',
+})
 export class SuppliersServiceController {
-  private readonly supplierControllerService = inject(SupplierControllerService);
+  private readonly supplierService = inject(SupplierControllerService);
 
-  constructor() {
-    CustomerApi.OpenAPI.BASE = environment.apiBase;
+  getSuppliers(page: number = 0, size: number = 10): Observable<PagedModelSupplierDto> {
+    return this.supplierService.getAllSuppliers({ page, size });
   }
 
-  createSupplier(request: CreateSupplierDto): Observable<SupplierDto> {
-    return from(this.supplierControllerService.createSupplier({ requestBody: request })).pipe(
-      catchError(this.handleError)
-    );
+  getSupplierById(id: number): Observable<Supplier> {
+    return this.supplierService.getSupplierById({ id });
   }
 
-  updateSupplier(request: SupplierDto): Observable<SupplierDto> {
-    return from(this.supplierControllerService.updateSupplier({ requestBody: request })).pipe(
-      catchError(this.handleError)
-    );
+  createSupplier(supplier: CreateSupplierDto): Observable<SupplierDto> {
+    return this.supplierService.createSupplier({ requestBody: supplier });
   }
 
-  getSupplier(id: number): Observable<Supplier> {
-    return from(this.supplierControllerService.getSupplierById({ id })).pipe(
-      catchError(this.handleError)
-    );
+  updateSupplier(supplier: SupplierDto): Observable<SupplierDto> {
+    return this.supplierService.updateSupplier({ requestBody: supplier });
   }
 
-  deleteSupplier(id: number): Observable<void> {
-    return from(this.supplierControllerService.deleteSupplier({ id })).pipe(
-      map(() => void 0),
-      catchError(this.handleError)
-    );
+  deleteSupplier(id: number): Observable<any> {
+    return this.supplierService.deleteSupplier({ id });
   }
-
-  getSuppliers(page = 0, size = 10): Observable<PagedModelSupplierDto> {
-    return from(this.supplierControllerService.getAllSuppliers({ page, size })).pipe(
-      catchError(this.handleError)
-    );
-  }
-
-  private handleError = (err: any) => {
-    let message = 'Neznámá chyba';
-    if (err && typeof err === 'object') {
-      if ('body' in err && err.body && typeof err.body === 'object') {
-        message = (err.body as any).message || JSON.stringify(err.body);
-      } else if ('message' in err) {
-        message = (err as any).message;
-      } else if ('status' in err) {
-        message = `HTTP ${err.status} ${err.statusText}`;
-      }
-    }
-    return throwError(() => new Error(message));
-  };
 }
 

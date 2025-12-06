@@ -6,10 +6,10 @@ import java.util.*
 data class CreateCustomerDto(
     val name: String?,
     val surname: String?,
-    val tradeNumber: String?,
+    val tradeName: String?,
     val email: String,
     val phoneNumber: String,
-    val birthDate: Date,
+    val birthDate: Date?,
     val street: String,
     val houseNumber: String,
     val city: String,
@@ -25,7 +25,7 @@ data class CreateCustomerDto(
         return Customer(
            name = name ?: "",
             surname = surname ?: "",
-            tradeName = tradeNumber ?: "",
+            tradeName = tradeName ?: "",
             email = email,
             phoneNumber = phoneNumber,
             birthDate = birthDate,

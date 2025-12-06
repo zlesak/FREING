@@ -1,7 +1,7 @@
 <section class="customer-create">
   <mat-card class="card">
     <mat-card-header>
-      <h2>Nový zákazník</h2>
+      <h2>{{ editMode() ? 'Upravit zákazníka' : 'Nový zákazník' }}</h2>
     </mat-card-header>
 
     <mat-card-content>
@@ -13,21 +13,36 @@
       }
 
       <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        @if (form.hasError('nameOrTradeNameRequired') && (form.touched || form.dirty)) {
+          <div class="alert error">
+            Musíte vyplnit buď <strong>Jméno a Příjmení</strong> NEBO <strong>Obchodní název</strong>
+          </div>
+        }
+        @if (form.hasError('bothNameTypesProvided') && (form.touched || form.dirty)) {
+          <div class="alert error">
+            Nelze vyplnit současně <strong>Jméno a Příjmení</strong> i <strong>Obchodní název</strong>. Vyberte pouze jednu možnost.
+          </div>
+        }
+
+        <div class="form-section-header">
+          <h3>Základní údaje</h3>
+          <p class="hint">Vyplňte buď osobní údaje (fyzická osoba) NEBO obchodní název (firma)</p>
+        </div>
+
         <div class="grid">
           <mat-form-field>
-            <mat-label>Jméno</mat-label>
-            <input matInput formControlName="name" placeholder="Jan" required />
-            @if (form.get('surname')?.touched && form.get('surname')?.invalid) {
-              <mat-error>Jméno je povinné</mat-error>
-            }
+            <mat-label>Jméno (fyzická osoba)</mat-label>
+            <input matInput formControlName="name" placeholder="Jan" />
           </mat-form-field>
 
           <mat-form-field>
-            <mat-label>Příjmení</mat-label>
+            <mat-label>Příjmení (fyzická osoba)</mat-label>
             <input matInput formControlName="surname" placeholder="Novák" />
-            @if (form.get('')?.touched && form.get('')?.hasError('required')) {
-              <mat-error>Přijmení je povinné</mat-error>
-            }
+          </mat-form-field>
+
+          <mat-form-field>
+            <mat-label>Obchodní název (firma)</mat-label>
+            <input matInput formControlName="tradeName" placeholder="ABC s.r.o." />
           </mat-form-field>
 
           <mat-form-field>
@@ -155,7 +170,7 @@
             type="submit"
             [disabled]="submitting || form.invalid"
           >
-            Vytvořit
+            {{ editMode() ? 'Uložit změny' : 'Vytvořit' }}
           </button>
           <a mat-button routerLink="/customers">Zpět</a>
         </div>

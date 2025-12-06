@@ -157,8 +157,10 @@
             ></mat-progress-spinner>
             <span>Zpracovávám...</span>
           } @else {
-            <mat-icon>check_circle</mat-icon>
-            <span>Schválit platbu</span>
+            <ng-container>
+              <mat-icon>check_circle</mat-icon>
+              <span>Schválit platbu</span>
+            </ng-container>
           }
         </button>
       </mat-card-actions>

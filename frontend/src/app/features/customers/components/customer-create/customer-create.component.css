@@ -28,6 +28,27 @@
   color:#900;
 }
 
+.form-section-header {
+  margin: 1.5rem 0 1rem 0;
+  padding: 0.75rem;
+  background: #f8f9ff;
+  border-radius: 8px;
+  border-left: 4px solid #6366f1;
+}
+
+.form-section-header h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.1rem;
+  color: #1e293b;
+}
+
+.form-section-header .hint {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #64748b;
+  font-style: italic;
+}
+
 .items {
   margin: 10px;
   width: 90%;

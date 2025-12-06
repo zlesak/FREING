@@ -4,7 +4,7 @@ import { Invoice } from '../../../../api/generated/invoice';
 import { firstValueFrom } from 'rxjs';
 import {MatCard, MatCardActions, MatCardContent} from '@angular/material/card';
 import {MatButton} from '@angular/material/button';
-import {CurrencyPipe, DatePipe, NgClass, NgStyle, PercentPipe} from '@angular/common';
+import {CurrencyPipe, DatePipe, NgClass, NgStyle} from '@angular/common';
 import {MatDivider} from '@angular/material/divider';
 import{MatIcon} from '@angular/material/icon';
 import {CustomersServiceController} from '../../../customers/controller/customers.service';
@@ -26,7 +26,6 @@ import { InvoiceStatusTranslationService } from '../../../../services/invoice-st
     MatCardActions,
     MatButton,
     CurrencyPipe,
-    PercentPipe,
     MatDivider,
     DatePipe,
     MatIcon,
@@ -93,7 +92,7 @@ export class InvoiceDetailComponent implements OnInit {
       this.customerDetail.set(user);
 
       const supplierId = invoice.supplierId;
-      const supplier = await firstValueFrom(this.supplierService.getSupplier(supplierId));
+      const supplier = await firstValueFrom(this.supplierService.getSupplierById(supplierId));
       this.supplierDetail.set(supplier);
 
     } catch (error: any) {
