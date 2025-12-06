@@ -3,10 +3,10 @@ set -e
 
 # Seznam endpointů, na které čekat
 ENDPOINTS="\
-  http://service-customer:8081/v3/api-docs \
-  http://service-invoice:8082/v3/api-docs \
-  http://service-payment:8083/v3/api-docs \
-  http://service-rendering:8084/v3/api-docs\
+  http://service-customer:8081/api/customers/v3/api-docs\
+  http://service-invoice:8082/api/invoices/v3/api-docs\
+  http://service-payment:8083/api/payments/v3/api-docs\
+  http://service-rendering:8084/api/rendering/v3/api-docs\
 "
 
 MAX_RETRIES=30
