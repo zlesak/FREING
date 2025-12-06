@@ -35,3 +35,7 @@ Zápočtový projekt týmu Endor předmětu MOIS ZS AR 2025/26
 #### Infrastruktura projektu
 
 ![Infrastruktura](./diagrams/FREING_INFRASTRUCTURE_DIAGRAM.png "Infrastruktura")
+
+### Diagram stavů faktur
+
+![Stavový diagram](./diagrams/FREING_STATE_DIAGRAM.png "Stavový diagram")

@@ -11,6 +11,7 @@ import {
 } from './features/invoices/components/invoice-pdf/invoice-pdf-component/invoice-pdf-component';
 import {PaymentsComponent} from './features/payments/payments-view/payments/payments-component';
 import {InvoicesTableComponent} from './features/invoices/components/invoices-table/invoices-table.component';
+import {MockApprovalComponent} from './features/payments/mock-approval/mock-approval.component';
 
 export const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'home' },
@@ -20,6 +21,7 @@ export const routes: Routes = [
   { path: 'invoice/edit/:id', component: InvoiceCreateEditComponent, canActivate: [AuthGuard], data: { roles: ['manager', 'accountant'] } },
   { path: 'customers/new', component: CustomerCreateComponent },
   { path: 'payments', component: PaymentsComponent },
+  { path: 'mock-approval', component: MockApprovalComponent },
   { path: 'customers', component: CustomersPageComponent, canActivate: [AuthGuard] },
   { path: 'invoice/:id', component: InvoiceDetailComponent, canActivate: [AuthGuard] },
   { path: 'invoice/pdf/:id', component: InvoicePdfComponent, canActivate: [AuthGuard] },

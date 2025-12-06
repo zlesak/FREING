@@ -60,7 +60,7 @@ class InvoiceController(
     }
 
     @Operation(summary = "Získat fakturu podle ID", description = "Vrací detail faktury podle jejího ID.")
-    @PostAuthorize("hasRole('ACCOUNTANT') or hasRole('MANAGER') or returnObject.customerId == authentication.principal.id")
+    @PostAuthorize("hasRole('ACCOUNTANT') or hasRole('MANAGER') or (returnObject.customerId == authentication.principal.id and returnObject.status.name() != 'DRAFT')")
     @GetMapping("/get-by-id/{id}")
     fun getInvoice(
         authentication: Authentication,
@@ -118,4 +118,16 @@ class InvoiceController(
         @Parameter(description = "ID faktury", example = "1")
         @PathVariable id: Long
     ) = service.deleteInvoice(id)
+
+    @Operation(summary = "Faktura přečtena", description = "Posune fakturu do stav upending jelikož ji zákazník přečetl.")
+    @PreAuthorize("hasRole('CUSTOMER')")
+    @PostMapping("/read/{id}")
+    fun markInvoiceAsRead(
+        authentication: Authentication,
+        @Parameter(description = "ID faktury", example = "1")
+        @PathVariable id: Long
+    ) {
+        getInvoice(authentication, id)
+        service.markInvoiceAsRead(id)
+    }
 }

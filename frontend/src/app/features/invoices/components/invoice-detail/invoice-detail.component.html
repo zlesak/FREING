@@ -120,8 +120,8 @@
             <td>{{ item.quantity }}</td>
             <td>{{ item.name }}</td>
             <td>{{ item.unitPrice}} </td>
-            <td>{{ item.vatRate | percent }}</td>
-            <td>{{ item.totalPrice}}</td>
+            <td>{{ item.vatRate }}</td>
+            <td>{{ item.unitPrice * item.quantity }}</td>
           </tr>
         }
         </tbody>
@@ -130,11 +130,11 @@
       <div class="total-summary">
         <div class="total-row">
           <span>Základ daně celkem:</span>
-          <strong>{{ invoiceDetail()?.amount | currency:'CZK':'symbol-narrow' }}</strong>
+          <strong>{{ getTaxBaseTotal() | currency:'CZK':'symbol-narrow' }}</strong>
         </div>
         <div class="total-row">
           <span>DPH celkem:</span>
-          <strong>{{ invoiceDetail()?.amount | currency:'CZK':'symbol-narrow' }}</strong>
+          <strong>{{ getVatTotal() | currency:'CZK':'symbol-narrow' }}</strong>
         </div>
         <div class="total-row grand-total">
           <span>Celkem k úhradě:</span>

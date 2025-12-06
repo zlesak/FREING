@@ -13,6 +13,7 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 
 @Service
 class InvoiceService(
@@ -33,7 +34,7 @@ class InvoiceService(
     fun getAllInvoices(pageable: Pageable): Page<Invoice> = repo.findAll(pageable)
 
     fun getAllInvoicesForLoggedInCustomer(customerId: Long, pageable: Pageable): Page<Invoice> =
-        repo.findAllByCustomerId(customerId, pageable)
+        repo.findAllByCustomerIdAndStatusNot(customerId, InvoiceStatusEnum.DRAFT, pageable)
 
     @Transactional
     fun updateInvoice(id: Long, request: InvoiceUpdateRequest): Invoice =
@@ -53,4 +54,8 @@ class InvoiceService(
             ?: throw OperationDeniedException("Nelze smazat fakturu - buď neexistuje, nebo není ve stavu DRAFT")
         repo.delete(invoice)
     }
+    @Transactional
+    fun markInvoiceAsPayed(id: Long): Int = repo.markInvoiceAsPaid(id, LocalDate.now())
+    @Transactional
+    fun markInvoiceAsRead(id: Long): Int = repo.markInvoiceAsRead(id, LocalDate.now())
 }

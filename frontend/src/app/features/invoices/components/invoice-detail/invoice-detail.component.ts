@@ -75,6 +75,8 @@ export class InvoiceDetailComponent implements OnInit {
     this.error.set(null);
 
     try {
+      await firstValueFrom(this.invoiceService.markRead(id));
+
       const invoice = await firstValueFrom(this.invoiceService.getInvoice(id));
       this.invoiceDetail.set(invoice);
       console.log('Loaded invoice:', invoice);
@@ -113,7 +115,17 @@ export class InvoiceDetailComponent implements OnInit {
     }
   }
   pay(){
+    const invoice = this.invoiceDetail();
+    if (!invoice) return;
 
+    this.router.navigate(['/payments'], {
+      queryParams: {
+        invoiceId: invoice.id,
+        amount: invoice.amount,
+        currency: invoice.currency,
+        description: `Platba za fakturu ${invoice.invoiceNumber}`
+      }
+    });
   }
   generatePDF(){
     this.router.navigate(['/invoice/pdf/', this.invoiceId])
@@ -121,6 +133,7 @@ export class InvoiceDetailComponent implements OnInit {
 
   readonly paymentStatuses = [
     InvoiceStatus.OVERDUE,
+    InvoiceStatus.PENDING,
     InvoiceStatus.SENT
   ] as InvoiceStatus[];
 
@@ -128,4 +141,20 @@ export class InvoiceDetailComponent implements OnInit {
     InvoiceStatus.DRAFT
   ] as InvoiceStatus[];
 
+  getTaxBaseTotal() {
+    const invoice = this.invoiceDetail();
+    if (!invoice) return 0;
+    return invoice.items.reduce((total, item) => {
+      const taxBase = item.totalPrice / (1 + item.vatRate / 100);
+      return total + taxBase;
+    }, 0);
+  }
+  getVatTotal() {
+    const invoice = this.invoiceDetail();
+    if (!invoice) return 0;
+    return invoice.items.reduce((total, item) => {
+      const vatAmount = item.totalPrice - (item.totalPrice / (1 + item.vatRate / 100));
+      return total + vatAmount;
+    }, 0);
+  }
 }

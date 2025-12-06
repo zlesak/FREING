@@ -48,6 +48,12 @@ export class InvoicesServiceController {
       catchError(handleError)
     );
   }
+  markRead(id: number): Observable<void> {
+    return from(this.invoicesService.markInvoiceAsRead({ id })).pipe(
+      map(() => void 0),
+      catchError(handleError)
+    );
+  }
 
   generateAggregatedReport(request: InvoiceApi.InvoiceReportRequest): Observable<InvoiceApi.AggregatedReportResponse> {
     return from(this.reportingService.makeAggregatedReport({ requestBody: request })).pipe(

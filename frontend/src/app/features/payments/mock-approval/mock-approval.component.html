@@ -1,0 +1,167 @@
+<div class="approval-container">
+  <mat-card class="approval-card">
+    @if (loading()) {
+      <mat-card-content>
+        <div class="loading-container">
+          <mat-progress-spinner mode="indeterminate" diameter="50"></mat-progress-spinner>
+          <p>Načítám platební informace...</p>
+        </div>
+      </mat-card-content>
+    }
+
+    @if (error()) {
+      <mat-card-content>
+        <div class="error-message">
+          <mat-icon>error</mat-icon>
+          <p>{{ error() }}</p>
+        </div>
+      </mat-card-content>
+    }
+
+    @if (!loading() && !error() && orderInfo()) {
+      <mat-card-header>
+        <mat-card-title>
+          <div class="header-title">
+            <mat-icon class="payment-icon">credit_card</mat-icon>
+            <h2>Mock Payment Gateway</h2>
+          </div>
+          <p class="header-subtitle">Testovací platební brána</p>
+        </mat-card-title>
+      </mat-card-header>
+
+      <mat-card-content>
+        <div class="payment-summary">
+          <h3>Souhrn platby</h3>
+          <div class="summary-row">
+            <span class="label">Faktura č.:</span>
+            <span class="value">{{ orderInfo()?.invoiceId }}</span>
+          </div>
+          <div class="summary-row">
+            <span class="label">Popis:</span>
+            <span class="value">{{ orderInfo()?.description }}</span>
+          </div>
+          <div class="summary-row total">
+            <span class="label">Celková částka:</span>
+            <span class="value">{{ orderInfo()?.amount }} {{ orderInfo()?.currency }}</span>
+          </div>
+        </div>
+
+        <div class="payment-form">
+          <h3>
+            <mat-icon>payment</mat-icon>
+            Platební údaje
+          </h3>
+
+          <form [formGroup]="paymentForm">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Číslo karty</mat-label>
+              <input
+                matInput
+                formControlName="cardNumber"
+                placeholder="1234 5678 9012 3456"
+                maxlength="16"
+                (blur)="formatCardNumber()"
+              >
+              <mat-icon matPrefix>credit_card</mat-icon>
+              @if (paymentForm.get('cardNumber')?.hasError('required') && paymentForm.get('cardNumber')?.touched) {
+                <mat-error>Číslo karty je povinné</mat-error>
+              }
+              @if (paymentForm.get('cardNumber')?.hasError('pattern') && paymentForm.get('cardNumber')?.touched) {
+                <mat-error>Číslo karty musí obsahovat 16 číslic</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Jméno držitele karty</mat-label>
+              <input
+                matInput
+                formControlName="cardHolder"
+                placeholder="Jan Novák"
+              >
+              <mat-icon matPrefix>person</mat-icon>
+              @if (paymentForm.get('cardHolder')?.hasError('required') && paymentForm.get('cardHolder')?.touched) {
+                <mat-error>Jméno držitele je povinné</mat-error>
+              }
+              @if (paymentForm.get('cardHolder')?.hasError('minlength') && paymentForm.get('cardHolder')?.touched) {
+                <mat-error>Jméno musí mít alespoň 3 znaky</mat-error>
+              }
+            </mat-form-field>
+
+            <div class="form-row">
+              <mat-form-field appearance="outline" class="half-width">
+                <mat-label>Platnost (MM/RR)</mat-label>
+                <input
+                  matInput
+                  formControlName="expiryDate"
+                  placeholder="12/25"
+                  maxlength="5"
+                  (input)="formatExpiryDate()"
+                >
+                <mat-icon matPrefix>date_range</mat-icon>
+                @if (paymentForm.get('expiryDate')?.hasError('required') && paymentForm.get('expiryDate')?.touched) {
+                  <mat-error>Platnost je povinná</mat-error>
+                }
+                @if (paymentForm.get('expiryDate')?.hasError('pattern') && paymentForm.get('expiryDate')?.touched) {
+                  <mat-error>Formát: MM/RR</mat-error>
+                }
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="half-width">
+                <mat-label>CVV</mat-label>
+                <input
+                  matInput
+                  formControlName="cvv"
+                  placeholder="123"
+                  maxlength="4"
+                  type="password"
+                >
+                <mat-icon matPrefix>lock</mat-icon>
+                @if (paymentForm.get('cvv')?.hasError('required') && paymentForm.get('cvv')?.touched) {
+                  <mat-error>CVV je povinné</mat-error>
+                }
+                @if (paymentForm.get('cvv')?.hasError('pattern') && paymentForm.get('cvv')?.touched) {
+                  <mat-error>CVV musí být 3-4 číslice</mat-error>
+                }
+              </mat-form-field>
+            </div>
+          </form>
+
+          <div class="security-info">
+            <mat-icon>security</mat-icon>
+            <p>Toto je testovací platební brána. Žádné skutečné platby nebudou provedeny.</p>
+          </div>
+        </div>
+      </mat-card-content>
+
+      <mat-card-actions align="end">
+        <button
+          mat-button
+          (click)="cancelPayment()"
+          [disabled]="processing()"
+        >
+          <mat-icon>close</mat-icon>
+          Zrušit
+        </button>
+        <button
+          mat-raised-button
+          color="primary"
+          (click)="approvePayment()"
+          [disabled]="processing() || paymentForm.invalid"
+        >
+          @if (processing()) {
+            <mat-progress-spinner
+              mode="indeterminate"
+              diameter="20"
+              style="display: inline-block; margin-right: 8px;"
+            ></mat-progress-spinner>
+            Zpracovávám...
+          } @else {
+            <mat-icon>check_circle</mat-icon>
+            Schválit platbu
+          }
+        </button>
+      </mat-card-actions>
+    }
+  </mat-card>
+</div>
+
