@@ -13,6 +13,7 @@ import {InvoicesServiceController} from '../../../../controller/invoices.service
 import {KeycloakService} from '../../../../keycloak.service';
 import {InvoiceStatus} from '../../../common/Enums.js';
 import {ResponsiveService} from '../../../../controller/common.service';
+import { PageTitleService } from '../../../../services/page-title.service';
 import {Customer, Supplier} from '../../../../api/generated/customer';
 
 @Component({
@@ -47,8 +48,10 @@ export class InvoiceDetailComponent implements OnInit {
   protected supplierDetail = signal<Supplier | null>(null);
   protected error = signal<string | null>(null);
   protected loading = signal<boolean>(false);
+  private readonly pageTitleService = inject(PageTitleService);
 
   ngOnInit(): void {
+    this.pageTitleService.setTitle('Detail faktury');
     this.initLoading();
   }
 

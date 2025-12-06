@@ -9,6 +9,7 @@ import { MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { PageTitleService } from '../../../services/page-title.service';
 
 interface MockOrderInfo {
   orderId: string;
@@ -47,6 +48,7 @@ export class MockApprovalComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly fb = inject(FormBuilder);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly pageTitleService = inject(PageTitleService);
 
   protected orderId = signal<string | null>(null);
   protected orderInfo = signal<MockOrderInfo | null>(null);
@@ -66,6 +68,8 @@ export class MockApprovalComponent implements OnInit {
   }
 
   async ngOnInit(): Promise<void> {
+    this.pageTitleService.setTitle('Platbební brána');
+
     this.route.queryParams.subscribe(params => {
       const orderId = params['orderId'];
       const amount = params['amount'];

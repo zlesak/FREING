@@ -33,6 +33,7 @@ import {CustomersServiceController} from '../../../customers/controller/customer
 import {SuppliersServiceController} from '../../../suppliers/controller/suppliers.service';
 import {ResponsiveService} from '../../../../controller/common.service';
 import {NgClass} from '@angular/common';
+import { PageTitleService } from '../../../../services/page-title.service';
 
 @Component({
   selector: 'app-invoice-create',
@@ -82,6 +83,7 @@ export class InvoiceCreateEditComponent implements OnInit {
   protected lastCurrency = 'CZK';
   protected currencyOptions = Object.values(CurrencyOptions);
   protected statusOptions = Object.values(InvoiceStatus);
+  private readonly pageTitleService = inject(PageTitleService);
 
   constructor(
     private fb: FormBuilder,
@@ -90,6 +92,7 @@ export class InvoiceCreateEditComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    this.pageTitleService.setTitle('Příprava faktury');
     this.buildForm();
     this.loadData();
   }

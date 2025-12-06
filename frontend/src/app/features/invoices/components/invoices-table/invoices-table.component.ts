@@ -18,6 +18,7 @@ import {MatPaginator, MatPaginatorModule, PageEvent} from '@angular/material/pag
 import {Invoice, PagedModelInvoice} from '../../../../api/generated/invoice';
 import {getStatusColor} from '../../../home/view/home-page.component';
 import {KeycloakService} from '../../../../keycloak.service';
+import { PageTitleService } from '../../../../services/page-title.service';
 
 export enum InvoiceStatus {
   DRAFT = 'DRAFT',
@@ -36,6 +37,7 @@ export enum InvoiceStatus {
 })
 export class InvoicesTableComponent implements OnInit, AfterViewChecked {
   private readonly invoicesService = inject( InvoicesServiceController);
+  private readonly pageTitleService = inject(PageTitleService);
   protected readonly keycloakService = inject( KeycloakService );
   protected readonly router = inject(Router);
   outputData = output<Invoice[]>()
@@ -59,6 +61,8 @@ export class InvoicesTableComponent implements OnInit, AfterViewChecked {
   ];
 
   ngOnInit(): void {
+    this.pageTitleService.setTitle('Faktury');
+
     if (this.keycloakService.hasAdminAccess){
       this.loadAllInvoices();
     } else {

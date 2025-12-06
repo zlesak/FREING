@@ -6,6 +6,7 @@ import {DomSanitizer, SafeResourceUrl} from '@angular/platform-browser';
 import {ResponsiveService} from '../../../../../controller/common.service';
 import {NgClass} from '@angular/common';
 import {MatProgressBar} from '@angular/material/progress-bar';
+import { PageTitleService } from '../../../../../services/page-title.service';
 
 @Component({
   selector: 'app-invoice-pdf-component',
@@ -18,6 +19,7 @@ import {MatProgressBar} from '@angular/material/progress-bar';
 })
 export class InvoicePdfComponent implements OnInit{
   private readonly paymentService = inject(PaymentServiceController);
+  private readonly pageTitleService = inject(PageTitleService);
   protected readonly responsiveService = inject(ResponsiveService);
   private readonly route = inject(ActivatedRoute);
   private readonly sanitizer = inject(DomSanitizer);
@@ -27,6 +29,7 @@ export class InvoicePdfComponent implements OnInit{
   protected invoicePdfUrl: SafeResourceUrl | null = null;
 
   ngOnInit(): void {
+    this.pageTitleService.setTitle('PDF zobrazení faktury');
     this.initLoading();
   }
 

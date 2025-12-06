@@ -18,6 +18,7 @@ import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatButton} from '@angular/material/button';
 import {ResponsiveService} from '../../../controller/common.service';
 import {InvoiceChartLine} from '../../invoices/components/invoice-chart-line/invoice-chart-line.component';
+import { PageTitleService } from '../../../services/page-title.service';
 import {InvoiceChartBar} from '../../invoices/components/invoice-chart-bar/invoice-chart-bar';
 @Component({
   imports: [
@@ -50,6 +51,7 @@ export class HomePageComponent implements OnInit{
   protected filteredInvoices = signal<Invoice[]>([]);
   protected loading = signal<boolean>(false);
   protected error?: string;
+  private readonly pageTitleService = inject(PageTitleService);
   protected users: {email: string, id: number}[]= [];
 
   filterForm: FormGroup = this.fb.group({
@@ -125,6 +127,7 @@ export class HomePageComponent implements OnInit{
   }
 
   ngOnInit(){
+    this.pageTitleService.setTitle('Přehled');
     if (this.keycloakService.hasAdminAccess){
       this.loadAllInvoices();
       this.loadUsers();

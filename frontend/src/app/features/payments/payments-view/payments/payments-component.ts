@@ -1,5 +1,6 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { PageTitleService } from '../../../../services/page-title.service';
 import { PaymentServiceController } from '../../../../controller/payment.service';
 import { firstValueFrom } from 'rxjs';
 import { MatCard, MatCardContent, MatCardActions } from '@angular/material/card';
@@ -29,6 +30,7 @@ export class PaymentsComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly pageTitleService = inject(PageTitleService);
 
   protected invoiceId = signal<number | null>(null);
   protected invoiceNumber = signal<string>("");
@@ -43,6 +45,8 @@ export class PaymentsComponent implements OnInit {
   protected orderId = signal<string | null>(null);
 
   ngOnInit(): void {
+    this.pageTitleService.setTitle('Platba faktury');
+
     // Načtení parametrů z URL
     this.route.queryParams.subscribe(params => {
       if (params['invoiceId']) {
