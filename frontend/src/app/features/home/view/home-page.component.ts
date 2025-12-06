@@ -20,6 +20,9 @@ import {ResponsiveService} from '../../../controller/common.service';
 import {InvoiceChartLine} from '../../invoices/components/invoice-chart-line/invoice-chart-line.component';
 import { PageTitleService } from '../../../services/page-title.service';
 import {InvoiceChartBar} from '../../invoices/components/invoice-chart-bar/invoice-chart-bar';
+import {InvoiceChartDoughnut} from '../../invoices/components/invoice-chart-doughnut/invoice-chart-doughnut';
+import {InvoiceChartStackedBar} from '../../invoices/components/invoice-chart-stacked-bar/invoice-chart-stacked-bar';
+import {InvoiceChartHorizontalBar} from '../../invoices/components/invoice-chart-horizontal-bar/invoice-chart-horizontal-bar';
 @Component({
   imports: [
     CommonModule,
@@ -34,7 +37,9 @@ import {InvoiceChartBar} from '../../invoices/components/invoice-chart-bar/invoi
     MatButton,
     InvoiceChartLine,
     InvoiceChartBar,
-
+    InvoiceChartDoughnut,
+    InvoiceChartStackedBar,
+    InvoiceChartHorizontalBar,
   ],
   selector: 'app-home-page',
   standalone: true,
@@ -120,6 +125,76 @@ export class HomePageComponent implements OnInit{
     }));
   });
 
+  protected chartDataAmountByStatus = computed(() => {
+    const statusAmount: Record<string, { amount: number; color: string }> = {};
+
+    this.filteredInvoices().forEach(invoice => {
+      const status = invoice.status ?? 'Unknown';
+      if (!statusAmount[status]) {
+        statusAmount[status] = { amount: 0, color: getStatusColor(status).background };
+      }
+      statusAmount[status].amount += invoice.amount;
+    });
+
+    return Object.entries(statusAmount).map(([status, { amount, color }]) => ({
+      itemName: status,
+      amount,
+      color,
+    }));
+  });
+
+  protected chartDataTopCustomers = computed(() => {
+    const customerAmount: Record<string, number> = {};
+
+    this.filteredInvoices().forEach(invoice => {
+      const id = invoice.customerId ?? 'Unknown';
+      customerAmount[id] = (customerAmount[id] || 0) + invoice.amount;
+    });
+
+    const sorted = Object.entries(customerAmount).sort((a, b) => b[1] - a[1]);
+
+    return sorted.map(([customerId, totalAmount]) => ({
+      customerName: this.resolveCustomerName(customerId),
+      totalAmount,
+      color: hashIdToColor(customerId),
+    }));
+  });
+
+  protected statusColors = computed(() => {
+    const colors: Record<string, string> = {};
+    this.filteredInvoices().forEach(invoice => {
+      const status = invoice.status ?? 'Unknown';
+      if (!colors[status]) {
+        colors[status] = getStatusColor(status).background;
+      }
+    });
+    return colors;
+  });
+
+
+  protected quickStats = computed(() => {
+    const invoices = this.filteredInvoices();
+    const totalCount = invoices.length;
+    const totalAmount = invoices.reduce((sum, inv) => sum + inv.amount, 0);
+    const paidCount = invoices.filter(inv => inv.status === 'PAID' || inv.status === 'PAID_OVERDUE').length;
+    const overdueCount = invoices.filter(inv => inv.status === 'OVERDUE').length;
+    const pendingCount = invoices.filter(inv => inv.status === 'PENDING' || inv.status === 'SENT' || inv.status === 'OVERDUE').length;
+    const paidAmount = invoices
+      .filter(inv => inv.status === 'PAID' || inv.status === 'PAID_OVERDUE')
+      .reduce((sum, inv) => sum + inv.amount, 0);
+    const unpaidAmount = totalAmount - paidAmount;
+
+    return {
+      totalCount,
+      totalAmount,
+      paidCount,
+      overdueCount,
+      pendingCount,
+      paidAmount,
+      unpaidAmount,
+      avgAmount: totalCount > 0 ? totalAmount / totalCount : 0
+    };
+  });
 
   protected resolveCustomerName(customerId: string | number): string {
     const user = this.users.find(u => u.id === Number(customerId));
@@ -263,4 +338,3 @@ export function hashIdToColor(id: string | number | null | undefined): string {
 
   return `#${r.toString(16).padStart(2,'0')}${g.toString(16).padStart(2,'0')}${b.toString(16).padStart(2,'0')}`;
 }
-

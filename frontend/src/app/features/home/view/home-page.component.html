@@ -86,49 +86,111 @@
     </div>
   </form>
 
-  <div  class="overview" [ngClass]="responsiveService.isMobile ? 'mobile' : ''">
-    <div>
-    <invoice-chart-pie
-      [data]="chartDataStatuses()"
-      [title]="'Stavy faktur'"
-    ></invoice-chart-pie>
-      @for(status of chartDataStatuses(); track $index){
-        <div class="info-table" [style.background-color]="status.color">
-        {{status.itemName}}<span class="occurrence">{{status.occurrence}}</span>
-        </div>
-      }
+  <div class="quick-stats" [ngClass]="responsiveService.isMobile ? 'mobile' : ''">
+    <div class="stat-card">
+      <div class="stat-icon">📊</div>
+      <div class="stat-content">
+        <div class="stat-label">Celkem Faktur</div>
+        <div class="stat-value">{{ quickStats().totalCount }}</div>
+      </div>
     </div>
+    <div class="stat-card">
+      <div class="stat-icon">💰</div>
+      <div class="stat-content">
+        <div class="stat-label">Celková Částka</div>
+        <div class="stat-value">{{ quickStats().totalAmount | number:'1.0-2' }} Kč</div>
+      </div>
+    </div>
+    <div class="stat-card success">
+      <div class="stat-icon">✅</div>
+      <div class="stat-content">
+        <div class="stat-label">Zaplaceno</div>
+        <div class="stat-value">{{ quickStats().paidCount }}</div>
+        <div class="stat-sub">{{ quickStats().paidAmount | number:'1.0-2' }} Kč</div>
+      </div>
+    </div>
+    <div class="stat-card warning">
+      <div class="stat-icon">⏳</div>
+      <div class="stat-content">
+        <div class="stat-label">Čeká na Úhradu</div>
+        <div class="stat-value">{{ quickStats().pendingCount }}</div>
+      </div>
+    </div>
+    <div class="stat-card danger">
+      <div class="stat-icon">⚠️</div>
+      <div class="stat-content">
+        <div class="stat-label">Po Splatnosti</div>
+        <div class="stat-value">{{ quickStats().overdueCount }}</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">📈</div>
+      <div class="stat-content">
+        <div class="stat-label">Průměrná Částka</div>
+        <div class="stat-value">{{ quickStats().avgAmount | number:'1.0-2' }} Kč</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="overview" [ngClass]="responsiveService.isMobile ? 'mobile' : ''">
     @if(keycloakService.hasAdminAccess){
       <!-- Admin view -->
-      <div>
-      <invoice-chart-pie
-        [data]="chartDataCustomers()"
-        [title]="'Zákazníci'"
-      ></invoice-chart-pie>
-      @for(customers of chartDataCustomers(); track $index){
-        <div class="info-table" [style.background-color]="customers.color">
-          <span>{{customers.itemName}}</span><span>{{customers.occurrence}}</span>
-        </div>
-      }
-    </div>
-      <div>
-      <invoice-chart-pie
-        [data]="chartDataCurrency()"
-        [title]="'Distribuce měn'"
-      ></invoice-chart-pie>
-        @for(currency of chartDataCurrency(); track $index){
-          <div class="info-table" [style.background-color]="currency.color">
-            {{currency.itemName}}<span class="occurrence">{{currency.occurrence}}</span>
-          </div>
-        }
+      <div class="chart-card">
+        <invoice-chart-pie
+          [data]="chartDataStatuses()"
+          [title]="'Počet Faktur Dle Statusu'"
+        ></invoice-chart-pie>
       </div>
-    } @else{
-      <div>
+      <div class="chart-card">
+        <invoice-chart-doughnut
+          [data]="chartDataAmountByStatus()"
+          [title]="'Celková Částka Dle Statusu'"
+        ></invoice-chart-doughnut>
+      </div>
+      <div class="chart-card">
+        <invoice-chart-pie
+          [data]="chartDataCustomers()"
+          [title]="'Počet Faktur Dle Zákazníka'"
+        ></invoice-chart-pie>
+      </div>
+      <div class="chart-card">
+        <invoice-chart-pie
+          [data]="chartDataCurrency()"
+          [title]="'Distribuce Měn'"
+        ></invoice-chart-pie>
+      </div>
+      <div class="chart-card">
+        <invoice-chart-stacked-bar
+          [data]="filteredInvoices()"
+          [statusColors]="statusColors()"
+        ></invoice-chart-stacked-bar>
+      </div>
+      <div class="chart-card">
+        <invoice-chart-horizontal-bar
+          [data]="chartDataTopCustomers()"
+          [title]="'Top 10 Zákazníků Dle Částky'"
+        ></invoice-chart-horizontal-bar>
+      </div>
+    } @else {
+      <!-- User view -->
+      <div class="chart-card">
+        <invoice-chart-pie
+          [data]="chartDataStatuses()"
+          [title]="'Počet Faktur Dle Statusu'"
+        ></invoice-chart-pie>
+      </div>
+      <div class="chart-card">
+        <invoice-chart-doughnut
+          [data]="chartDataAmountByStatus()"
+          [title]="'Celková Částka Dle Statusu'"
+        ></invoice-chart-doughnut>
+      </div>
+      <div class="chart-card">
         <invoice-chart-line
           [data]="filteredInvoices()"
         ></invoice-chart-line>
       </div>
-      <div>
+      <div class="chart-card">
         <invoice-chart-bar
           [data]="filteredInvoices()"
         ></invoice-chart-bar>

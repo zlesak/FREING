@@ -61,24 +61,50 @@ export class InvoiceChartLine implements AfterViewInit, OnChanges {
 
     const { labels, issuedData, paidData } = this.processData(this.data());
 
+    // Gradientní výplň pro vystavené faktury
+    const gradientIssued = ctx.createLinearGradient(0, 0, 0, 400);
+    gradientIssued.addColorStop(0, 'rgba(158, 158, 158, 0.3)');
+    gradientIssued.addColorStop(1, 'rgba(158, 158, 158, 0.05)');
+
+    // Gradientní výplň pro zaplacené faktury
+    const gradientPaid = ctx.createLinearGradient(0, 0, 0, 400);
+    gradientPaid.addColorStop(0, 'rgba(76, 175, 80, 0.4)');
+    gradientPaid.addColorStop(1, 'rgba(76, 175, 80, 0.05)');
+
     const chartData = {
       labels: labels,
       datasets: [
         {
           label: 'Celkem Vystaveno',
           data: issuedData,
-          borderColor: '#9a9a9c',
-          backgroundColor: 'rgba(109,109,110,0.2)',
+          borderColor: '#757575',
+          backgroundColor: gradientIssued,
+          borderWidth: 3,
           tension: 0.4,
-          fill: false,
+          fill: true,
+          pointRadius: 5,
+          pointHoverRadius: 7,
+          pointBackgroundColor: '#757575',
+          pointBorderColor: '#fff',
+          pointBorderWidth: 2,
+          pointHoverBackgroundColor: '#424242',
+          pointHoverBorderColor: '#fff',
         },
         {
           label: 'Celkem Zaplaceno',
           data: paidData,
-          borderColor: '#6265ef',
-          backgroundColor: 'rgb(63,80,180)',
+          borderColor: '#4caf50',
+          backgroundColor: gradientPaid,
+          borderWidth: 3,
           tension: 0.4,
-          fill: false,
+          fill: true,
+          pointRadius: 5,
+          pointHoverRadius: 7,
+          pointBackgroundColor: '#4caf50',
+          pointBorderColor: '#fff',
+          pointBorderWidth: 2,
+          pointHoverBackgroundColor: '#2e7d32',
+          pointHoverBorderColor: '#fff',
         }
       ],
     };
@@ -89,17 +115,77 @@ export class InvoiceChartLine implements AfterViewInit, OnChanges {
       options: {
         responsive: true,
         maintainAspectRatio: false,
+        layout: {
+          padding: {
+            top: 20,
+            bottom: 10
+          }
+        },
+        interaction: {
+          mode: 'index',
+          intersect: false,
+        },
         plugins: {
-          legend: { position: 'top' },
+          legend: {
+            display: true,
+            position: 'bottom',
+            labels: {
+              padding: 15,
+              font: { size: 12, weight: 'bold' },
+              usePointStyle: true,
+              pointStyle: 'circle',
+              color: '#333'
+            }
+          },
           title: {
             display: true,
             text: 'Částka Vystavených a Zaplacených Faktur v Čase',
-            position: 'bottom'
+            position: 'top',
+            font: { size: 18, weight: 'bold' },
+            padding: { top: 5, bottom: 15 },
+            color: '#1a237e'
+          },
+          tooltip: {
+            mode: 'index',
+            intersect: false,
+            backgroundColor: 'rgba(0, 0, 0, 0.9)',
+            padding: 16,
+            cornerRadius: 10,
+            titleFont: { size: 14, weight: 'bold' },
+            bodyFont: { size: 13 },
+            bodySpacing: 8
           }
         },
         scales: {
-          x: { title: { display: true, text: 'Měsíc / Datum' } },
-          y: { title: { display: true, text: 'Částka' } }
+          x: {
+            title: {
+              display: true,
+              text: 'Měsíc / Datum',
+              font: { size: 13, weight: 'bold' },
+              color: '#555'
+            },
+            grid: { display: false },
+            ticks: {
+              font: { size: 11 },
+              color: '#666'
+            }
+          },
+          y: {
+            title: {
+              display: true,
+              text: 'Částka',
+              font: { size: 13, weight: 'bold' },
+              color: '#555'
+            },
+            beginAtZero: true,
+            grid: {
+              color: 'rgba(0, 0, 0, 0.06)'
+            },
+            ticks: {
+              font: { size: 11 },
+              color: '#666'
+            }
+          }
         }
       },
     };

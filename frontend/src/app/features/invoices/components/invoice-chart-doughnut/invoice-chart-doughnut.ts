@@ -6,14 +6,14 @@ import ChartDataLabels from 'chartjs-plugin-datalabels';
 Chart.register(...registerables, ChartDataLabels);
 
 @Component({
-  selector: 'invoice-chart-pie',
+  selector: 'invoice-chart-doughnut',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './invoice-chart-pie.html',
-  styleUrls: ['./invoice-chart-pie.css']
+  templateUrl: './invoice-chart-doughnut.html',
+  styleUrls: ['./invoice-chart-doughnut.css']
 })
-export class InvoiceChartPie implements AfterViewInit, OnChanges {
-  data = input.required<{ itemName: string, occurrence: number, color: string }[]>();
+export class InvoiceChartDoughnut implements AfterViewInit, OnChanges {
+  data = input.required<{ itemName: string, amount: number, color: string }[]>();
   title = input<string>();
   @ViewChild('chartCanvas') chartCanvas!: ElementRef<HTMLCanvasElement>;
 
@@ -33,24 +33,23 @@ export class InvoiceChartPie implements AfterViewInit, OnChanges {
     const ctx = this.chartCanvas.nativeElement.getContext('2d');
     if (!ctx) return;
 
-    // compute once
-    const itemName = this.data().map(d => d.itemName);
-    const occurrences = this.data().map(d => d.occurrence);
+    const itemNames = this.data().map(d => d.itemName);
+    const amounts = this.data().map(d => d.amount);
     const backgroundColors = this.data().map(d => d.color);
     const borderColors = this.data().map(d => this.darkenColor(d.color));
 
     const chartData = {
-      labels: itemName,
+      labels: itemNames,
       datasets: [{
-        data: occurrences,
+        data: amounts,
         backgroundColor: backgroundColors,
         borderColor: borderColors,
-        borderWidth: 1,
+        borderWidth: 2,
       }],
     };
 
     const config: ChartConfiguration = {
-      type: 'pie' as ChartType,
+      type: 'doughnut' as ChartType,
       data: chartData,
       options: {
         responsive: true,
@@ -93,7 +92,7 @@ export class InvoiceChartPie implements AfterViewInit, OnChanges {
                 const value = context.parsed || 0;
                 const total = (context.dataset.data as number[]).reduce((a, b) => a + b, 0);
                 const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : '0.0';
-                return `${label}: ${value} (${percentage}%)`;
+                return `${label}: ${value.toFixed(2)} Kč (${percentage}%)`;
               }
             }
           },
@@ -101,12 +100,12 @@ export class InvoiceChartPie implements AfterViewInit, OnChanges {
             color: '#fff',
             font: {
               weight: 'bold',
-              size: 14
+              size: 13
             },
             formatter: (value: any, context: any) => {
               const total = (context.dataset.data as number[]).reduce((a: number, b: number) => a + b, 0);
               const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : '0.0';
-              return `${value}\n(${percentage}%)`;
+              return `${value.toFixed(0)} Kč\n(${percentage}%)`;
             },
             textAlign: 'center',
             anchor: 'center',
@@ -127,18 +126,19 @@ export class InvoiceChartPie implements AfterViewInit, OnChanges {
 
   private updateChart(): void {
     const itemNames = this.data().map(d => d.itemName);
-    const occurrences = this.data().map(d => d.occurrence);
+    const amounts = this.data().map(d => d.amount);
     const backgroundColors = this.data().map(d => d.color);
     const borderColors = this.data().map(d => this.darkenColor(d.color));
 
     this.chart.data.labels = itemNames;
-    this.chart.data.datasets[0].data = occurrences;
+    this.chart.data.datasets[0].data = amounts;
     this.chart.data.datasets[0].backgroundColor = backgroundColors;
     (this.chart.data.datasets[0] as any).borderColor = borderColors;
 
     this.chart.update();
   }
-   darkenColor(color: string, amount: number = 0.4): string {
+
+  private darkenColor(color: string, amount: number = 0.4): string {
     if (color.startsWith('#')) color = color.slice(1);
 
     const num = parseInt(color, 16);

@@ -78,8 +78,9 @@ export class InvoiceDetailComponent implements OnInit {
     this.error.set(null);
 
     try {
-      await firstValueFrom(this.invoiceService.markRead(id));
-
+      if(!this.keycloakService.hasAdminAccess) {
+        await firstValueFrom(this.invoiceService.markRead(id));
+      }
       const invoice = await firstValueFrom(this.invoiceService.getInvoice(id));
       this.invoiceDetail.set(invoice);
       console.log('Loaded invoice:', invoice);

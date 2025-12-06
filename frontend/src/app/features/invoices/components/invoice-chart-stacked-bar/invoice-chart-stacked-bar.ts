@@ -5,15 +5,22 @@ import { Invoice } from '../../../../api/generated/invoice';
 
 Chart.register(...registerables);
 
+interface MonthlyData {
+  [month: string]: {
+    [status: string]: number;
+  };
+}
+
 @Component({
-  selector: 'invoice-chart-bar',
+  selector: 'invoice-chart-stacked-bar',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './invoice-chart-bar.html',
-  styleUrls: ['./invoice-chart-bar.css']
+  templateUrl: './invoice-chart-stacked-bar.html',
+  styleUrls: ['./invoice-chart-stacked-bar.css']
 })
-export class InvoiceChartBar implements AfterViewInit, OnChanges {
+export class InvoiceChartStackedBar implements AfterViewInit, OnChanges {
   data = input.required<Invoice[]>();
+  statusColors = input.required<{ [status: string]: string }>();
   @ViewChild('chartCanvas') chartCanvas!: ElementRef<HTMLCanvasElement>;
 
   private chart!: Chart;
@@ -28,67 +35,51 @@ export class InvoiceChartBar implements AfterViewInit, OnChanges {
     }
   }
 
-  private processData(invoices: Invoice[]): { labels: string[], counts: number[] } {
-    const bins = [0, 500, 1000, 5000, 10000];
-    const labels = bins.map((min, index) => {
-      const max = bins[index + 1];
-      if (max === undefined) return `>${min}`;
-      return `${min} - ${max}`;
-    });
-
-    const counts = new Array(bins.length).fill(0);
+  private processData(invoices: Invoice[]): { labels: string[], datasets: any[] } {
+    const monthlyData: MonthlyData = {};
+    const statusSet = new Set<string>();
 
     invoices.forEach(inv => {
-      let binIndex = -1;
-      for (let i = 0; i < bins.length; i++) {
-        const min = bins[i];
-        const max = bins[i + 1];
+      const dateKey = new Date(inv.issueDate).toISOString().substring(0, 7);
+      const status = inv.status || 'Unknown';
 
-        if (max === undefined) {
-          if (inv.amount >= min) {
-            binIndex = i;
-          }
-        } else if (inv.amount >= min && inv.amount < max) {
-          binIndex = i;
-        }
-
-        if (binIndex !== -1) {
-          counts[binIndex]++;
-          break;
-        }
+      if (!monthlyData[dateKey]) {
+        monthlyData[dateKey] = {};
       }
+      if (!monthlyData[dateKey][status]) {
+        monthlyData[dateKey][status] = 0;
+      }
+
+      monthlyData[dateKey][status] += 1;
+      statusSet.add(status);
     });
-    return { labels, counts };
+
+    const labels = Object.keys(monthlyData).sort();
+    const statuses = Array.from(statusSet);
+    const colors = this.statusColors();
+
+    const datasets = statuses.map(status => ({
+      label: status,
+      data: labels.map(month => monthlyData[month][status] || 0),
+      backgroundColor: colors[status] || '#b0bec5',
+      borderColor: this.darkenColor(colors[status] || '#b0bec5'),
+      borderWidth: 2,
+      borderRadius: 6,
+      borderSkipped: false,
+    }));
+
+    return { labels, datasets };
   }
 
   private renderChart(): void {
     const ctx = this.chartCanvas.nativeElement.getContext('2d');
     if (!ctx) return;
 
-    const { labels, counts } = this.processData(this.data());
-
-    // Vytvoření gradientu pro bars
-    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-    gradient.addColorStop(0, '#42a5f5');
-    gradient.addColorStop(0.5, '#1e88e5');
-    gradient.addColorStop(1, '#1565c0');
-
-    const chartData = {
-      labels: labels,
-      datasets: [{
-        label: 'Počet Faktur',
-        data: counts,
-        backgroundColor: gradient,
-        borderColor: '#0d47a1',
-        borderWidth: 2,
-        borderRadius: 8,
-        borderSkipped: false,
-      }],
-    };
+    const { labels, datasets } = this.processData(this.data());
 
     const config: ChartConfiguration = {
       type: 'bar' as ChartType,
-      data: chartData,
+      data: { labels, datasets },
       options: {
         responsive: true,
         maintainAspectRatio: false,
@@ -112,31 +103,29 @@ export class InvoiceChartBar implements AfterViewInit, OnChanges {
           },
           title: {
             display: true,
-            text: 'Rozdělení Počtu Faktur Dle Částky',
+            text: 'Měsíční Rozdělení Faktur Dle Statusu',
             position: 'top',
             font: { size: 18, weight: 'bold' },
             padding: { top: 5, bottom: 15 },
             color: '#1a237e'
           },
           tooltip: {
+            mode: 'index',
+            intersect: false,
             backgroundColor: 'rgba(0, 0, 0, 0.9)',
             padding: 16,
             cornerRadius: 10,
             titleFont: { size: 14, weight: 'bold' },
             bodyFont: { size: 13 },
-            callbacks: {
-              label: (context) => {
-                const value = context.parsed.y || 0;
-                return `Počet Faktur: ${value}`;
-              }
-            }
+            bodySpacing: 6
           }
         },
         scales: {
           x: {
+            stacked: true,
             title: {
               display: true,
-              text: 'Interval Částky',
+              text: 'Měsíc',
               font: { size: 13, weight: 'bold' },
               color: '#555'
             },
@@ -147,6 +136,7 @@ export class InvoiceChartBar implements AfterViewInit, OnChanges {
             }
           },
           y: {
+            stacked: true,
             beginAtZero: true,
             title: {
               display: true,
@@ -171,11 +161,26 @@ export class InvoiceChartBar implements AfterViewInit, OnChanges {
   }
 
   private updateChart(): void {
-    const { labels, counts } = this.processData(this.data());
+    const { labels, datasets } = this.processData(this.data());
 
     this.chart.data.labels = labels;
-    this.chart.data.datasets[0].data = counts;
+    this.chart.data.datasets = datasets;
 
     this.chart.update();
+  }
+
+  private darkenColor(color: string, amount: number = 0.4): string {
+    if (color.startsWith('#')) color = color.slice(1);
+
+    const num = parseInt(color, 16);
+    let r = (num >> 16) & 0xFF;
+    let g = (num >> 8) & 0xFF;
+    let b = num & 0xFF;
+
+    r = Math.max(0, Math.floor(r * (1 - amount)));
+    g = Math.max(0, Math.floor(g * (1 - amount)));
+    b = Math.max(0, Math.floor(b * (1 - amount)));
+
+    return `#${r.toString(16).padStart(2,'0')}${g.toString(16).padStart(2,'0')}${b.toString(16).padStart(2,'0')}`;
   }
 }

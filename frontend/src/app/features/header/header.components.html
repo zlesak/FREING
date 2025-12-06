@@ -9,8 +9,6 @@
     <a routerLink="/invoices" routerLinkActive="active">Faktury</a>
     @if(keycloakService.hasAdminAccess){
       <a routerLink="/customers" routerLinkActive="active">Zákazníci</a>
-    } @else{
-      <a routerLink="/payments" routerLinkActive="active">Platby</a>
     }
 
   </nav>
