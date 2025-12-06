@@ -52,3 +52,6 @@ exchange:
   rates:
     base-url: ${EXCHANGE_RATES_BASE_URL:https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies}
     cache-ttl-seconds: ${EXCHANGE_RATES_CACHE_TTL_SECONDS:3600}
+
+queue:
+  name: invoice.requests

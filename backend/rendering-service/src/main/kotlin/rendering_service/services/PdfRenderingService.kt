@@ -20,14 +20,14 @@ import javax.xml.transform.stream.StreamSource
 @Service
 class PdfRenderingService {
     fun renderInvoicePdf(invoiceData: Map<String, Any?>): ByteArray {
-        val xml = invoiceData["xml"] as? String
-            ?: throw IllegalArgumentException("Chybí XML data v invoiceData")
+        val xml = invoiceData["payload"] as? String
+            ?: throw IllegalArgumentException("Missing XML data in payload")
 
         val filename = "invoice.pdf"
         try {
             val tFactory = TransformerFactory.newInstance()
             val xslStream = javaClass.classLoader.getResourceAsStream("xslformater.xsl")
-                ?: throw IllegalArgumentException("Soubor xslformater.xsl nebyl nalezen v resources")
+                ?: throw IllegalArgumentException("File formater not found, could not make formated document")
             val transformer: Transformer = tFactory.newTransformer(StreamSource(xslStream))
             transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8")
             transformer.setOutputProperty(OutputKeys.METHOD, "xml")
@@ -52,7 +52,7 @@ class PdfRenderingService {
                 try {
                     renderer.fontResolver.addFont(fontPath, BaseFont.IDENTITY_H, true)
                 } catch (e: Exception) {
-                    println("Chyba při načítání fontu:")
+                    println("Font load error:")
                     e.printStackTrace()
                 }
 
@@ -69,14 +69,14 @@ class PdfRenderingService {
             return pdf
         } catch (e: Exception) {
             e.printStackTrace()
-            throw RuntimeException("Chyba při generování PDF", e)
+            throw RuntimeException("PDF generating error: ", e)
         }
     }
 
     private fun resolveFontPath(resourcePath: String): String {
         val cl = javaClass.classLoader
         val url = cl.getResource(resourcePath)
-            ?: throw IllegalArgumentException("Font $resourcePath nebyl nalezen v resources")
+            ?: throw IllegalArgumentException("Font $resourcePath have not been found in resources")
 
         return try {
             if (url.protocol == "file") {
@@ -91,7 +91,7 @@ class PdfRenderingService {
                 }
             }
         } catch (ex: Exception) {
-            throw IOException("Nelze získat font $resourcePath: ${ex.message}", ex)
+            throw IOException("Could not get font $resourcePath: ${ex.message}", ex)
         }
     }
 

@@ -1,5 +1,6 @@
 package com.uhk.fim.prototype.common.messaging.preprocessor
 
+import com.uhk.fim.prototype.common.messaging.dto.MessageRequest
 import com.uhk.fim.prototype.common.messaging.dto.MessageResponse
 import org.aopalliance.intercept.MethodInterceptor
 import org.aopalliance.intercept.MethodInvocation
@@ -29,5 +30,14 @@ class MessageListenerProcessorChain(
 
 data class MessageProcess(
     var correlationId: String,
-    var messageResponse: MessageResponse? = null,
-)
+    var message: Any? = null, // Can be MessageRequest<*> or MessageResponse
+) {
+    val messageResponse: MessageResponse?
+        get() = message as? MessageResponse
+
+    val messageRequest: MessageRequest<*>?
+        get() = message as? MessageRequest<*>
+
+    fun isResponse(): Boolean = message is MessageResponse
+    fun isRequest(): Boolean = message is MessageRequest<*>
+}

@@ -5,6 +5,7 @@ import com.google.zxing.EncodeHintType
 import com.google.zxing.common.BitMatrix
 import com.google.zxing.qrcode.QRCodeWriter
 import com.uhk.fim.prototype.common.exceptions.BadGatewayException
+import invoice_service.messaging.handlers.CustomerServiceRequestHandler
 import org.mustangproject.*
 import org.mustangproject.ZUGFeRD.Profiles
 import org.mustangproject.ZUGFeRD.ZUGFeRD2PullProvider
@@ -17,9 +18,15 @@ import java.util.*
 import javax.imageio.ImageIO
 
 @Service
-class ZugferdService {
+class ZugferdService (
+    private val invoiceService: InvoiceService,
+    private val customerServiceRequestHandler: CustomerServiceRequestHandler
+){
 
-    fun createInvoice(invoice: invoice_service.models.invoices.Invoice, customer: Map<String, Any>): String {
+    fun createInvoice(invoiceId: Long): String {
+
+        val invoice = invoiceService.getInvoice(invoiceId, true)
+        val customer = customerServiceRequestHandler.getCustomerById(invoice.customerId)
 
         val i = Invoice()
 

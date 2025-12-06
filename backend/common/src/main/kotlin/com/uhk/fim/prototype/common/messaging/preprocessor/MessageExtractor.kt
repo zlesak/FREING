@@ -1,6 +1,5 @@
 package com.uhk.fim.prototype.common.messaging.preprocessor
 
-import com.uhk.fim.prototype.common.messaging.dto.MessageResponse
 import org.springframework.amqp.core.Message
 import org.springframework.amqp.support.converter.MessageConverter
 import org.springframework.stereotype.Service
@@ -15,26 +14,42 @@ class MessageExtractor(
             when (arg) {
                 is Message -> {
                     try {
+                        val convertedMessage = messageConverter.fromMessage(arg)
+                        val correlationId = arg.messageProperties.correlationId
+
                         MessageProcess(
-                            messageResponse = messageConverter.fromMessage(arg) as? MessageResponse,
-                            correlationId = arg.messageProperties.correlationId
+                            message = convertedMessage,
+                            correlationId = correlationId
                         )
                     } catch (e: Exception) {
-                        println("[GlobalRabbitListenerAdvice] Failed to convert message: ${e.message}")
+                        println("[MessageExtractor] Failed to convert message: ${e.message}")
                         null
                     }
                 }
+
                 else -> null
             }
         }
 
         payload?.let { message ->
-            // Here you can handle messages with embedded errors
-            if (message.messageResponse?.error != null) {
-                println("[GlobalRabbitListenerAdvice] Message contains error: ${message.messageResponse?.error}")
-                // Optional: handle, modify, or route message to dead-letter queue
-            } else {
-                println("[GlobalRabbitListenerAdvice] Message OK: $message")
+            when {
+                message.isResponse() -> {
+                    val response = message.messageResponse
+                    if (response?.error != null) {
+                        println("[MessageExtractor] MessageResponse contains error: ${response.error}")
+                    } else {
+                        println("[MessageExtractor] MessageResponse OK: correlationId=${message.correlationId}")
+                    }
+                }
+
+                message.isRequest() -> {
+                    val request = message.messageRequest
+                    println("[MessageExtractor] MessageRequest received: route=${request?.route}, correlationId=${message.correlationId}")
+                }
+
+                else -> {
+                    println("[MessageExtractor] Unknown message type: ${message.message?.javaClass?.simpleName}")
+                }
             }
         }
 
