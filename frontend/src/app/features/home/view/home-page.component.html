@@ -195,6 +195,18 @@
           [data]="filteredInvoices()"
         ></invoice-chart-bar>
       </div>
+      <div class="chart-card">
+        <invoice-chart-stacked-bar
+          [data]="filteredInvoices()"
+          [statusColors]="statusColors()"
+        ></invoice-chart-stacked-bar>
+      </div>
+      <div class="chart-card">
+        <invoice-chart-pie
+          [data]="chartDataCurrency()"
+          [title]="'Distribuce Měn'"
+        ></invoice-chart-pie>
+      </div>
     }
 
   </div>
