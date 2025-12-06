@@ -27,7 +27,7 @@ class ZugferdService (
 
         val invoice = invoiceService.getInvoice(invoiceId, true)
         val customer = customerServiceRequestHandler.getCustomerById(invoice.customerId)
-        val supplier = customerServiceRequestHandler.getSupplierById(invoice.customerId)
+        val supplier = customerServiceRequestHandler.getSupplierById(invoice.supplierId)
 
         val i = Invoice()
 

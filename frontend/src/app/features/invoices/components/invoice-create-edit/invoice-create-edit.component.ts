@@ -30,6 +30,7 @@ import {distinctUntilChanged, firstValueFrom} from 'rxjs';
 import {CurrencyOptions, InvoiceStatus} from '../../../common/Enums.js';
 import {KeycloakService} from '../../../../keycloak.service';
 import {CustomersServiceController} from '../../../customers/controller/customers.service';
+import {SuppliersServiceController} from '../../../suppliers/controller/suppliers.service';
 import {ResponsiveService} from '../../../../controller/common.service';
 import {NgClass} from '@angular/common';
 
@@ -66,11 +67,13 @@ import {NgClass} from '@angular/common';
 export class InvoiceCreateEditComponent implements OnInit {
   private readonly keycloakService = inject(KeycloakService);
   private readonly customerService = inject(CustomersServiceController);
+  private readonly supplierService = inject(SuppliersServiceController);
   protected readonly responsiveService = inject(ResponsiveService);
   protected readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   protected editMode = signal(false);
   protected users: {email: string, id: number}[] = [];
+  protected suppliers: {tradeName: string, id: number}[] = [];
   protected editInvoiceId: number = 0;
   protected form!: FormGroup;
   protected submitting = false;
@@ -94,6 +97,7 @@ export class InvoiceCreateEditComponent implements OnInit {
   private async loadData() {
     if(this.keycloakService.hasAdminAccess){
       await this.loadUsersInfo();
+      await this.loadSuppliersInfo();
     }
 
     const idParam = this.route.snapshot.paramMap.get('id');
@@ -112,6 +116,7 @@ export class InvoiceCreateEditComponent implements OnInit {
           invoiceNumber: invoice.invoiceNumber,
           referenceNumber: invoice.referenceNumber,
           customerId: invoice.customerId,
+          supplierId: invoice.supplierId,
           issueDate: invoice.issueDate,
           dueDate: invoice.dueDate,
           amount: invoice.amount,
@@ -165,6 +170,7 @@ export class InvoiceCreateEditComponent implements OnInit {
       invoiceNumber: ['', [Validators.required, Validators.minLength(3)]],
       referenceNumber: [''],
       customerId: [null, [Validators.required]],
+      supplierId: [null, [Validators.required]],
       issueDate: [today, Validators.required],
       dueDate: [today, Validators.required],
       amount: [0, [Validators.required, Validators.min(0)]],
@@ -270,9 +276,12 @@ export class InvoiceCreateEditComponent implements OnInit {
         issueDate: new Date(formValue.issueDate).toISOString().split('T')[0],
         dueDate: new Date(formValue.dueDate).toISOString().split('T')[0],
         amount: formValue.amount,
-        items: formValue.items
+        items: formValue.items,
+        customerId: formValue.customerId,
+        supplierId: formValue.supplierId
       };
 
+      console.log('Update request:', request);
       this.invoicesService.updateInvoice(this.editInvoiceId, request).subscribe({
         next: () => {
           this.submitting = false;
@@ -312,6 +321,14 @@ export class InvoiceCreateEditComponent implements OnInit {
     if(usersFromDb.content){
       usersFromDb.content.forEach(user=>{
         this.users.push({email: user.email, id: user.id!});
+      })
+    }
+  }
+  async loadSuppliersInfo(){
+    const suppliers = await firstValueFrom(this.supplierService.getSuppliers(0,999));
+    if(suppliers.content){
+      suppliers.content.forEach(supplier=>{
+        this.suppliers.push({tradeName: supplier.tradeName, id: supplier.id!});
       })
     }
   }

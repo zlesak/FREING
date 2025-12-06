@@ -60,19 +60,44 @@
 
         <div class="party-box">
           <h3>Dodavatel:</h3>
+
           <p>
-            <strong>Jmeno</strong><br>
-           Ulice<br>
-            ZIP Mesto<br>
-           Stat
+            <strong>{{supplierDetail()?.tradeName}}</strong><br>
+            {{supplierDetail()?.email}}<br>
+            {{supplierDetail()?.phoneNumber}}
           </p>
-          <p>
-            <strong>IČO:</strong>  ICO<br>
-            <strong>DIČ:</strong> DIC<br>
-            <strong>IBAN:</strong> IBAN
-          </p>
+
+          <div class="customer-section">
+            <div class="customer-row">
+              <span class="label">Ulice, č.p.:</span>
+              <span class="value">{{supplierDetail()?.street}} {{supplierDetail()?.houseNumber}}</span>
+            </div>
+
+            <div class="customer-row">
+              <span class="label">PSČ, Město:</span>
+              <span class="value">{{supplierDetail()?.zip}} {{supplierDetail()?.city}}</span>
+            </div>
+
+            <div class="customer-row">
+              <span class="label">Země:</span>
+              <span class="value">{{supplierDetail()?.country}}</span>
+            </div>
+          </div>
+
+          <div class="customer-section">
+            <div class="customer-row">
+              <span class="label">IČO:</span>
+              <span class="value">{{supplierDetail()?.ico}}</span>
+            </div>
+
+            <div class="customer-row">
+              <span class="label">DIČ:</span>
+              <span class="value">{{supplierDetail()?.dic}}</span>
+            </div>
+          </div>
         </div>
       </div>
+
       <mat-divider></mat-divider>
       <h3>Stav</h3> {{ invoiceDetail()?.status}}
 

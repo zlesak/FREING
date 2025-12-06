@@ -76,6 +76,7 @@ data class Invoice(
     fun updateFrom(request: InvoiceUpdateRequest) {
         this.invoiceNumber = request.invoiceNumber
         this.customerId = request.customerId
+        this.supplierId = request.supplierId
         this.referenceNumber = request.referenceNumber
         this.issueDate = request.issueDate
         this.dueDate = request.dueDate

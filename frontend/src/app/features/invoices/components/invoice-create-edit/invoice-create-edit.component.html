@@ -44,6 +44,18 @@
           </mat-form-field>
 
           <mat-form-field>
+            <mat-label>Dodavatel</mat-label>
+            <mat-select formControlName="supplierId">
+              @for(supplier of suppliers; track $index){
+                <mat-option [value]="supplier.id">{{supplier.tradeName}}</mat-option>
+              }
+            </mat-select>
+            @if (form.get('supplierId')?.touched && form.get('supplierId')?.invalid) {
+              <mat-error>Dodavatel je povinný</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field>
             <mat-label>Datum vystavení</mat-label>
             <input
               matInput
