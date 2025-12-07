@@ -1,5 +1,6 @@
 import { Component, AfterViewInit, OnChanges, SimpleChanges, ElementRef, ViewChild, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { MatIconModule } from '@angular/material/icon';
 import { Chart, ChartConfiguration, ChartType, registerables } from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 
@@ -8,9 +9,9 @@ Chart.register(...registerables, ChartDataLabels);
 @Component({
   selector: 'invoice-chart-doughnut',
   standalone: true,
-  imports: [CommonModule],
-  templateUrl: './invoice-chart-doughnut.html',
-  styleUrls: ['./invoice-chart-doughnut.css']
+  imports: [CommonModule, MatIconModule],
+  templateUrl: './invoice-chart-base.html',
+  styleUrls: ['./chart-common.css']
 })
 export class InvoiceChartDoughnut implements AfterViewInit, OnChanges {
   data = input.required<{ itemName: string, amount: number, color: string }[]>();

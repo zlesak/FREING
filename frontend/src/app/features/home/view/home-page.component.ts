@@ -1,6 +1,6 @@
 import {Component, computed, inject, OnInit, signal} from '@angular/core';
 import { KeycloakService } from '../../../keycloak.service';
-import { InvoiceChartPie } from '../../invoices/components/invoice-chart-pie/invoice-chart-pie';
+import { InvoiceChartPie } from '../../invoices/components/invoice-charts/invoice-chart-pie';
 import {Invoice, PagedModelInvoice} from '../../../api/generated/invoice';
 import { CommonModule } from '@angular/common';
 import {InvoicesServiceController} from '../../../controller/invoices.service';
@@ -17,12 +17,12 @@ import {MatSelectModule} from '@angular/material/select';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatButton} from '@angular/material/button';
 import {ResponsiveService} from '../../../controller/common.service';
-import {InvoiceChartLine} from '../../invoices/components/invoice-chart-line/invoice-chart-line.component';
+import {InvoiceChartLine} from '../../invoices/components/invoice-charts/invoice-chart-line.component';
 import { PageTitleService } from '../../../services/page-title.service';
-import {InvoiceChartBar} from '../../invoices/components/invoice-chart-bar/invoice-chart-bar';
-import {InvoiceChartDoughnut} from '../../invoices/components/invoice-chart-doughnut/invoice-chart-doughnut';
-import {InvoiceChartStackedBar} from '../../invoices/components/invoice-chart-stacked-bar/invoice-chart-stacked-bar';
-import {InvoiceChartHorizontalBar} from '../../invoices/components/invoice-chart-horizontal-bar/invoice-chart-horizontal-bar';
+import {InvoiceChartBar} from '../../invoices/components/invoice-charts/invoice-chart-bar';
+import {InvoiceChartDoughnut} from '../../invoices/components/invoice-charts/invoice-chart-doughnut';
+import {InvoiceChartStackedBar} from '../../invoices/components/invoice-charts/invoice-chart-stacked-bar';
+import {InvoiceChartHorizontalBar} from '../../invoices/components/invoice-charts/invoice-chart-horizontal-bar';
 import { InvoiceStatusTranslationService } from '../../../services/invoice-status-translation.service';
 @Component({
   imports: [

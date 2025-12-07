@@ -1,5 +1,6 @@
 import { Component, AfterViewInit, OnChanges, SimpleChanges, ElementRef, ViewChild, input, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { MatIconModule } from '@angular/material/icon';
 import { Chart, ChartConfiguration, ChartType, registerables } from 'chart.js';
 import { Invoice } from '../../../../api/generated/invoice';
 import { InvoiceStatusTranslationService } from '../../../../services/invoice-status-translation.service';
@@ -15,9 +16,9 @@ interface MonthlyData {
 @Component({
   selector: 'invoice-chart-stacked-bar',
   standalone: true,
-  imports: [CommonModule],
-  templateUrl: './invoice-chart-stacked-bar.html',
-  styleUrls: ['./invoice-chart-stacked-bar.css']
+  imports: [CommonModule, MatIconModule],
+  templateUrl: './invoice-chart-base.html',
+  styleUrls: ['./chart-common.css']
 })
 export class InvoiceChartStackedBar implements AfterViewInit, OnChanges {
   private readonly statusTranslation = inject(InvoiceStatusTranslationService);

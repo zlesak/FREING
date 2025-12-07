@@ -1,5 +1,6 @@
 import { Component, AfterViewInit, OnChanges, SimpleChanges, ElementRef, ViewChild, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { MatIconModule } from '@angular/material/icon';
 import { Chart, ChartConfiguration, ChartType, registerables } from 'chart.js';
 
 Chart.register(...registerables);
@@ -7,9 +8,9 @@ Chart.register(...registerables);
 @Component({
   selector: 'invoice-chart-horizontal-bar',
   standalone: true,
-  imports: [CommonModule],
-  templateUrl: './invoice-chart-horizontal-bar.html',
-  styleUrls: ['./invoice-chart-horizontal-bar.css']
+  imports: [CommonModule, MatIconModule],
+  templateUrl: './invoice-chart-base.html',
+  styleUrls: ['./chart-common.css']
 })
 export class InvoiceChartHorizontalBar implements AfterViewInit, OnChanges {
   data = input.required<{ customerName: string, totalAmount: number, color: string }[]>();

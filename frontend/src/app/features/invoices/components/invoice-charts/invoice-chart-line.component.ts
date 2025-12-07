@@ -1,17 +1,18 @@
 import { Component, AfterViewInit, OnChanges, SimpleChanges, ElementRef, ViewChild, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { MatIconModule } from '@angular/material/icon';
 import { Chart, ChartConfiguration, ChartType, registerables } from 'chart.js';
 import { Invoice } from '../../../../api/generated/invoice';
-import {InvoiceStatus} from '../../../common/Enums.js';
+import {InvoiceStatus} from '../../../common/Enums.js.js';
 
 Chart.register(...registerables);
 
 @Component({
   selector: 'invoice-chart-line',
   standalone: true,
-  imports: [CommonModule],
-  templateUrl: './invoice-chart-line.component.html',
-  styleUrls: ['./invoice-chart-line.component.css']
+  imports: [CommonModule, MatIconModule],
+  templateUrl: './invoice-chart-base.html',
+  styleUrls: ['./chart-common.css']
 })
 export class InvoiceChartLine implements AfterViewInit, OnChanges {
   data = input.required<Invoice[]>();

@@ -1,5 +1,6 @@
 import { Component, AfterViewInit, OnChanges, SimpleChanges, ElementRef, ViewChild, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { MatIconModule } from '@angular/material/icon';
 import { Chart, ChartConfiguration, ChartType, registerables } from 'chart.js';
 import { Invoice } from '../../../../api/generated/invoice';
 
@@ -8,9 +9,9 @@ Chart.register(...registerables);
 @Component({
   selector: 'invoice-chart-bar',
   standalone: true,
-  imports: [CommonModule],
-  templateUrl: './invoice-chart-bar.html',
-  styleUrls: ['./invoice-chart-bar.css']
+  imports: [CommonModule, MatIconModule],
+  templateUrl: './invoice-chart-base.html',
+  styleUrls: ['./chart-common.css']
 })
 export class InvoiceChartBar implements AfterViewInit, OnChanges {
   data = input.required<Invoice[]>();
