@@ -89,5 +89,8 @@ export class CustomersPageComponent implements OnInit, AfterViewChecked {
   pageUpdate(event: PageEvent): void {
     this.currentPage = event.pageIndex;
     this.currentSize = event.pageSize;
+    this.page = event.pageIndex;
+    this.size = event.pageSize;
+    this.loadAllCustomers();
   }
 }

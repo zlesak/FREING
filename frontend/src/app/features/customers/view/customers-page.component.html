@@ -66,12 +66,13 @@
 
     </table>
       <mat-paginator class="paginator"
-                     [length]="totalElements"
-                     [pageSize]="currentSize"
-                     [pageSizeOptions]="[5, 10, 25, 50]"
-                     [showFirstLastButtons]="true"
-                     [disabled]="loading()"
-                     (page)="pageUpdate($event)">
+             [length]="totalElements"
+             [pageSize]="currentSize"
+             [pageIndex]="currentPage"
+             [pageSizeOptions]="[5, 10, 25, 50]"
+             [showFirstLastButtons]="true"
+             [disabled]="loading()"
+             (page)="pageUpdate($event)">
       </mat-paginator>
     </div>
   }
