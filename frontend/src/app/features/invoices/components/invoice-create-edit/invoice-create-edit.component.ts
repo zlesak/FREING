@@ -32,7 +32,7 @@ import {KeycloakService} from '../../../../keycloak.service';
 import {CustomersServiceController} from '../../../customers/controller/customers.service';
 import {SuppliersServiceController} from '../../../suppliers/controller/suppliers.service';
 import {ResponsiveService} from '../../../../controller/common.service';
-import {NgClass} from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { PageTitleService } from '../../../../services/page-title.service';
 import { InvoiceStatusTranslationService } from '../../../../services/invoice-status-translation.service';
 
@@ -60,7 +60,7 @@ import { InvoiceStatusTranslationService } from '../../../../services/invoice-st
     MatDatepicker,
     MatDatepickerModule,
     MatInputModule,
-    NgClass,
+    CommonModule,
   ],
   providers: [
     provideNativeDateAdapter(),
@@ -178,8 +178,8 @@ export class InvoiceCreateEditComponent implements OnInit {
       supplierId: [null, [Validators.required]],
       issueDate: [today, Validators.required],
       dueDate: [today, Validators.required],
-      amount: [0, [Validators.required, Validators.min(0)]],
-      subAmount: [0],
+      amount: this.fb.control<number>({ value: 0, disabled: true }, [Validators.required, Validators.min(0)]),
+      subAmount: this.fb.control<number>({ value: 0, disabled: true }),
       currency: ['CZK', Validators.required],
       status: ['DRAFT'],
       items: this.fb.array([])
@@ -214,6 +214,10 @@ export class InvoiceCreateEditComponent implements OnInit {
 
   get items(): FormArray {
     return this.form.get('items') as FormArray;
+  }
+
+  get itemsFormGroups(): FormGroup[] {
+    return (this.items as FormArray).controls as FormGroup[];
   }
 
   newItem(): FormGroup {

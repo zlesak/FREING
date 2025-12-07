@@ -3,7 +3,6 @@
     <mat-card-header>
       <h2>{{ editMode() ? 'Upravit zákazníka' : 'Nový zákazník' }}</h2>
     </mat-card-header>
-
     <mat-card-content>
       @if (error) {
         <div class="alert error">{{ error }}</div>
@@ -11,7 +10,6 @@
       @if (success) {
         <div class="alert success">{{ success }}</div>
       }
-
       <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
         @if (form.hasError('nameOrTradeNameRequired') && (form.touched || form.dirty)) {
           <div class="alert error">
@@ -23,37 +21,31 @@
             Nelze vyplnit současně <strong>Jméno a Příjmení</strong> i <strong>Obchodní název</strong>. Vyberte pouze jednu možnost.
           </div>
         }
-
         <div class="form-section-header">
           <h3>Základní údaje</h3>
           <p class="hint">Vyplňte buď osobní údaje (fyzická osoba) NEBO obchodní název (firma)</p>
         </div>
-
         <div class="grid">
           <mat-form-field>
             <mat-label>Jméno (fyzická osoba)</mat-label>
             <input matInput formControlName="name" placeholder="Jan" />
           </mat-form-field>
-
           <mat-form-field>
             <mat-label>Příjmení (fyzická osoba)</mat-label>
             <input matInput formControlName="surname" placeholder="Novák" />
           </mat-form-field>
-
           <mat-form-field>
             <mat-label>Obchodní název (firma)</mat-label>
             <input matInput formControlName="tradeName" placeholder="ABC s.r.o." />
           </mat-form-field>
-
+        </div>
+        <div class="form-section-header">
+          <h3>Kontaktní údaje</h3>
+        </div>
+        <div class="grid">
           <mat-form-field>
             <mat-label>Email</mat-label>
-            <input
-              matInput
-              formControlName="email"
-              type="email"
-              placeholder="jan.novak@email.cz"
-              required
-            />
+            <input matInput formControlName="email" type="email" placeholder="jan.novak@email.cz" required />
             @if (form.get('email')?.touched && form.get('email')?.hasError('required')) {
               <mat-error>Email je povinný</mat-error>
             }
@@ -61,80 +53,45 @@
               <mat-error>Prosím zadejte platný email</mat-error>
             }
           </mat-form-field>
-
           <mat-form-field>
             <mat-label>Telefon</mat-label>
-            <input
-              matInput
-              formControlName="phoneNumber"
-              placeholder="+420 123 456 789"
-            />
+            <input matInput formControlName="phoneNumber" placeholder="+420 123 456 789" />
           </mat-form-field>
-
           <mat-form-field>
             <mat-label>Datum narození</mat-label>
-            <input
-              matInput
-              [matDatepicker]="picker"
-              formControlName="birthDate"
-            />
-            <mat-datepicker-toggle
-              matIconSuffix
-              [for]="picker"
-            ></mat-datepicker-toggle>
-            <mat-datepicker
-              #picker
-              startView="multi-year"
-              [startAt]="defaultBirthday">
-            </mat-datepicker>
-          </mat-form-field>
-
-          <mat-form-field>
-            <mat-label>Měna</mat-label>
-            <mat-select
-              [value]="currency"
-              (selectionChange)="currency = $event.value"
-            >
-              @for (c of currencyOptions; track c) {
-                <mat-option [value]="c">{{ c }}</mat-option>
-              }
-            </mat-select>
+            <input matInput [matDatepicker]="picker" formControlName="birthDate" />
+            <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker startView="multi-year" [startAt]="defaultBirthday"></mat-datepicker>
           </mat-form-field>
         </div>
-
-        <h3>Adresa</h3>
+        <div class="form-section-header">
+          <h3>Adresa</h3>
+        </div>
         <div class="grid">
           <mat-form-field>
             <mat-label>Ulice</mat-label>
             <input matInput formControlName="street" placeholder="Dlouhá" />
           </mat-form-field>
-
           <mat-form-field>
             <mat-label>Číslo domu</mat-label>
             <input matInput formControlName="houseNumber" placeholder="123/45" />
           </mat-form-field>
-
           <mat-form-field>
             <mat-label>Město</mat-label>
             <input matInput formControlName="city" placeholder="Praha" />
           </mat-form-field>
-
           <mat-form-field>
             <mat-label>PSČ</mat-label>
             <input matInput formControlName="zip" placeholder="110 00" />
           </mat-form-field>
-
           <mat-form-field>
             <mat-label>Země</mat-label>
-            <input
-              matInput
-              formControlName="country"
-              placeholder="Česká republika"
-            />
+            <input matInput formControlName="country" placeholder="Česká republika" />
           </mat-form-field>
         </div>
-
-        <h3>Fakturační údaje a Bankovní spojení</h3>
+        <div class="form-section-header">
+          <h3>Fakturační údaje a bankovní spojení</h3>
+        </div>
         <div class="grid">
           <mat-form-field>
             <mat-label>IČO</mat-label>
@@ -143,33 +100,29 @@
               <mat-icon>search</mat-icon>
             </button>
           </mat-form-field>
-
           <mat-form-field>
             <mat-label>DIČ</mat-label>
             <input matInput formControlName="dic" placeholder="CZ12345678" />
           </mat-form-field>
-
           <mat-form-field>
             <mat-label>Číslo účtu</mat-label>
-            <input
-              matInput
-              formControlName="bankAccount"
-              placeholder="123456789/0100"
-            />
+            <input matInput formControlName="bankAccount" placeholder="123456789/0100" />
           </mat-form-field>
-
           <mat-form-field>
             <mat-label>Kód banky</mat-label>
             <input matInput formControlName="bankCode" placeholder="0100" />
           </mat-form-field>
+          <mat-form-field>
+            <mat-label>Měna</mat-label>
+            <mat-select [value]="currency" (selectionChange)="currency = $event.value">
+              @for (c of currencyOptions; track c) {
+                <mat-option [value]="c">{{ c }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
         </div>
         <div class="actions">
-          <button
-            mat-flat-button
-            color="primary"
-            type="submit"
-            [disabled]="submitting || form.invalid"
-          >
+          <button mat-flat-button color="primary" type="submit" [disabled]="submitting || form.invalid">
             {{ editMode() ? 'Uložit změny' : 'Vytvořit' }}
           </button>
           <a mat-button routerLink="/customers">Zpět</a>

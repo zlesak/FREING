@@ -20,7 +20,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
+  margin-bottom: 5px;
   padding-bottom: 16px;
   border-bottom: 2px solid #e0e0e0;
 }
@@ -53,8 +53,8 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 16px;
-  margin: 24px 0;
-  padding: 20px;
+  margin: 5px 0 10px 0;
+  padding: 10px;
   background: #f7fafc;
   border-radius: 8px;
 }
@@ -116,7 +116,7 @@
 .items-table {
   width: 100%;
   border-collapse: collapse;
-  margin: 24px 0;
+  margin: 12px 0;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   border-radius: 8px;
   overflow: hidden;
@@ -165,9 +165,9 @@
 .total-summary {
   max-width: 400px;
   margin-left: auto;
-  margin-top: 24px;
-  margin-bottom: 24px;
-  padding: 24px;
+  margin-top: 12px;
+  margin-bottom: 12px;
+  padding: 12px;
   background: #f8f9ff;
   border-radius: 12px;
   border: 2px solid #e0e7ff;
@@ -201,7 +201,7 @@
 }
 
 mat-card-actions {
-  padding: 24px;
+  padding: 12px;
   gap: 12px;
   display: flex;
   flex-wrap: wrap;

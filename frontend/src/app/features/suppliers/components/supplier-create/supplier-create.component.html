@@ -3,7 +3,6 @@
     <mat-card-header>
       <h2>{{ editMode() ? 'Upravit dodavatele' : 'Nový dodavatel' }}</h2>
     </mat-card-header>
-
     <mat-card-content>
       @if (error) {
         <div class="alert error">{{ error }}</div>
@@ -11,9 +10,10 @@
       @if (success) {
         <div class="alert success">{{ success }}</div>
       }
-
       <form [formGroup]="form" (ngSubmit)="onSubmit()">
-        <h3>Základní údaje</h3>
+        <div class="form-section-header">
+          <h3>Základní údaje</h3>
+        </div>
         <div class="grid">
           <mat-form-field>
             <mat-label>Obchodní jméno</mat-label>
@@ -25,7 +25,11 @@
               <mat-error>Obchodní jméno musí mít alespoň 2 znaky</mat-error>
             }
           </mat-form-field>
-
+        </div>
+        <div class="form-section-header">
+          <h3>Kontaktní údaje</h3>
+        </div>
+        <div class="grid">
           <mat-form-field>
             <mat-label>Email</mat-label>
             <input matInput type="email" formControlName="email" placeholder="info@firma.cz">
@@ -36,7 +40,6 @@
               <mat-error>Neplatný formát emailu</mat-error>
             }
           </mat-form-field>
-
           <mat-form-field>
             <mat-label>Telefon</mat-label>
             <input matInput formControlName="phoneNumber" placeholder="+420 123 456 789">
@@ -45,8 +48,9 @@
             }
           </mat-form-field>
         </div>
-
-        <h3>Adresa</h3>
+        <div class="form-section-header">
+          <h3>Adresa</h3>
+        </div>
         <div class="grid">
           <mat-form-field>
             <mat-label>Ulice</mat-label>
@@ -55,7 +59,6 @@
               <mat-error>Ulice je povinná</mat-error>
             }
           </mat-form-field>
-
           <mat-form-field>
             <mat-label>Číslo popisné</mat-label>
             <input matInput formControlName="houseNumber" placeholder="123">
@@ -63,7 +66,6 @@
               <mat-error>Číslo popisné je povinné</mat-error>
             }
           </mat-form-field>
-
           <mat-form-field>
             <mat-label>Město</mat-label>
             <input matInput formControlName="city" placeholder="Praha">
@@ -71,7 +73,6 @@
               <mat-error>Město je povinné</mat-error>
             }
           </mat-form-field>
-
           <mat-form-field>
             <mat-label>PSČ</mat-label>
             <input matInput formControlName="zip" placeholder="110 00">
@@ -79,7 +80,6 @@
               <mat-error>PSČ je povinné</mat-error>
             }
           </mat-form-field>
-
           <mat-form-field>
             <mat-label>Země</mat-label>
             <input matInput formControlName="country" placeholder="Česká republika">
@@ -88,29 +88,26 @@
             }
           </mat-form-field>
         </div>
-
-        <h3>Fakturační údaje a Bankovní spojení</h3>
+        <div class="form-section-header">
+          <h3>Fakturační údaje a bankovní spojení</h3>
+        </div>
         <div class="grid">
           <mat-form-field>
             <mat-label>IČO</mat-label>
             <input matInput formControlName="ico" placeholder="12345678">
           </mat-form-field>
-
           <mat-form-field>
             <mat-label>DIČ</mat-label>
             <input matInput formControlName="dic" placeholder="CZ12345678">
           </mat-form-field>
-
           <mat-form-field>
             <mat-label>Číslo účtu</mat-label>
             <input matInput formControlName="bankAccount" placeholder="123456789">
           </mat-form-field>
-
           <mat-form-field>
             <mat-label>Kód banky</mat-label>
             <input matInput formControlName="bankCode" placeholder="0100">
           </mat-form-field>
-
           <mat-form-field>
             <mat-label>Měna</mat-label>
             <mat-select formControlName="currency">
@@ -120,7 +117,6 @@
             </mat-select>
           </mat-form-field>
         </div>
-
         <div class="actions">
           <button mat-button type="button" (click)="cancel()" [disabled]="submitting">
             <mat-icon>cancel</mat-icon>
@@ -135,4 +131,3 @@
     </mat-card-content>
   </mat-card>
 </section>
-
