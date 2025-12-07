@@ -5,6 +5,7 @@ import com.uhk.fim.prototype.common.messaging.dto.MessageResponse
 import org.aopalliance.intercept.MethodInterceptor
 import org.aopalliance.intercept.MethodInvocation
 import org.springframework.stereotype.Component
+import org.slf4j.LoggerFactory
 
 @Component
 class MessageListenerProcessorChain(
@@ -12,6 +13,7 @@ class MessageListenerProcessorChain(
 ): MethodInterceptor {
 
     private val processors: MutableList<MessageListenerProcessor> = mutableListOf()
+    private val logger = LoggerFactory.getLogger(MessageListenerProcessorChain::class.java)
 
     override fun invoke(invocation: MethodInvocation): Any? {
         val inputData = messageExtractor.extractMessage(invocation.arguments)?: return invocation.proceed()
@@ -22,7 +24,7 @@ class MessageListenerProcessorChain(
     }
 
     fun registerProcessor(processor: MessageListenerProcessor): MessageListenerProcessorChain{
-        println("[MessageListenerProcessorChain] registered new processor: ${processor::class.simpleName}")
+        logger.debug("[MessageListenerProcessorChain] registered new processor: {}", processor::class.simpleName)
         processors.add(processor)
         return this
     }

@@ -1,5 +1,6 @@
 package customer_service.external
 
+import jakarta.ws.rs.core.Response
 import org.keycloak.admin.client.Keycloak
 import org.keycloak.representations.idm.UserRepresentation
 import org.springframework.stereotype.Service
@@ -8,12 +9,9 @@ import org.springframework.stereotype.Service
 class KeycloakAdminClient(private val keycloak: Keycloak) {
 
     fun createUser(user: UserRepresentation): String {
-        val realm = keycloak.realm("freing")
-        val users = realm.users()
+        val response = keycloak.realm("freing").users().create(user)
 
-        val response = users.create(user)
-
-        if (response.status != jakarta.ws.rs.core.Response.Status.CREATED.statusCode) {
+        if (response.status != Response.Status.CREATED.statusCode) {
             throw RuntimeException("Failed to create user in Keycloak. Status: ${response.statusInfo.reasonPhrase}")
         }
 
@@ -21,10 +19,7 @@ class KeycloakAdminClient(private val keycloak: Keycloak) {
         return location.path.substringAfterLast('/')
     }
 
-    fun sendUpdatePasswordEmail(userId: String) {
-        val realm = keycloak.realm("freing")
-        realm.users().get(userId).executeActionsEmail(listOf("UPDATE_PASSWORD"))
-    }
+    fun sendUpdatePasswordEmail(userId: String) = keycloak.realm("freing").users().get(userId).executeActionsEmail(listOf("UPDATE_PASSWORD"))
 
     fun addRealmRoleToUser(userId: String, roleName: String) {
         val realm = keycloak.realm("freing")
@@ -32,8 +27,5 @@ class KeycloakAdminClient(private val keycloak: Keycloak) {
         realm.users().get(userId).roles().realmLevel().add(listOf(roleRepresentation))
     }
 
-    fun deleteUser(userId: String) {
-        val realm = keycloak.realm("freing")
-        realm.users().get(userId).remove()
-    }
+    fun deleteUser(userId: String) = keycloak.realm("freing").users().get(userId).remove()
 }

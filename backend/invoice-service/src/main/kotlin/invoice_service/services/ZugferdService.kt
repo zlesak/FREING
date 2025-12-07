@@ -18,10 +18,10 @@ import java.util.*
 import javax.imageio.ImageIO
 
 @Service
-class ZugferdService (
+class ZugferdService(
     private val invoiceService: InvoiceService,
     private val customerServiceRequestHandler: CustomerServiceRequestHandler
-){
+) {
 
     fun createInvoice(invoiceId: Long): String {
 
@@ -35,7 +35,6 @@ class ZugferdService (
             .setReferenceNumber(invoice.referenceNumber)
             .setIssueDate(Date.from(invoice.issueDate.atStartOfDay(ZoneId.systemDefault()).toInstant()))
             .setDueDate(Date.from(invoice.dueDate.atStartOfDay(ZoneId.systemDefault()).toInstant()))
-            .setDeliveryDate(Date.from(invoice.receiveDate?.atStartOfDay(ZoneId.systemDefault())?.toInstant()))
             .setCurrency(invoice.currency)
             .setSender(
                 toTradeParty(supplier)
@@ -43,6 +42,10 @@ class ZugferdService (
             .setRecipient(
                 toTradeParty(customer)
             )
+
+        invoice.receiveDate?.let {
+            i.setDeliveryDate(Date.from(it.atStartOfDay(ZoneId.systemDefault()).toInstant()))
+        }
 
         for (item in invoice.items) {
             i.addItem(
@@ -114,7 +117,7 @@ class ZugferdService (
         }
     }
 
-  fun toTradeParty(party: Map<String, Any>): TradeParty {
+    fun toTradeParty(party: Map<String, Any>): TradeParty {
         val tradeName = party["tradeName"] as? String
         val name = party["name"] as? String ?: ""
         val surname = party["surname"] as? String ?: ""

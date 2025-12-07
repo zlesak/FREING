@@ -16,9 +16,12 @@ import javax.xml.transform.Transformer
 import javax.xml.transform.TransformerFactory
 import javax.xml.transform.stream.StreamResult
 import javax.xml.transform.stream.StreamSource
+import org.slf4j.LoggerFactory
 
 @Service
 class PdfRenderingService {
+    private val logger = LoggerFactory.getLogger(PdfRenderingService::class.java)
+
     fun renderInvoicePdf(invoiceData: Map<String, Any?>): ByteArray {
         val xml = invoiceData["payload"] as? String
             ?: throw IllegalArgumentException("Missing XML data in payload")
@@ -39,7 +42,7 @@ class PdfRenderingService {
             }
 
             val htmlContent = sampleHtmlFile.readText(Charsets.UTF_8)
-            println(htmlContent)
+            logger.debug(htmlContent)
 
             val fontPath: String = resolveFontPath("fonts/DejaVuSans.ttf")
 
@@ -52,8 +55,7 @@ class PdfRenderingService {
                 try {
                     renderer.fontResolver.addFont(fontPath, BaseFont.IDENTITY_H, true)
                 } catch (e: Exception) {
-                    println("Font load error:")
-                    e.printStackTrace()
+                    logger.error("Font load error:", e)
                 }
 
                 renderer.setDocumentFromString(htmlContent, baseUri)
@@ -68,7 +70,7 @@ class PdfRenderingService {
 
             return pdf
         } catch (e: Exception) {
-            e.printStackTrace()
+            logger.error("PDF generating error:", e)
             throw RuntimeException("PDF generating error: ", e)
         }
     }

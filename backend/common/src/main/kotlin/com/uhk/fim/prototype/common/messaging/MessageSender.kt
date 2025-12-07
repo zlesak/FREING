@@ -7,6 +7,7 @@ import com.uhk.fim.prototype.common.messaging.enums.actions.IMessageAction
 import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
+import org.slf4j.LoggerFactory
 import java.util.*
 
 @Component
@@ -18,9 +19,10 @@ class MessageSender(
     private val serviceName: String = ""
 
     val replyQueueName: String = "invoice.responses.$serviceName-" + UUID.randomUUID().toString()
+    private val logger = LoggerFactory.getLogger(MessageSender::class.java)
 
     init {
-        println("replyQueueName = $replyQueueName")
+        logger.info("replyQueueName = {}", replyQueueName)
         rabbitTemplate.execute { channel ->
             channel.queueDeclare(replyQueueName, true, false, false, null)
             null
@@ -38,7 +40,7 @@ class MessageSender(
             correlationId = correlationId,
             requestId = requestId
         ) { messageIds ->
-            println("Sending request with requestId: ${messageIds.requestId} with correlationId=${messageIds.correlationId}")
+            logger.info("Sending request with requestId: {} with correlationId={}", messageIds.requestId, messageIds.correlationId)
             sendRequest(request, request.route, messageIds.correlationId)
 
         }
@@ -57,7 +59,7 @@ class MessageSender(
     }
 
     fun sendResponse(response: MessageResponse, replyTo: String, correlationId: String) {
-        println("Sending response to $replyTo with correlationId=$correlationId")
+        logger.info("Sending response to {} with correlationId={}", replyTo, correlationId)
         rabbitTemplate.convertAndSend(
             "",
             replyTo,

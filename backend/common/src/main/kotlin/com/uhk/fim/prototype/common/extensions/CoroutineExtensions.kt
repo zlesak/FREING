@@ -4,6 +4,7 @@ import com.uhk.fim.prototype.common.messaging.coroutines.CorrelationId
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.springframework.amqp.core.Message
+import org.slf4j.LoggerFactory
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
@@ -14,8 +15,9 @@ fun <T> T.processInCoroutineWithContext(
     context: CoroutineContext = EmptyCoroutineContext,
     process: suspend (T) -> Unit
 ) {
+    val logger = LoggerFactory.getLogger("CoroutineExtensions")
     scope.launch(scope.coroutineContext + context) {
-        println("Running task in coroutine on thread: ${Thread.currentThread().name}")
+        logger.debug("Running task in coroutine on thread: {}", Thread.currentThread().name)
         process(this@processInCoroutineWithContext)
     }
 }
