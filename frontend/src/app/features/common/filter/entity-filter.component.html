@@ -1,0 +1,52 @@
+<form [formGroup]="filterForm">
+  <div class="filter" [ngClass]="responsiveService?.isMobile ? 'mobile' : ''">
+    <mat-form-field *ngIf="showTradeName" subscriptSizing="dynamic">
+      <mat-label>Obchodní jméno</mat-label>
+      <input matInput formControlName="tradeName" />
+    </mat-form-field>
+    <mat-form-field *ngIf="showName" subscriptSizing="dynamic">
+      <mat-label>Jméno</mat-label>
+      <input matInput formControlName="name" />
+    </mat-form-field>
+    <mat-form-field *ngIf="showSurname" subscriptSizing="dynamic">
+      <mat-label>Příjmení</mat-label>
+      <input matInput formControlName="surname" />
+    </mat-form-field>
+    <mat-form-field *ngIf="showEmail" subscriptSizing="dynamic">
+      <mat-label>Email</mat-label>
+      <input matInput formControlName="email" />
+    </mat-form-field>
+    <mat-form-field *ngIf="showPhone" subscriptSizing="dynamic">
+      <mat-label>Telefon</mat-label>
+      <input matInput formControlName="phoneNumber" />
+    </mat-form-field>
+    <mat-form-field *ngIf="showCity" subscriptSizing="dynamic">
+      <mat-label>Město</mat-label>
+      <input matInput formControlName="city" />
+    </mat-form-field>
+    <mat-form-field *ngIf="showIco" subscriptSizing="dynamic">
+      <mat-label>IČO</mat-label>
+      <input matInput formControlName="ico" />
+    </mat-form-field>
+    <mat-form-field *ngIf="showDic" subscriptSizing="dynamic">
+      <mat-label>DIČ</mat-label>
+      <input matInput formControlName="dic" />
+    </mat-form-field>
+    <mat-form-field *ngIf="showCountry" subscriptSizing="dynamic">
+      <mat-label>Země</mat-label>
+      <input matInput formControlName="country" />
+    </mat-form-field>
+    <mat-form-field *ngIf="showCurrency" subscriptSizing="dynamic">
+      <mat-label>Měna</mat-label>
+      <mat-select formControlName="currency">
+        <mat-option [value]="null">zrušit výběr</mat-option>
+        <ng-container *ngFor="let c of currencyOptions">
+          <mat-option [value]="c">{{ c }}</mat-option>
+        </ng-container>
+      </mat-select>
+    </mat-form-field>
+    <button mat-raised-button color="primary" (click)="applyFilter()">
+      Filtrovat
+    </button>
+  </div>
+</form>
