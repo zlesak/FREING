@@ -50,7 +50,17 @@ class CustomerController(
         @Parameter(description = "Velikost stránky", example = "10")
         @RequestParam(defaultValue = "10") size: Int,
         @RequestParam(required = false) customerId: Long?,
-        @RequestParam(required = false) customerIds: List<Long>?
+        @RequestParam(required = false) customerIds: List<Long>?,
+        @RequestParam(required = false) tradeName: String?,
+        @RequestParam(required = false) name: String?,
+        @RequestParam(required = false) surname: String?,
+        @RequestParam(required = false) email: String?,
+        @RequestParam(required = false) phoneNumber: String?,
+        @RequestParam(required = false) city: String?,
+        @RequestParam(required = false) ico: String?,
+        @RequestParam(required = false) dic: String?,
+        @RequestParam(required = false) country: String?,
+        @RequestParam(required = false) currency: String?
     ): Page<CustomerDto> {
         val isCustomer = authentication.authorities.any { it.authority == "ROLE_CUSTOMER" }
         val principal = authentication.principal as? com.uhk.fim.prototype.common.security.JwtUserPrincipal
@@ -58,8 +68,21 @@ class CustomerController(
             principal?.id ?: throw IllegalStateException("Customer principal does not contain a valid id.")
         ) else customerIds
         val effectiveCustomerId = if (isCustomer) principal?.id else customerId
-        return customerService.getAllCustomers(PageRequest.of(page, size), effectiveCustomerId, effectiveCustomerIds)
-            .map { it.toDto() }
+        return customerService.getAllCustomers(
+            PageRequest.of(page, size),
+            effectiveCustomerId,
+            effectiveCustomerIds,
+            tradeName,
+            name,
+            surname,
+            email,
+            phoneNumber,
+            city,
+            ico,
+            dic,
+            country,
+            currency
+        ).map { it.toDto() }
     }
 
     @PreAuthorize("hasAnyAuthority('SCOPE_service.call', 'ROLE_MANAGER', 'ROLE_ACCOUNTANT')")

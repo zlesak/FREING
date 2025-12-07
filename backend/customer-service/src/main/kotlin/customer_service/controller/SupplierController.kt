@@ -47,6 +47,26 @@ class SupplierController(
         @Parameter(description = "Velikost stránky", example = "10")
         @RequestParam(defaultValue = "10") size: Int,
         @RequestParam(required = false) supplierId: Long?,
-        @RequestParam(required = false) supplierIds: List<Long>?
-    ): Page<SupplierDto> = supplierService.getAllSuppliers(PageRequest.of(page, size), supplierId, supplierIds).map { it.toDto() }
+        @RequestParam(required = false) supplierIds: List<Long>?,
+        @RequestParam(required = false) tradeName: String?,
+        @RequestParam(required = false) email: String?,
+        @RequestParam(required = false) phoneNumber: String?,
+        @RequestParam(required = false) city: String?,
+        @RequestParam(required = false) ico: String?,
+        @RequestParam(required = false) dic: String?,
+        @RequestParam(required = false) country: String?,
+        @RequestParam(required = false) currency: String?
+    ): Page<SupplierDto> = supplierService.getAllSuppliers(
+        PageRequest.of(page, size),
+        supplierId,
+        supplierIds,
+        tradeName,
+        email,
+        phoneNumber,
+        city,
+        ico,
+        dic,
+        country,
+        currency
+    ).map { it.toDto() }
 }
