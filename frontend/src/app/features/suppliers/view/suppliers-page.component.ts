@@ -48,13 +48,12 @@ export class SuppliersPageComponent implements OnInit, AfterViewChecked {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   displayedColumns: string[] = [
-    'index',
     'tradeName',
-    'email',
-    'phoneNumber',
-    'city',
     'ico',
-    'dic'
+    'dic',
+    'address',
+    'email',
+    'phoneNumber'
   ];
 
   ngOnInit(): void {
