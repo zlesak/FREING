@@ -24,6 +24,7 @@ import {InvoiceChartDoughnut} from '../../invoices/components/invoice-charts/inv
 import {InvoiceChartStackedBar} from '../../invoices/components/invoice-charts/invoice-chart-stacked-bar';
 import {InvoiceChartHorizontalBar} from '../../invoices/components/invoice-charts/invoice-chart-horizontal-bar';
 import { InvoiceStatusTranslationService } from '../../common/controller/invoice-status-translation.service';
+import { CommonFilterComponent } from '../../common/filter/filter.component';
 @Component({
   imports: [
     CommonModule,
@@ -41,6 +42,7 @@ import { InvoiceStatusTranslationService } from '../../common/controller/invoice
     InvoiceChartDoughnut,
     InvoiceChartStackedBar,
     InvoiceChartHorizontalBar,
+    CommonFilterComponent,
   ],
   selector: 'app-home-page',
   standalone: true,
@@ -61,6 +63,8 @@ export class HomePageComponent implements OnInit{
   private readonly pageTitleService = inject(PageTitleService);
   protected users: {email: string, id: number}[]= [];
 
+  statusOptions = Object.values(InvoiceStatus);
+  currencyOptions = Object.values(CurrencyOptions);
   filterForm: FormGroup = this.fb.group({
     from: [null],
     to: [null],
@@ -70,9 +74,6 @@ export class HomePageComponent implements OnInit{
     amountTo: [null],
     currency: [null]
   });
-
-  statusOptions = Object.values(InvoiceStatus);
-  currencyOptions = Object.values(CurrencyOptions);
 
   protected chartDataStatuses = computed(() => {
     const statusCount: Record<string, { occurrence: number; color: string }> = {};
@@ -214,7 +215,7 @@ export class HomePageComponent implements OnInit{
   loadAllInvoices(): void {
     this.loading.set(true);
     this.error = undefined;
-    this.invoicesService.getInvoices(0, 999).subscribe({
+    this.invoicesService.getInvoices({ page: 0, size: 999 }).subscribe({
       next: (resp: PagedModelInvoice) => {
         const invoices = resp.content;
         if(invoices){
@@ -222,7 +223,7 @@ export class HomePageComponent implements OnInit{
         } else {
           this.invoices.set([]);
         }
-        this.applyFilter();
+        this.filteredInvoices.set(this.invoices());
         this.loading.set(false);
       },
       error: (err) => {
@@ -233,7 +234,7 @@ export class HomePageComponent implements OnInit{
   }
 
   async loadUsers(){
-    const usersFromDb = await firstValueFrom(this.customerService.getCustomers(0,999));
+    const usersFromDb = await firstValueFrom(this.customerService.getCustomers({ page: 0, size: 999 }));
     if(usersFromDb.content){
       usersFromDb.content.forEach(user=>{
         this.users.push({email: user.email, id: user.id!});
@@ -241,24 +242,18 @@ export class HomePageComponent implements OnInit{
     }
   }
 
-  applyFilter() {
-    const { from, to, customerId, status, amountFrom, amountTo, currency } =
-      this.filterForm.value;
-
+  onFilter(filterValues: any) {
+    this.filterForm.patchValue(filterValues);
+    const { from, to, customerId, status, amountFrom, amountTo, currency } = filterValues;
     const filtered = this.invoices().filter(inv => {
-
       if (from && new Date(inv.issueDate) < new Date(from)) return false;
       if (to && new Date(inv.dueDate) > new Date(to)) return false;
-
       if (customerId && inv.customerId !== Number(customerId)) return false;
-
       if (status && inv.status !== status) return false;
-
       if (amountFrom !== null && inv.amount < amountFrom) return false;
       if (amountTo !== null && inv.amount > amountTo) return false;
-
-      return !(currency && inv.currency !== currency);
-
+      if (currency && inv.currency !== currency) return false;
+      return true;
     });
     this.filteredInvoices.set(filtered);
   }

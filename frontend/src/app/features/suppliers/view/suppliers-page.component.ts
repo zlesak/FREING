@@ -10,6 +10,8 @@ import { MatPaginator, MatPaginatorModule, PageEvent } from '@angular/material/p
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { SupplierDto, PagedModelSupplierDto } from '../../../api/generated/customer';
 import { PageTitleService } from '../../common/controller/page-title.service';
+import { EntityFilterComponent } from '../../common/filter/entity-filter.component';
+import { ResponsiveService } from '../../common/controller/common.service';
 
 @Component({
   selector: 'app-suppliers-page',
@@ -24,12 +26,15 @@ import { PageTitleService } from '../../common/controller/page-title.service';
     MatTableModule,
     MatPaginatorModule,
     MatSortModule,
+    EntityFilterComponent,
   ],
 })
 export class SuppliersPageComponent implements OnInit, AfterViewChecked {
+    filterValues: any = {};
   private readonly suppliersService = inject(SuppliersServiceController);
   protected readonly router = inject(Router);
   private readonly pageTitleService = inject(PageTitleService);
+  protected readonly responsiveService = inject(ResponsiveService);
 
   protected dataSource = new MatTableDataSource<SupplierDto>([]);
   protected loading = signal<boolean>(false);
@@ -67,7 +72,8 @@ export class SuppliersPageComponent implements OnInit, AfterViewChecked {
   loadAllSuppliers(): void {
     this.loading.set(true);
     this.error = undefined;
-    this.suppliersService.getSuppliers(this.currentPage, this.currentSize).subscribe({
+    const params = { page: this.currentPage, size: this.currentSize, ...this.filterValues };
+    this.suppliersService.getSuppliers(params).subscribe({
       next: (resp: PagedModelSupplierDto) => {
         this.dataSource.data = resp.content ?? [];
         this.currentPage = resp.page?.number ?? 0;
@@ -80,6 +86,11 @@ export class SuppliersPageComponent implements OnInit, AfterViewChecked {
         this.loading.set(false);
       },
     });
+  }
+
+  onFilter(values: any) {
+    this.filterValues = values;
+    this.loadAllSuppliers();
   }
 
   pageUpdate(event: PageEvent): void {

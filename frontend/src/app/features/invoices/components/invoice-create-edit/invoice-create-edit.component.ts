@@ -334,7 +334,7 @@ export class InvoiceCreateEditComponent implements OnInit {
   }
 
   async loadUsersInfo(){
-    const usersFromDb = await firstValueFrom(this.customerService.getCustomers(0,999));
+    const usersFromDb = await firstValueFrom(this.customerService.getCustomers({ page: 0, size: 999 }));
     if(usersFromDb.content){
       usersFromDb.content.forEach(user=>{
         this.users.push({email: user.email, id: user.id!});
@@ -342,7 +342,7 @@ export class InvoiceCreateEditComponent implements OnInit {
     }
   }
   async loadSuppliersInfo(){
-    const suppliers = await firstValueFrom(this.supplierService.getSuppliers(0,999));
+    const suppliers = await firstValueFrom(this.supplierService.getSuppliers({ page: 0, size: 999 }));
     if(suppliers.content){
       suppliers.content.forEach(supplier=>{
         this.suppliers.push({tradeName: supplier.tradeName, id: supplier.id!});

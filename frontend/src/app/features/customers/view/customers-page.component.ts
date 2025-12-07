@@ -9,8 +9,10 @@ import { MatProgressBar } from '@angular/material/progress-bar';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatPaginator, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatSort, MatSortModule } from '@angular/material/sort';
-import {Customer, CustomerDto} from '../../../api/generated/customer';
+import { Customer, CustomerDto } from '../../../api/generated/customer';
 import { PageTitleService } from '../../common/controller/page-title.service';
+import { EntityFilterComponent } from '../../common/filter/entity-filter.component';
+import { ResponsiveService } from '../../common/controller/common.service';
 
 @Component({
   selector: 'app-customers-page',
@@ -25,12 +27,15 @@ import { PageTitleService } from '../../common/controller/page-title.service';
     MatTableModule,
     MatPaginatorModule,
     MatSortModule,
+    EntityFilterComponent,
   ],
 })
 export class CustomersPageComponent implements OnInit, AfterViewChecked {
+    filterValues: any = {};
   private readonly customersService = inject(CustomersServiceController);
   protected readonly router = inject(Router);
   private readonly pageTitleService = inject(PageTitleService);
+  protected readonly responsiveService = inject(ResponsiveService);
 
   protected dataSource = new MatTableDataSource<CustomerDto>([]);
   protected loading = signal<boolean>(false);
@@ -72,7 +77,8 @@ export class CustomersPageComponent implements OnInit, AfterViewChecked {
   loadAllCustomers(): void {
     this.loading.set(true);
     this.error = undefined;
-    this.customersService.getCustomers(this.page, this.size).subscribe({
+    const params = { page: this.page, size: this.size, ...this.filterValues };
+    this.customersService.getCustomers(params).subscribe({
       next: (resp: CustomerApi.PagedModelCustomerDto) => {
         this.dataSource.data = resp.content ?? [];
         this.page = resp.page?.number ?? 0;
@@ -86,6 +92,11 @@ export class CustomersPageComponent implements OnInit, AfterViewChecked {
         this.loading.set(false);
       },
     });
+  }
+
+  onFilter(values: any) {
+    this.filterValues = values;
+    this.loadAllCustomers();
   }
 
   pageUpdate(event: PageEvent): void {

@@ -15,8 +15,21 @@ export class SuppliersServiceController {
   private readonly supplierService = inject(SupplierControllerService);
 
 
-  getSuppliers(page: number = 0, size: number = 10): Observable<PagedModelSupplierDto> {
-    return this.supplierService.getAllSuppliers({ page, size });
+  getSuppliers(params: {
+    page?: number,
+    size?: number,
+    supplierId?: number,
+    supplierIds?: number[],
+    tradeName?: string,
+    email?: string,
+    phoneNumber?: string,
+    city?: string,
+    ico?: string,
+    dic?: string,
+    country?: string,
+    currency?: string
+  } = {}): Observable<PagedModelSupplierDto> {
+    return this.supplierService.getAllSuppliers(params);
   }
 
   getSuppliersByIds(supplierIds: number[]): Observable<PagedModelSupplierDto> {

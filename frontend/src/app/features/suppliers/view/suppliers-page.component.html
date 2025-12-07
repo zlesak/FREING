@@ -1,22 +1,26 @@
 <section class="page-table-cards">
-
   <div class="toolbar">
-  <h2 style="margin: 10px;">Dodavatelé</h2>
+    <h2 style="margin: 10px;">Dodavatelé</h2>
     <button mat-button class="add-button" (click)="router.navigate(['/suppliers/new'])">
       <mat-icon color="white" aria-label="add">add</mat-icon>
       Nový dodavatel
     </button>
   </div>
 
+  <app-entity-filter [showTradeName]="true" [showName]="false" [showSurname]="false" [showEmail]="true"
+    [showPhone]="true" [showCity]="true" [showIco]="true" [showDic]="true" [showCountry]="true" [showCurrency]="true"
+    [currencyOptions]="['CZK', 'EUR', 'USD']" [responsiveService]="responsiveService" (filter)="onFilter($event)" />
+
   @if (loading()) {
-    <mat-progress-bar style="width: 80%; margin: auto" mode="indeterminate"></mat-progress-bar>
+  <mat-progress-bar style="width: 80%; margin: auto" mode="indeterminate"></mat-progress-bar>
   }
 
   @if (error) {
-    <div class="error">{{ error }}</div>
+  <div class="error">{{ error }}</div>
   }
 
   @if (!loading() && !error && dataSource.data.length) {
+  <div class="table-scroll-area">
     <div class="desktop-table">
       <table mat-table [dataSource]="dataSource" matSort class="table-cards-table">
         <ng-container matColumnDef="index">
@@ -48,22 +52,15 @@
           <td mat-cell *matCellDef="let s">{{ s.dic || '-' }}</td>
         </ng-container>
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr
-          mat-row
-          *matRowDef="let row; columns: displayedColumns;"
-          class="clickable-row"
-          (click)="router.navigate(['/suppliers/edit', row.id])"
-        ></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="clickable-row"
+          (click)="router.navigate(['/suppliers/edit', row.id])"></tr>
       </table>
-      <mat-paginator class="paginator"
-                     [length]="totalElements"
-                     [pageSize]="currentSize"
-                     [pageSizeOptions]="[5, 10, 25, 50]"
-                     [showFirstLastButtons]="true"
-                     [disabled]="loading()"
-                     (page)="pageUpdate($event)">
+      <mat-paginator class="paginator" [length]="totalElements" [pageSize]="currentSize"
+        [pageSizeOptions]="[5, 10, 25, 50]" [showFirstLastButtons]="true" [disabled]="loading()"
+        (page)="pageUpdate($event)">
       </mat-paginator>
     </div>
+  </div>
     <div class="mobile-cards">
       <ng-container *ngFor="let s of dataSource.data">
         <div class="table-card" (click)="router.navigate(['/suppliers/edit', s.id])">
@@ -75,19 +72,14 @@
           <div class="card-row"><strong>DIČ:</strong> {{ s.dic || '-' }}</div>
         </div>
       </ng-container>
-      <mat-paginator class="paginator"
-                     [length]="totalElements"
-                     [pageSize]="currentSize"
-                     [pageSizeOptions]="[5, 10, 25, 50]"
-                     [showFirstLastButtons]="true"
-                     [disabled]="loading()"
-                     (page)="pageUpdate($event)">
+      <mat-paginator class="paginator" [length]="totalElements" [pageSize]="currentSize"
+        [pageSizeOptions]="[5, 10, 25, 50]" [showFirstLastButtons]="true" [disabled]="loading()"
+        (page)="pageUpdate($event)">
       </mat-paginator>
     </div>
   }
 
   @if (!loading() && !error && !dataSource.data.length) {
-    <p>Žádní dodavatelé k zobrazení.</p>
+  <p>Žádní dodavatelé k zobrazení.</p>
   }
 </section>
-

@@ -7,15 +7,20 @@
     </button>
   </div>
 
+  <app-entity-filter [showTradeName]="true" [showName]="true" [showSurname]="true" [showEmail]="true" [showPhone]="true"
+    [showCity]="true" [showIco]="true" [showDic]="true" [showCountry]="true" [showCurrency]="true"
+    [currencyOptions]="['CZK', 'EUR', 'USD']" [responsiveService]="responsiveService" (filter)="onFilter($event)" />
+
   @if (loading()) {
-    <mat-progress-bar style="width: 80%; margin: auto" mode="indeterminate"></mat-progress-bar>
+  <mat-progress-bar style="width: 80%; margin: auto" mode="indeterminate"></mat-progress-bar>
   }
 
   @if (error) {
-    <div class="error">{{ error }}</div>
+  <div class="error">{{ error }}</div>
   }
 
   @if (!loading() && !error && dataSource.data.length) {
+  <div class="table-scroll-area">
     <div class="desktop-table">
       <table mat-table [dataSource]="dataSource" matSort class="table-cards-table">
         <ng-container matColumnDef="index">
@@ -26,9 +31,9 @@
           <th mat-header-cell *matHeaderCellDef mat-sort-header>Jméno / Obchodní název</th>
           <td mat-cell *matCellDef="let c">
             @if (c.tradeName) {
-              <strong>{{ c.tradeName }}</strong>
+            <strong>{{ c.tradeName }}</strong>
             } @else {
-              {{ c.name }} {{ c.surname }}
+            {{ c.name }} {{ c.surname }}
             }
           </td>
         </ng-container>
@@ -49,40 +54,28 @@
           <td mat-cell *matCellDef="let c">{{ c.city }}</td>
         </ng-container>
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr
-          mat-row
-          *matRowDef="let row; columns: displayedColumns;"
-          class="clickable-row"
-          (click)="router.navigate(['/customers/edit', row.id])"
-        ></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="clickable-row"
+          (click)="router.navigate(['/customers/edit', row.id])"></tr>
       </table>
-      <mat-paginator class="paginator"
-             [length]="totalElements"
-             [pageSize]="currentSize"
-             [pageIndex]="currentPage"
-             [pageSizeOptions]="[5, 10, 25, 50]"
-             [showFirstLastButtons]="true"
-             [disabled]="loading()"
-             (page)="pageUpdate($event)">
+      <mat-paginator class="paginator" [length]="totalElements" [pageSize]="currentSize" [pageIndex]="currentPage"
+        [pageSizeOptions]="[5, 10, 25, 50]" [showFirstLastButtons]="true" [disabled]="loading()"
+        (page)="pageUpdate($event)">
       </mat-paginator>
     </div>
+  </div>
     <div class="mobile-cards">
       <ng-container *ngFor="let c of dataSource.data">
         <div class="table-card" (click)="router.navigate(['/customers/edit', c.id])">
-          <div class="card-row"><strong>Jméno:</strong> {{ c.tradeName ? c.tradeName : (c.name + ' ' + c.surname) }}</div>
+          <div class="card-row"><strong>Jméno:</strong> {{ c.tradeName ? c.tradeName : (c.name + ' ' + c.surname) }}
+          </div>
           <div class="card-row"><strong>Email:</strong> {{ c.email }}</div>
           <div class="card-row"><strong>Telefon:</strong> {{ c.phoneNumber }}</div>
           <div class="card-row"><strong>Město:</strong> {{ c.city }}</div>
         </div>
       </ng-container>
-      <mat-paginator class="paginator"
-             [length]="totalElements"
-             [pageSize]="currentSize"
-             [pageIndex]="currentPage"
-             [pageSizeOptions]="[5, 10, 25, 50]"
-             [showFirstLastButtons]="true"
-             [disabled]="loading()"
-             (page)="pageUpdate($event)">
+      <mat-paginator class="paginator" [length]="totalElements" [pageSize]="currentSize" [pageIndex]="currentPage"
+        [pageSizeOptions]="[5, 10, 25, 50]" [showFirstLastButtons]="true" [disabled]="loading()"
+        (page)="pageUpdate($event)">
       </mat-paginator>
     </div>
   }
@@ -90,6 +83,6 @@
 
 
   @if (!loading() && !error && !dataSource.data.length) {
-    <p>Žádní zákazníci k zobrazení.</p>
+  <p>Žádní zákazníci k zobrazení.</p>
   }
 </section>

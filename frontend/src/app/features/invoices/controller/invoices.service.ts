@@ -1,10 +1,11 @@
+
 import { environment } from '../../../../environments/environment';
-import {inject, Injectable} from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { from, Observable, map } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { InvoiceApi } from '../../../api/generated';
-import {InvoicesService, ReportingService} from '../../../api/generated/invoice';
-import {handleError} from '../../common/controller/common.service';
+import { InvoicesService, ReportingService } from '../../../api/generated/invoice';
+import { handleError } from '../../common/controller/common.service';
 
 @Injectable({ providedIn: 'root' })
 export class InvoicesServiceController {
@@ -14,8 +15,18 @@ export class InvoicesServiceController {
     InvoiceApi.OpenAPI.BASE = environment.apiBase;
   }
 
-  getInvoices(page = 0, size = 10): Observable<InvoiceApi.PagedModelInvoice> {
-    return from(this.invoicesService.getInvoices({ page, size })).pipe(
+  getInvoices(params: {
+    page?: number,
+    size?: number,
+    dateFrom?: string,
+    dateTo?: string,
+    customerId?: number,
+    status?: 'DRAFT' | 'PENDING' | 'PAID' | 'OVERDUE' | 'CANCELLED' | 'SENT' | 'PAID_OVERDUE',
+    amountFrom?: number,
+    amountTo?: number,
+    currency?: string
+  } = {}): Observable<InvoiceApi.PagedModelInvoice> {
+    return from(this.invoicesService.getInvoices(params)).pipe(
       catchError(handleError)
     );
   }
