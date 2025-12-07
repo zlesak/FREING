@@ -12,7 +12,7 @@ import {MatProgressBar} from '@angular/material/progress-bar';
 import {
   MatTableDataSource, MatTableModule
 } from '@angular/material/table';
-import {DatePipe} from '@angular/common';
+import {DatePipe, CommonModule} from '@angular/common';
 import {MatSort, MatSortModule} from '@angular/material/sort';
 import {MatPaginator, MatPaginatorModule, PageEvent} from '@angular/material/paginator';
 import {Invoice, PagedModelInvoice} from '../../../../api/generated/invoice';
@@ -38,7 +38,7 @@ export enum InvoiceStatus {
   standalone: true,
   templateUrl: './invoices-table.component.html',
   styleUrl: './invoices-table.component.css',
-  imports: [MatButtonModule, MatDividerModule, MatIconModule, MatProgressBar, MatTableModule, DatePipe, MatSortModule, MatPaginatorModule],
+  imports: [CommonModule, MatButtonModule, MatDividerModule, MatIconModule, MatProgressBar, MatTableModule, DatePipe, MatSortModule, MatPaginatorModule],
 })
 export class InvoicesTableComponent implements OnInit, AfterViewInit {
   private readonly invoicesService = inject( InvoicesServiceController);

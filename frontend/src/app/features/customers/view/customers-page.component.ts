@@ -2,6 +2,7 @@ import { AfterViewChecked, Component, inject, OnInit, signal, ViewChild } from '
 import { CustomersServiceController } from '../controller/customers.service';
 import { CustomerApi } from '../../../api/generated';
 import { Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBar } from '@angular/material/progress-bar';
@@ -15,8 +16,9 @@ import { PageTitleService } from '../../../services/page-title.service';
   selector: 'app-customers-page',
   standalone: true,
   templateUrl: './customers-page.component.html',
-  styleUrl: './customers-page.component.css',
+  styleUrls: ['../../common/common-table-cards.css'],
   imports: [
+    CommonModule,
     MatButtonModule,
     MatIconModule,
     MatProgressBar,

@@ -1,6 +1,7 @@
 import { AfterViewChecked, Component, inject, OnInit, signal, ViewChild } from '@angular/core';
 import { SuppliersServiceController } from '../controller/suppliers.service';
 import { Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBar } from '@angular/material/progress-bar';
@@ -14,8 +15,9 @@ import { PageTitleService } from '../../../services/page-title.service';
   selector: 'app-suppliers-page',
   standalone: true,
   templateUrl: './suppliers-page.component.html',
-  styleUrl: './suppliers-page.component.css',
+  styleUrls: ['../../common/common-table-cards.css'],
   imports: [
+    CommonModule,
     MatButtonModule,
     MatIconModule,
     MatProgressBar,
