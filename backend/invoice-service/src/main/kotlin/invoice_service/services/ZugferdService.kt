@@ -35,6 +35,7 @@ class ZugferdService (
             .setReferenceNumber(invoice.referenceNumber)
             .setIssueDate(Date.from(invoice.issueDate.atStartOfDay(ZoneId.systemDefault()).toInstant()))
             .setDueDate(Date.from(invoice.dueDate.atStartOfDay(ZoneId.systemDefault()).toInstant()))
+            .setDeliveryDate(Date.from(invoice.receiveDate?.atStartOfDay(ZoneId.systemDefault())?.toInstant()))
             .setCurrency(invoice.currency)
             .setSender(
                 toTradeParty(supplier)

@@ -35,6 +35,10 @@ data class Invoice(
     @Column(nullable = false)
     var issueDate: LocalDate = LocalDate.now(),
 
+    @field:Schema(description = "Datum doručení faktury", example = "2025-10-05")
+    @Column(nullable = true)
+    var receiveDate: LocalDate? = null,
+
     @field:Schema(description = "Datum splatnosti faktury", example = "2025-11-05")
     @Column(nullable = false)
     var dueDate: LocalDate = LocalDate.now().plusDays(30),

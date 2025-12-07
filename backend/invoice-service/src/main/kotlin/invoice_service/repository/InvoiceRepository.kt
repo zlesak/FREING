@@ -39,9 +39,10 @@ interface InvoiceRepository : JpaRepository<Invoice, Long>, JpaSpecificationExec
     @Query("""
         UPDATE Invoice i 
         SET i.status = CASE 
-            WHEN i.dueDate >= :currentDate THEN 'PENDING'
-            ELSE 'OVERDUE'
-        END  
+                WHEN i.dueDate >= :currentDate THEN 'PENDING'
+                ELSE 'OVERDUE'
+            END,
+            i.receiveDate = :currentDate
         WHERE i.id = :id AND i.status = 'SENT'
     """)
     fun markInvoiceAsRead(id: Long, currentDate: LocalDate): Int
