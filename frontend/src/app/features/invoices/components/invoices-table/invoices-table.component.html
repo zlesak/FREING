@@ -16,7 +16,7 @@
   @if (error) {
     <div class="error">{{ error }}</div>
   }
- @if(!loading() && !error && dataSource.data){
+ @if(!loading() && !loadingCustomers() && !error && dataSource.data){
   <div>
     <table mat-table [dataSource]="dataSource" class="invoices-table" matSort>
       @if (!loading() && !error && !dataSource.data.length) {
@@ -29,7 +29,7 @@
 
       <ng-container matColumnDef="customerName">
         <th mat-header-cell *matHeaderCellDef>Zákazník</th>
-        <td mat-cell *matCellDef="let inv">{{ inv.customerName ?? inv.customerId }}</td>
+        <td mat-cell *matCellDef="let inv">{{ getCustomerDisplayName(inv.customerId) }}</td>
       </ng-container>
 
       <ng-container matColumnDef="issueDate">
@@ -65,13 +65,14 @@
       ></tr>
     </table>
     <mat-paginator #paginator class="paginator"
-                   [length]="totalElements"
-                   [pageSize]="currentSize"
-                   [pageSizeOptions]="[10, 25, 50, 100]"
-                   [showFirstLastButtons]="true"
-                   [disabled]="loading()"
-                   (page)="pageUpdate($event)"
-                   aria-label="Select page">
+             [length]="totalElements"
+             [pageSize]="currentSize"
+             [pageIndex]="currentPage"
+             [pageSizeOptions]="[10, 25, 50, 100]"
+             [showFirstLastButtons]="true"
+             [disabled]="loading()"
+             (page)="pageUpdate($event)"
+             aria-label="Select page">
     </mat-paginator>
     </div>
  }

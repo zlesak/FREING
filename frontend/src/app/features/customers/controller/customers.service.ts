@@ -38,8 +38,8 @@ export class CustomersServiceController {
     );
   }
 
-  getCustomers(page = 0, size = 10): Observable<CustomerApi.PagedModelCustomerDto> {
-    return from(this.customerControllerService.getAllCustomers({ page, size })).pipe(
+  getCustomers(page = 0, size = 10, customerIds?: number[]): Observable<CustomerApi.PagedModelCustomerDto> {
+    return from(this.customerControllerService.getAllCustomers({ page, size, customerIds })).pipe(
       catchError(this.handleError)
     );
   }

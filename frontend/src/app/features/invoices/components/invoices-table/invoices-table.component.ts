@@ -1,5 +1,5 @@
 import {
-  AfterViewChecked, Component,
+  AfterViewInit, Component,
   inject, OnInit, output, signal, ViewChild
 } from '@angular/core';
 import { InvoicesServiceController } from '../../../../controller/invoices.service';
@@ -20,6 +20,8 @@ import {getStatusColor} from '../../../home/view/home-page.component';
 import {KeycloakService} from '../../../../keycloak.service';
 import { PageTitleService } from '../../../../services/page-title.service';
 import { InvoiceStatusTranslationService } from '../../../../services/invoice-status-translation.service';
+import { CustomersServiceController } from '../../../customers/controller/customers.service';
+import { CustomerDto } from '../../../../api/generated/customer/models/CustomerDto';
 
 export enum InvoiceStatus {
   DRAFT = 'DRAFT',
@@ -36,7 +38,7 @@ export enum InvoiceStatus {
   styleUrl: './invoices-table.component.css',
   imports: [MatButtonModule, MatDividerModule, MatIconModule, MatProgressBar, MatTableModule, DatePipe, MatSortModule, MatPaginatorModule],
 })
-export class InvoicesTableComponent implements OnInit, AfterViewChecked {
+export class InvoicesTableComponent implements OnInit, AfterViewInit {
   private readonly invoicesService = inject( InvoicesServiceController);
   private readonly pageTitleService = inject(PageTitleService);
   protected readonly keycloakService = inject( KeycloakService );
@@ -46,12 +48,16 @@ export class InvoicesTableComponent implements OnInit, AfterViewChecked {
   protected dataSource = new MatTableDataSource<InvoiceApi.Invoice>([]);
   protected loading = signal<boolean>(false);
   protected error?: string;
+  protected loadingCustomers = signal<boolean>(true);
 
   protected totalElements = 0;
   protected currentPage = 0;
   protected currentSize = 10;
   @ViewChild(MatSort) sort!: MatSort;
   @ViewChild('paginator') paginator! : MatPaginator;
+
+  private readonly customersService = inject(CustomersServiceController);
+  protected customersMap: Record<number, CustomerDto> = {};
 
   public displayedColumns: string[] = [
     'invoiceNumber',
@@ -64,28 +70,31 @@ export class InvoicesTableComponent implements OnInit, AfterViewChecked {
 
   ngOnInit(): void {
     this.pageTitleService.setTitle('Faktury');
-    this.loadAllInvoices();
+    this.loadInvoicesPage(0, this.currentSize);
   }
 
-  ngAfterViewChecked() {
-    if (this.sort && this.dataSource.sort !== this.sort) {
+  ngAfterViewInit() {
+    if (this.sort) {
       this.dataSource.sort = this.sort;
+    }
+    if (this.paginator) {
       this.dataSource.paginator = this.paginator;
     }
   }
-  loadAllInvoices(): void {
+  loadInvoicesPage(page: number, size: number): void {
     this.loading.set(true);
     this.error = undefined;
-    this.invoicesService.getInvoices(0, 999).subscribe({
+    this.invoicesService.getInvoices(page, size).subscribe({
       next: (resp: PagedModelInvoice) => {
         if(resp.content){
           this.dataSource.data = resp.content;
           this.outputData.emit(this.dataSource.data);
+          this.totalElements = resp.page?.totalElements ?? resp.content.length;
+          this.loadCustomersForInvoices();
         }
         if (this.paginator) {
           this.paginator.length = this.totalElements;
-          this.paginator.pageSize = this.currentSize;
-          this.paginator.pageIndex = 0;
+          this.paginator.pageSize = size;
         }
         if (this.sort) this.dataSource.sort = this.sort;
         if (this.paginator) this.dataSource.paginator = this.paginator;
@@ -98,9 +107,40 @@ export class InvoicesTableComponent implements OnInit, AfterViewChecked {
     });
   }
 
+  loadCustomersForInvoices(): void {
+    this.loadingCustomers.set(true);
+    const invoiceCustomerIds = Array.from(new Set(this.dataSource.data.map(inv => inv.customerId).filter(id => !!id)));
+    if (!invoiceCustomerIds.length) {
+      this.loadingCustomers.set(false);
+      return;
+    }
+    this.customersService.getCustomers(0, invoiceCustomerIds.length, invoiceCustomerIds).subscribe({
+      next: (resp) => {
+        if (resp.content) {
+          for (const c of resp.content) {
+            this.customersMap[c.id] = c;
+          }
+        }
+        this.loadingCustomers.set(false);
+      },
+      error: (err) => {
+        this.loadingCustomers.set(false);
+        console.log('Nepodařilo se načíst zákazníky:', err);
+      }
+    });
+  }
+
+  getCustomerDisplayName(id: number): string {
+    const c = this.customersMap[id];
+    if (!c) return id?.toString() ?? '';
+    if (c.tradeName && c.tradeName.trim().length > 0) return c.tradeName;
+    return (c.name + ' ' + c.surname).trim();
+  }
+
   pageUpdate(event: PageEvent){
     this.currentPage = event.pageIndex;
     this.currentSize = event.pageSize;
+    this.loadInvoicesPage(this.currentPage, this.currentSize);
   }
 
   async onInvoiceClick(invoice: any){

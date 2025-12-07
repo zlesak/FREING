@@ -9,6 +9,7 @@ import customer_service.repo.CustomerRepo
 import org.keycloak.representations.idm.UserRepresentation
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
+import org.springframework.data.jpa.domain.Specification
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -87,7 +88,14 @@ class CustomerService(
     private fun getCustomerByEmailOrPhoneNumber(email: String, phoneNumber: String): Customer? =
         customerRepo.findByEmailOrPhoneNumber(email, phoneNumber)?.takeIf { !it.deleted }
 
-    fun getAllCustomers(pageable: Pageable): Page<Customer> = customerRepo.findAll(pageable)
+    fun getAllCustomers(pageable: Pageable, customerId: Long? = null, customerIds: List<Long>? = null): Page<Customer> {
+        val spec: Specification<Customer>? = when {
+            !customerIds.isNullOrEmpty() -> Specification { root, _, _ -> root.get<Long>("id").`in`(customerIds) }
+            customerId != null -> Specification { root, _, cb -> cb.equal(root.get<Long>("id"), customerId) }
+            else -> null
+        }
+        return if (spec != null) customerRepo.findAll(spec, pageable) else customerRepo.findAll(pageable)
+    }
 
     fun getCustomersNotDeleted(pageable: Pageable): Page<Customer> =
         customerRepo.findAllByDeletedFalse(pageable)

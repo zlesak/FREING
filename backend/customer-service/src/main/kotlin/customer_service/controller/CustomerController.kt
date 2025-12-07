@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.security.access.prepost.PostAuthorize
 import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -39,15 +40,27 @@ class CustomerController(
     @PostAuthorize("hasAnyAuthority('SCOPE_service.call', 'ROLE_MANAGER', 'ROLE_ACCOUNTANT') or returnObject.id == authentication.principal.id")
     fun getById(@PathVariable("id") id: Long): Customer = customerService.getCustomerById(id)
 
-    @PreAuthorize("hasAnyAuthority('SCOPE_service.call', 'ROLE_MANAGER', 'ROLE_ACCOUNTANT')")
+    @PreAuthorize("hasAnyAuthority('SCOPE_service.call', 'ROLE_MANAGER', 'ROLE_ACCOUNTANT', 'ROLE_CUSTOMER')")
     @Operation(operationId = "getAllCustomers")
     @GetMapping("/get-customers-paged")
     fun getAll(
+        authentication: Authentication,
         @Parameter(description = "Číslo stránky", example = "0")
         @RequestParam(defaultValue = "0") page: Int,
         @Parameter(description = "Velikost stránky", example = "10")
-        @RequestParam(defaultValue = "10") size: Int
-    ): Page<CustomerDto> = customerService.getAllCustomers(PageRequest.of(page, size)).map { it.toDto() }
+        @RequestParam(defaultValue = "10") size: Int,
+        @RequestParam(required = false) customerId: Long?,
+        @RequestParam(required = false) customerIds: List<Long>?
+    ): Page<CustomerDto> {
+        val isCustomer = authentication.authorities.any { it.authority == "ROLE_CUSTOMER" }
+        val principal = authentication.principal as? com.uhk.fim.prototype.common.security.JwtUserPrincipal
+        val effectiveCustomerIds = if (isCustomer) listOf(
+            principal?.id ?: throw IllegalStateException("Customer principal does not contain a valid id.")
+        ) else customerIds
+        val effectiveCustomerId = if (isCustomer) principal?.id else customerId
+        return customerService.getAllCustomers(PageRequest.of(page, size), effectiveCustomerId, effectiveCustomerIds)
+            .map { it.toDto() }
+    }
 
     @PreAuthorize("hasAnyAuthority('SCOPE_service.call', 'ROLE_MANAGER', 'ROLE_ACCOUNTANT')")
     @Operation(operationId = "getAllCustomersNotDeleted")
