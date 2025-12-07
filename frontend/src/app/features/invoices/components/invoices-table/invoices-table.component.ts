@@ -22,6 +22,8 @@ import { PageTitleService } from '../../../../services/page-title.service';
 import { InvoiceStatusTranslationService } from '../../../../services/invoice-status-translation.service';
 import { CustomersServiceController } from '../../../customers/controller/customers.service';
 import { CustomerDto } from '../../../../api/generated/customer/models/CustomerDto';
+import { SuppliersServiceController } from '../../../suppliers/controller/suppliers.service';
+import { SupplierDto } from '../../../../api/generated/customer/models/SupplierDto';
 
 export enum InvoiceStatus {
   DRAFT = 'DRAFT',
@@ -49,6 +51,7 @@ export class InvoicesTableComponent implements OnInit, AfterViewInit {
   protected loading = signal<boolean>(false);
   protected error?: string;
   protected loadingCustomers = signal<boolean>(true);
+  protected loadingSuppliers = signal<boolean>(true);
 
   protected totalElements = 0;
   protected currentPage = 0;
@@ -57,12 +60,17 @@ export class InvoicesTableComponent implements OnInit, AfterViewInit {
   @ViewChild('paginator') paginator! : MatPaginator;
 
   private readonly customersService = inject(CustomersServiceController);
+  private readonly suppliersService = inject(SuppliersServiceController);
   protected customersMap: Record<number, CustomerDto> = {};
+  protected suppliersMap: Record<number, SupplierDto> = {};
 
   public displayedColumns: string[] = [
     'invoiceNumber',
+    'referenceNumber',
     'customerName',
+    'supplierId',
     'issueDate',
+    'receiveDate',
     'dueDate',
     'amount',
     'status'
@@ -91,6 +99,7 @@ export class InvoicesTableComponent implements OnInit, AfterViewInit {
           this.outputData.emit(this.dataSource.data);
           this.totalElements = resp.page?.totalElements ?? resp.content.length;
           this.loadCustomersForInvoices();
+          this.loadSuppliersForInvoices();
         }
         if (this.paginator) {
           this.paginator.length = this.totalElements;
@@ -103,6 +112,28 @@ export class InvoicesTableComponent implements OnInit, AfterViewInit {
       error: (err) => {
         this.error = err.message || 'Nepodařilo se načíst faktury';
         this.loading.set(false);
+      }
+    });
+  }
+  loadSuppliersForInvoices(): void {
+    this.loadingSuppliers.set(true);
+    const invoiceSupplierIds = Array.from(new Set(this.dataSource.data.map(inv => inv.supplierId).filter(id => !!id)));
+    if (!invoiceSupplierIds.length) {
+      this.loadingSuppliers.set(false);
+      return;
+    }
+    this.suppliersService.getSuppliersByIds(invoiceSupplierIds).subscribe({
+      next: (resp) => {
+        if (resp.content) {
+          for (const s of resp.content) {
+            this.suppliersMap[s.id] = s;
+          }
+        }
+        this.loadingSuppliers.set(false);
+      },
+      error: (err) => {
+        this.loadingSuppliers.set(false);
+        console.log('Nepodařilo se načíst dodavatele:', err);
       }
     });
   }
@@ -135,6 +166,13 @@ export class InvoicesTableComponent implements OnInit, AfterViewInit {
     if (!c) return id?.toString() ?? '';
     if (c.tradeName && c.tradeName.trim().length > 0) return c.tradeName;
     return (c.name + ' ' + c.surname).trim();
+  }
+
+  getSupplierDisplayName(id: number): string {
+    const s = this.suppliersMap[id];
+    if (!s) return id?.toString() ?? '';
+    if (s.tradeName && s.tradeName.trim().length > 0) return s.tradeName;
+    return s.email || s.phoneNumber || id?.toString() || '';
   }
 
   pageUpdate(event: PageEvent){

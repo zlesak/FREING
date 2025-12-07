@@ -39,12 +39,14 @@ class SupplierController(
     fun getById(@PathVariable("id") id: Long): Supplier = supplierService.getSupplierById(id)
 
     @Operation(operationId = "getAllSuppliers")
-    @PreAuthorize("hasAnyAuthority('SCOPE_service.call', 'ROLE_MANAGER', 'ROLE_ACCOUNTANT')")
+    @PreAuthorize("hasAnyAuthority('SCOPE_service.call', 'ROLE_MANAGER', 'ROLE_ACCOUNTANT', 'ROLE_CUSTOMER')")
     @GetMapping("/get-suppliers-paged")
     fun getAll(
         @Parameter(description = "Číslo stránky", example = "0")
         @RequestParam(defaultValue = "0") page: Int,
         @Parameter(description = "Velikost stránky", example = "10")
-        @RequestParam(defaultValue = "10") size: Int
-    ): Page<SupplierDto> = supplierService.getAllSuppliers(PageRequest.of(page, size)).map { it.toDto() }
+        @RequestParam(defaultValue = "10") size: Int,
+        @RequestParam(required = false) supplierId: Long?,
+        @RequestParam(required = false) supplierIds: List<Long>?
+    ): Page<SupplierDto> = supplierService.getAllSuppliers(PageRequest.of(page, size), supplierId, supplierIds).map { it.toDto() }
 }

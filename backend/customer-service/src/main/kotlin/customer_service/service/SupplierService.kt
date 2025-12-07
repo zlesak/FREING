@@ -6,6 +6,7 @@ import customer_service.models.Supplier
 import customer_service.repo.SupplierRepo
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
+import org.springframework.data.jpa.domain.Specification
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -52,5 +53,12 @@ class SupplierService(
     private fun getSupplierByEmailOrPhoneNumber(email: String, phoneNumber: String): Supplier? =
         supplierRepo.findByEmailOrPhoneNumber(email, phoneNumber)
 
-    fun getAllSuppliers(pageable: Pageable): Page<Supplier> = supplierRepo.findAll(pageable)
+    fun getAllSuppliers(pageable: Pageable, supplierId: Long? = null, supplierIds: List<Long>? = null): Page<Supplier> {
+        val spec: Specification<Supplier>? = when {
+            !supplierIds.isNullOrEmpty() -> Specification { root, _, _ -> root.get<Long>("id").`in`(supplierIds) }
+            supplierId != null -> Specification { root, _, cb -> cb.equal(root.get<Long>("id"), supplierId) }
+            else -> null
+        }
+        return if (spec != null) supplierRepo.findAll(spec, pageable) else supplierRepo.findAll(pageable)
+    }
 }

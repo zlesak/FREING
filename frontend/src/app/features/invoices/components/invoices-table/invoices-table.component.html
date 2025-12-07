@@ -1,14 +1,13 @@
 <section class="page invoices">
-  <div>
-  <h2>Faktury</h2>
-  @if(keycloakService.hasAdminAccess){
-    <div>
+  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.8rem;">
+    <h2 style="margin: 0;">Faktury</h2>
+    @if(keycloakService.hasAdminAccess){
       <button mat-button class="add-button" (click)="router.navigate(['/invoices/new'])">
         <mat-icon color="white" aria-label="add">add</mat-icon>
         Nová faktura
       </button>
-    </div>
-  }
+    }
+  </div>
   @if (loading()) {
     <mat-progress-bar style="width: 80%; margin: auto" mode="indeterminate"></mat-progress-bar>
   }
@@ -16,9 +15,23 @@
   @if (error) {
     <div class="error">{{ error }}</div>
   }
- @if(!loading() && !loadingCustomers() && !error && dataSource.data){
+ @if(!loading() && !loadingCustomers() && !loadingSuppliers() && !error && dataSource.data){
   <div>
-    <table mat-table [dataSource]="dataSource" class="invoices-table" matSort>
+    <table mat-table [dataSource]="dataSource" class="invoices-table responsive-table" matSort>
+            <ng-container matColumnDef="referenceNumber">
+              <th mat-header-cell *matHeaderCellDef>Ref. číslo</th>
+              <td mat-cell *matCellDef="let inv">{{ inv.referenceNumber || '-' }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="supplierId">
+              <th mat-header-cell *matHeaderCellDef>Dodavatel</th>
+              <td mat-cell *matCellDef="let inv">{{ getSupplierDisplayName(inv.supplierId) }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="receiveDate">
+              <th mat-header-cell *matHeaderCellDef>Datum doručení</th>
+              <td mat-cell *matCellDef="let inv">{{ inv.receiveDate ? (inv.receiveDate | date) : '-' }}</td>
+            </ng-container>
       @if (!loading() && !error && !dataSource.data.length) {
         <p>Žádné faktury k zobrazení.</p>
       }
@@ -56,13 +69,11 @@
         </td>
       </ng-container>
 
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns" class="responsive-header"></tr>
 
-      <tr class="table-row"
-          mat-row *matRowDef="let row;
-           columns: displayedColumns;"
-          (click)="onInvoiceClick(row)"
-      ></tr>
+        <tr class="table-row responsive-row"
+          mat-row *matRowDef="let row; columns: displayedColumns;"
+          (click)="onInvoiceClick(row)"></tr>
     </table>
     <mat-paginator #paginator class="paginator"
              [length]="totalElements"
@@ -75,6 +86,5 @@
              aria-label="Select page">
     </mat-paginator>
     </div>
- }
-  </div>
+  }
 </section>
