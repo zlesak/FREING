@@ -27,9 +27,17 @@ data class Invoice(
     @Column(nullable = false)
     var customerId: Long = 0,
 
+    @field:Schema(description = "ID dodavatele", example = "42")
+    @Column(nullable = false)
+    var supplierId: Long = 0,
+
     @field:Schema(description = "Datum vystavení faktury", example = "2025-10-05")
     @Column(nullable = false)
     var issueDate: LocalDate = LocalDate.now(),
+
+    @field:Schema(description = "Datum doručení faktury", example = "2025-10-05")
+    @Column(nullable = true)
+    var receiveDate: LocalDate? = null,
 
     @field:Schema(description = "Datum splatnosti faktury", example = "2025-11-05")
     @Column(nullable = false)
@@ -72,6 +80,7 @@ data class Invoice(
     fun updateFrom(request: InvoiceUpdateRequest) {
         this.invoiceNumber = request.invoiceNumber
         this.customerId = request.customerId
+        this.supplierId = request.supplierId
         this.referenceNumber = request.referenceNumber
         this.issueDate = request.issueDate
         this.dueDate = request.dueDate

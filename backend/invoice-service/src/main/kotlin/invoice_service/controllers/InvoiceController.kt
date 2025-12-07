@@ -1,12 +1,11 @@
 package invoice_service.controllers
 
-import com.uhk.fim.prototype.common.messaging.enums.invoice.MessageInvoiceAction
+import com.uhk.fim.prototype.common.security.JwtUserPrincipal
 import invoice_service.dtos.invoices.requests.InvoiceCreateRequest
 import invoice_service.dtos.invoices.requests.InvoiceUpdateRequest
-import invoice_service.messaging.MessageSender
 import invoice_service.models.invoices.Invoice
-import com.uhk.fim.prototype.common.security.JwtUserPrincipal
 import invoice_service.services.InvoiceService
+import invoice_service.services.ZugferdService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content
@@ -26,7 +25,7 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("/api/invoices")
 class InvoiceController(
     private val service: InvoiceService,
-    private val messageSender: MessageSender
+    private val zugferdService: ZugferdService
 ) {
 
     @Operation(summary = "Získat všechny faktury", description = "Vrací stránkovaný seznam všech faktur pro účetní.")
@@ -51,15 +50,17 @@ class InvoiceController(
         @RequestParam(defaultValue = "0") page: Int,
         @Parameter(description = "Velikost stránky", example = "10")
         @RequestParam(defaultValue = "10") size: Int
-    ): Page<Invoice>  {
-        val principal = authentication.principal as? JwtUserPrincipal ?: throw IllegalStateException("Invalid principal type")
+    ): Page<Invoice> {
+        val principal =
+            authentication.principal as? JwtUserPrincipal ?: throw IllegalStateException("Invalid principal type")
         return service.getAllInvoicesForLoggedInCustomer(
             principal.id,
-            PageRequest.of(page, size))
+            PageRequest.of(page, size)
+        )
     }
 
     @Operation(summary = "Získat fakturu podle ID", description = "Vrací detail faktury podle jejího ID.")
-    @PostAuthorize("hasRole('ACCOUNTANT') or hasRole('MANAGER') or returnObject.customerId == authentication.principal.id")
+    @PostAuthorize("hasRole('ACCOUNTANT') or hasRole('MANAGER') or (returnObject.customerId == authentication.principal.id and returnObject.status.name() != 'DRAFT')")
     @GetMapping("/get-by-id/{id}")
     fun getInvoice(
         authentication: Authentication,
@@ -75,11 +76,7 @@ class InvoiceController(
         @Parameter(description = "ID faktury", example = "1")
         @PathVariable id: Long
     ): String {
-        return messageSender.sendInvoiceRequest(
-            invoiceId = id,
-            action = MessageInvoiceAction.RENDER,
-            timeoutSeconds = 10
-        ).payload["xml"]?.toString() ?: throw IllegalStateException("XML payload not found")
+        return zugferdService.createInvoice(id)
     }
 
     @Operation(summary = "Vytvořit novou fakturu", description = "Vytvoří novou fakturu na základě požadavku.")
@@ -121,4 +118,16 @@ class InvoiceController(
         @Parameter(description = "ID faktury", example = "1")
         @PathVariable id: Long
     ) = service.deleteInvoice(id)
+
+    @Operation(summary = "Faktura přečtena", description = "Posune fakturu do stav upending jelikož ji zákazník přečetl.")
+    @PreAuthorize("hasRole('CUSTOMER')")
+    @PostMapping("/read/{id}")
+    fun markInvoiceAsRead(
+        authentication: Authentication,
+        @Parameter(description = "ID faktury", example = "1")
+        @PathVariable id: Long
+    ) {
+        getInvoice(authentication, id)
+        service.markInvoiceAsRead(id)
+    }
 }

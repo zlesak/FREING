@@ -17,7 +17,7 @@ rectangle "FREING" <<system>> as freing {
 '    }
 }
 
-node PayPal as paypal{
+node PaymentGateway as paypal{
 }
 
 node ExchangeRates as exchange_rates{

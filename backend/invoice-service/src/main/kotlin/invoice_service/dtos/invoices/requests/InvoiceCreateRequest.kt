@@ -14,6 +14,8 @@ data class InvoiceCreateRequest(
     var referenceNumber: String? = null,
     @field:Schema(description = "ID zákazníka", example = "42")
     var customerId: Long = 0,
+    @field:Schema(description = "ID dodavatele", example = "42")
+    var supplierId: Long = 0,
     @field:Schema(description = "Datum vystavení faktury", example = "2025-10-05")
     val issueDate: LocalDate,
     @field:Schema(description = "Datum splatnosti faktury", example = "2025-11-05")
@@ -32,6 +34,7 @@ data class InvoiceCreateRequest(
             invoiceNumber = this.invoiceNumber,
             referenceNumber = this.referenceNumber,
             customerId = this.customerId,
+            supplierId = this.supplierId,
             issueDate = this.issueDate,
             dueDate = this.dueDate,
             amount = this.amount,

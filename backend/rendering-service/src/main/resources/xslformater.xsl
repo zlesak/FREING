@@ -184,9 +184,9 @@
                     <xsl:for-each select="/rsm:CrossIndustryInvoice/rsm:SupplyChainTradeTransaction/ram:IncludedSupplyChainTradeLineItem">
                         <tr>
                             <td><xsl:value-of select="ram:SpecifiedLineTradeDelivery/ram:BilledQuantity"/></td>
-                            <td><xsl:value-of select="ram:SpecifiedLineTradeAgreement/ram:GrossPriceProductTradePrice/ram:BasisQuantity/@unitCode"/></td>
+                            <td><xsl:value-of select="ram:SpecifiedLineTradeDelivery/ram:BilledQuantity/@unitCode"/></td>
                             <td><xsl:value-of select="ram:SpecifiedTradeProduct/ram:Name"/></td>
-                            <td><xsl:value-of select="ram:SpecifiedLineTradeAgreement/ram:GrossPriceProductTradePrice/ram:ChargeAmount"/><xsl:value-of select="$cur"/></td>
+                            <td><xsl:value-of select="ram:SpecifiedLineTradeAgreement/ram:NetPriceProductTradePrice/ram:ChargeAmount"/><xsl:value-of select="$cur"/></td>
                             <td><xsl:value-of select="ram:SpecifiedLineTradeSettlement/ram:ApplicableTradeTax/ram:RateApplicablePercent"/>%</td>
                             <td><xsl:value-of select="ram:SpecifiedLineTradeSettlement/ram:SpecifiedTradeSettlementLineMonetarySummation/ram:LineTotalAmount"/><xsl:value-of select="$cur"/></td>
 

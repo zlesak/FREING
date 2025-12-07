@@ -22,7 +22,7 @@ repositories {
 dependencies {
     implementation(project(":common"))
     implementation("org.modelmapper:modelmapper:3.2.5")
-    implementation("org.mustangproject:validator:2.20.0:shaded")
+    implementation("org.mustangproject:validator:2.20.0")
     implementation("com.google.zxing:core:3.5.1")
     implementation("com.google.zxing:javase:3.5.1")
 

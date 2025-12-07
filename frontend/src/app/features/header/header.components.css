@@ -1,0 +1,152 @@
+.app-header {
+  --header-height: 56px;
+  position: sticky;
+  top: 0;
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  padding: 0 1.5rem;
+  height: var(--header-height);
+  background: #ffffffee;
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid #e4e7ec;
+  font-family: Inter, Arial, sans-serif;
+  z-index: 100;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+  font-size: 1.1rem;
+  gap: .5rem;
+  white-space: nowrap;
+}
+.logo { font-size: 1.3rem; }
+.title { letter-spacing: .5px; }
+
+.nav {
+  display: flex;
+  gap: 1rem;
+  flex: 1 1 auto;
+}
+.nav a {
+  position: relative;
+  text-decoration: none;
+  color: #344054;
+  padding: .35rem .6rem;
+  border-radius: .5rem;
+  font-size: .9rem;
+  transition: background .18s ease, color .18s ease;
+}
+.nav a:hover { background: #f2f4f7; }
+.nav a.active { background: #eef2ff; color: #4338ca; }
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  background: #f8f9ff;
+  border-radius: 0.6rem;
+  border: 1px solid #e0e7ff;
+}
+
+.user-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.user-name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #1e293b;
+  line-height: 1.2;
+}
+
+.user-role {
+  font-size: 0.75rem;
+  color: #64748b;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.icon-btn {
+  background: #f2f4f7;
+  border: 1px solid #d0d5dd;
+  border-radius: .6rem;
+  height: 36px; width: 36px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem;
+  transition: background .18s, border-color .18s;
+}
+.icon-btn:hover:not(:disabled) { background: #e4e7ec; }
+.icon-btn:disabled { opacity: .5; cursor: not-allowed; }
+
+.primary-btn {
+  background: #667eea;
+  color: #fff;
+  border: 1px solid #667eea;
+  padding: .55rem 1rem;
+  border-radius: .6rem;
+  font-size: .85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background .18s, box-shadow .18s;
+}
+.primary-btn:hover:not(:disabled) { background: #4f46e5; }
+.primary-btn:disabled { opacity: .55; cursor: not-allowed; }
+
+@media (max-width: 768px) {
+  .app-header {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    height: auto;
+  }
+
+  .brand {
+    flex: 1 1 100%;
+    justify-content: center;
+  }
+
+  .nav {
+    flex: 1 1 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .nav a {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.9rem;
+  }
+
+  .actions {
+    flex: 1 1 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.75rem;
+  }
+
+  .user-info {
+    width: 100%;
+    max-width: 300px;
+    justify-content: center;
+  }
+
+  .primary-btn {
+    width: 100%;
+    max-width: 220px;
+  }
+}

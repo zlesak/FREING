@@ -3,14 +3,14 @@ package invoice_service.components.mappers
 import invoice_service.dtos.reports.responses.AllInvoicesReportResponse
 import invoice_service.dtos.reports.responses.CustomerInvoicesReportResponse
 import invoice_service.extensions.totalAmount
-import invoice_service.messaging.handlers.CustomerServiceHandler
+import invoice_service.messaging.handlers.CustomerServiceRequestHandler
 import invoice_service.models.invoices.Invoice
 import org.springframework.stereotype.Component
 
 
 @Component
 class InvoiceReportMapper(
-    private val customerServiceHandler: CustomerServiceHandler
+    private val customerServiceRequestHandler: CustomerServiceRequestHandler
 ) {
 
     fun groupInvoicesByCustomer(invoices: List<Invoice>): List<CustomerInvoicesReportResponse> =
@@ -18,7 +18,7 @@ class InvoiceReportMapper(
             .groupBy { it.customerId }
             .map { (customerId, customerInvoices) ->
                 CustomerInvoicesReportResponse(
-                    customerName = customerServiceHandler.getCustomerNameById(customerId),
+                    customerName = customerServiceRequestHandler.getCustomerNameById(customerId),
                     invoiceCount = customerInvoices.size,
                     totalAmount = customerInvoices.totalAmount()
                 )

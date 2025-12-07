@@ -10,3 +10,26 @@ p { margin: 0 0 1rem; }
 
 .page { width:100%; }
 
+@media (max-width: 768px) {
+  .app-content {
+    margin: 0;
+    padding: 0;
+  }
+
+  .page {
+    margin: 0;
+    padding: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  html, body {
+    overflow-x: hidden;
+  }
+
+  .app-content {
+    margin: 0;
+    padding: 0;
+  }
+}
+

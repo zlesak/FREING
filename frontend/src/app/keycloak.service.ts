@@ -1,12 +1,18 @@
 // frontend/src/app/keycloak.service.ts
 import { Injectable } from '@angular/core';
-import Keycloak, { KeycloakInstance, KeycloakInitOptions } from 'keycloak-js';
+import Keycloak, {KeycloakInstance, KeycloakInitOptions, KeycloakProfile} from 'keycloak-js';
+import {HttpClient} from '@angular/common/http';
 
 @Injectable({ providedIn: 'root' })
 export class KeycloakService {
   private keycloakAuth!: KeycloakInstance;
   private refreshTimeoutId: number | null = null;
   private readonly refreshMinValidity = 30;
+  public hasAdminAccess: boolean = false;
+  public currentUser: KeycloakProfile | null = null;
+
+  constructor(public readonly http: HttpClient) {
+  }
 
   public async init(): Promise<void> {
     this.keycloakAuth = new Keycloak({
@@ -24,14 +30,19 @@ export class KeycloakService {
     return new Promise((resolve, reject) => {
       this.keycloakAuth.init(initOptions).then((authenticated) => {
         if (authenticated) {
+          this.hasAdminAccess = this.hasAnyRole(['accountant','manager']);
           try {
             this.scheduleTokenRefresh();
           } catch (e) {
             console.warn('Nepodařilo se naplánovat automatické obnovení tokenu', e);
           }
-          resolve();
+          this.keycloakAuth.loadUserProfile().then((currentUser)=>{
+            this.currentUser = currentUser;
+            resolve();
+          })
         } else {
           reject('Neautentizováno');
+          resolve();
         }
       }).catch((error) => reject(error));
     });
@@ -54,7 +65,6 @@ export class KeycloakService {
     this.keycloakAuth.logout();
   }
 
-  // Přidáno: zkontroluje, zda token obsahuje některou z požadovaných rolí
   public hasAnyRole(requiredRoles: string[]): boolean {
     if (!this.keycloakAuth || !this.keycloakAuth.tokenParsed) {
       return false;
@@ -76,6 +86,29 @@ export class KeycloakService {
     }
 
     return requiredRoles.some(r => rolesSet.has(r));
+  }
+
+  public getUserRoles(): string[] {
+    if (!this.keycloakAuth || !this.keycloakAuth.tokenParsed) {
+      return [];
+    }
+
+    const tokenParsed: any = this.keycloakAuth.tokenParsed;
+    const rolesSet = new Set<string>();
+
+    if (tokenParsed.realm_access && Array.isArray(tokenParsed.realm_access.roles)) {
+      tokenParsed.realm_access.roles.forEach((r: string) => rolesSet.add(r));
+    }
+
+    if (tokenParsed.resource_access && typeof tokenParsed.resource_access === 'object') {
+      Object.values(tokenParsed.resource_access).forEach((client: any) => {
+        if (client && Array.isArray(client.roles)) {
+          client.roles.forEach((r: string) => rolesSet.add(r));
+        }
+      });
+    }
+
+    return Array.from(rolesSet);
   }
 
   private scheduleTokenRefresh(): void {
@@ -139,4 +172,13 @@ export class KeycloakService {
         }
       });
   }
+
+  get currentCustomerId(): number | null {
+    const tokenParsed: any = this.keycloakAuth.tokenParsed;
+    if (!tokenParsed) return null;
+    console.log(tokenParsed);
+    return Number(tokenParsed["db_id"] ?? null);
+  }
+
+
 }

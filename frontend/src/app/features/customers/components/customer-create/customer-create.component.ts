@@ -1,146 +1,291 @@
-import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {Component, OnInit, signal} from '@angular/core';
+import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import { CustomersServiceController } from '../../controller/customers.service';
-import { CreateCustomerDto } from '../../../../api/generated/customer/models/CreateCustomerDto';
-import { Router } from '@angular/router';
+import {ActivatedRoute, Router, RouterLink} from '@angular/router';
+import { CustomerApi } from '../../../../api/generated';
+import {MatFormField} from '@angular/material/input';
+import {MatLabel} from '@angular/material/input';
+import {MatInput} from '@angular/material/input';
+import {MatCard, MatCardContent, MatCardHeader} from '@angular/material/card';
+import {MatDatepicker, MatDatepickerInput, MatDatepickerToggle} from '@angular/material/datepicker';
+import {MatButton, MatIconButton} from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import {MatNativeDateModule, MatOption, provideNativeDateAdapter} from '@angular/material/core';
+import {MatSelect} from '@angular/material/select';
+import {firstValueFrom} from 'rxjs';
+import {MatIcon} from '@angular/material/icon';
 
 @Component({
   selector: 'app-customer-create',
   templateUrl: './customer-create.component.html',
   styleUrls: ['./customer-create.component.css'],
-  standalone: false
+  imports: [
+    ReactiveFormsModule,
+    RouterLink,
+    MatFormField,
+    MatLabel,
+    MatInput,
+    MatCardContent,
+    MatCardHeader,
+    MatCard,
+    MatDatepickerToggle,
+    MatDatepicker,
+    MatDatepickerInput,
+    MatFormFieldModule,
+    MatButton,
+    MatNativeDateModule,
+    MatOption,
+    MatSelect,
+    MatIcon,
+    MatIconButton
+  ], providers: [
+    provideNativeDateAdapter(),
+  ],
+  standalone: true
 })
-export class CustomerCreateComponent {
+export class CustomerCreateComponent implements OnInit {
   form: FormGroup;
   submitting = false;
   error?: string;
   success?: string;
+  editMode = signal(false);
+  editCustomerId: number = 0;
 
-  aresLoading = false;
-  aresError?: string;
-  aresSuccess?: string;
-
-  constructor(private fb: FormBuilder, private router: Router, private customersService: CustomersServiceController) {
+  constructor(
+    private fb: FormBuilder,
+    private customersService: CustomersServiceController,
+    private router: Router,
+    private route: ActivatedRoute
+  ) {
     this.form = this.fb.group({
       name: [''],
       surname: [''],
       tradeName: [''],
       email: ['', [Validators.required, Validators.email]],
-      phoneNumber: [''],
-      birthDate: [''],
-      street: [''],
-      houseNumber: [''],
-      city: [''],
-      zip: [''],
-      country: [''],
+      phoneNumber: ['', [Validators.required]],
+      birthDate: [null],
+      street: ['', [Validators.required]],
+      houseNumber: ['', [Validators.required]],
+      city: ['', [Validators.required]],
+      zip: ['', [Validators.required]],
+      country: ['Česká republika', [Validators.required]],
       ico: [''],
       dic: [''],
       bankCode: [''],
       bankAccount: [''],
-      currency: ['']
-    }, {
-      validators: (group: FormGroup) => {
-        const name = group.get('name')?.value?.trim();
-        const surname = group.get('surname')?.value?.trim();
-        const tradeName = group.get('tradeName')?.value?.trim();
-        if ((!name || !surname) && !tradeName) {
-          return { nameSurnameOrTradeName: true };
-        }
-        return null;
-      }
-    });
+      currency: ['CZK', [Validators.required]],
+    }, { validators: this.nameOrTradeNameValidator });
   }
 
-  submit() {
-    this.error = undefined; this.success = undefined;
-    if (this.form.invalid) { this.form.markAllAsTouched(); return; }
-    this.submitting = true;
-    const payload: CreateCustomerDto = {
-      name: this.form.value.name,
-      surname: this.form.value.surname,
-      tradeNumber: this.form.value.tradeName,
-      email: this.form.value.email,
-      phoneNumber: this.form.value.phoneNumber,
-      birthDate: this.form.value.birthDate,
-      street: this.form.value.street,
-      houseNumber: this.form.value.houseNumber,
-      city: this.form.value.city,
-      zip: this.form.value.zip,
-      country: this.form.value.country,
-      ico: this.form.value.ico,
-      dic: this.form.value.dic,
-      bankCode: this.form.value.bankCode,
-      bankAccount: this.form.value.bankAccount,
-      currency: this.form.value.currency
-    };
+  private nameOrTradeNameValidator(group: FormGroup): { [key: string]: boolean } | null {
+    const name = group.get('name')?.value?.trim();
+    const surname = group.get('surname')?.value?.trim();
+    const tradeName = group.get('tradeName')?.value?.trim();
 
-    this.customersService.createCustomer(payload).subscribe({
-      next: (resp) => {
-        this.submitting = false;
-        this.success = 'Zákazník vytvořen: ' + (resp.id ?? '');
-        setTimeout(() => this.router.navigate(['/customers']), 800);
+    const hasPersonalName = name && surname;
+    const hasTradeName = tradeName;
+
+    if (!hasPersonalName && !hasTradeName) {
+      return { nameOrTradeNameRequired: true };
+    }
+
+    // Nesmí být vyplněno obojí
+    if (hasPersonalName && hasTradeName) {
+      return { bothNameTypesProvided: true };
+    }
+
+    return null;
+  }
+  protected defaultBirthday = new Date(1995,1,1);
+  protected currency: string = 'CZK';
+  protected currencyOptions = ['CZK', 'EUR', 'USD'];
+
+  ngOnInit(): void {
+    this.editCustomerId = Number(this.route.snapshot.paramMap.get('id'));
+    if (this.editCustomerId) {
+      this.editMode.set(true);
+      this.loadCustomer();
+    }
+  }
+
+  private loadCustomer(): void {
+    this.customersService.getCustomer(this.editCustomerId).subscribe({
+      next: (customer: CustomerApi.Customer) => {
+        this.form.patchValue({
+          name: customer.name || '',
+          surname: customer.surname || '',
+          tradeName: customer.tradeName || '',
+          email: customer.email,
+          phoneNumber: customer.phoneNumber,
+          birthDate: customer.birthDate ? new Date(customer.birthDate) : null,
+          street: customer.street,
+          houseNumber: customer.houseNumber,
+          city: customer.city,
+          zip: customer.zip,
+          country: customer.country,
+          ico: customer.ico,
+          dic: customer.dic,
+          bankCode: customer.bankCode,
+          bankAccount: customer.bankAccount,
+          currency: customer.currency,
+        });
       },
-      error: (err) => {
-        this.submitting = false;
-        this.error = err?.message || 'Chyba při vytváření zákazníka';
-      }
+      error: (err: any) => {
+        this.error = err?.message || 'Nepodařilo se načíst zákazníka';
+      },
     });
   }
 
-  fetchFromAres() {
-    this.aresError = undefined;
-    this.aresSuccess = undefined;
+  submit(): void {
+    this.error = undefined;
+    this.success = undefined;
 
-    const ico = (this.form.get('ico')?.value || '').toString().trim();
-    if (!ico) {
-      this.aresError = 'Zadejte platné IČO';
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
       return;
     }
 
-    this.aresLoading = true;
-    this.customersService.getCustomerInfoFromAres(ico).subscribe({
-      next: (resp) => {
-        this.aresLoading = false;
-        if (!resp) {
-          this.aresError = 'Pro zadané IČO nebyly nalezeny žádné údaje';
-          return;
-        }
+    this.submitting = true;
 
-        const patch: any = {};
-        if (resp.name !== undefined && resp.name !== null) patch.name = resp.name;
-        if (resp.surname !== undefined && resp.surname !== null) patch.surname = resp.surname;
-        if (resp.tradeName !== undefined && resp.tradeName !== null) patch.tradeName = resp.tradeName;
-        if (resp.email !== undefined && resp.email !== null) patch.email = resp.email;
-        if (resp.phoneNumber !== undefined && resp.phoneNumber !== null) patch.phoneNumber = resp.phoneNumber;
-        if (resp.birthDate !== undefined && resp.birthDate !== null) {
-          try {
-            const d = new Date(resp.birthDate as any);
-            if (!isNaN(d.getTime())) {
-              const yyyy = d.getFullYear();
-              const mm = String(d.getMonth() + 1).padStart(2, '0');
-              const dd = String(d.getDate()).padStart(2, '0');
-              patch.birthDate = `${yyyy}-${mm}-${dd}`;
-            }
-          } catch (e) { /* ignore převod */ }
-        }
-        if (resp.street !== undefined && resp.street !== null) patch.street = resp.street;
-        if (resp.houseNumber !== undefined && resp.houseNumber !== null) patch.houseNumber = resp.houseNumber;
-        if (resp.city !== undefined && resp.city !== null) patch.city = resp.city;
-        if (resp.zip !== undefined && resp.zip !== null) patch.zip = resp.zip;
-        if (resp.country !== undefined && resp.country !== null) patch.country = resp.country;
-        if (resp.ico !== undefined && resp.ico !== null) patch.ico = resp.ico;
-        if (resp.dic !== undefined && resp.dic !== null) patch.dic = resp.dic;
-        if (resp.bankCode !== undefined && resp.bankCode !== null) patch.bankCode = resp.bankCode;
-        if (resp.bankAccount !== undefined && resp.bankAccount !== null) patch.bankAccount = resp.bankAccount;
-        if (resp.currency !== undefined && resp.currency !== null) patch.currency = resp.currency;
+    if (this.editMode()) {
+      const formValue = this.form.value;
 
-        this.form.patchValue(patch);
-        this.aresSuccess = 'Údaje načteny z ARES';
-      },
-      error: (err) => {
-        this.aresLoading = false;
-        this.aresError = err?.message || 'Chyba při načítání z ARES';
-      }
-    });
+      const hasPersonalName = formValue.name?.trim() && formValue.surname?.trim();
+      const hasTradeName = formValue.tradeName?.trim();
+
+      const updateRequest: CustomerApi.CustomerDto = {
+        id: this.editCustomerId,
+        name: hasPersonalName ? formValue.name : '',
+        surname: hasPersonalName ? formValue.surname : '',
+        tradeName: hasTradeName ? formValue.tradeName : '',
+        email: formValue.email,
+        phoneNumber: formValue.phoneNumber || '',
+        birthDate: formValue.birthDate,
+        street: formValue.street || '',
+        houseNumber: formValue.houseNumber || '',
+        city: formValue.city || '',
+        zip: formValue.zip || '',
+        country: formValue.country || '',
+        ico: formValue.ico || '',
+        dic: formValue.dic || '',
+        bankCode: formValue.bankCode || '',
+        bankAccount: formValue.bankAccount || '',
+        currency: formValue.currency || 'CZK',
+      };
+
+      this.customersService.updateCustomer(updateRequest).subscribe({
+        next: () => {
+          this.submitting = false;
+          this.success = 'Zákazník byl úspěšně aktualizován';
+          setTimeout(() => this.router.navigate(['/customers']), 800);
+        },
+        error: (err) => {
+          this.submitting = false;
+          this.error = err.message || 'Chyba při aktualizaci zákazníka';
+          console.error(err);
+        },
+      });
+    } else {
+      const formValue = this.form.value;
+
+      const hasPersonalName = formValue.name?.trim() && formValue.surname?.trim();
+      const hasTradeName = formValue.tradeName?.trim();
+
+      const request: CustomerApi.CreateCustomerDto = {
+        name: hasPersonalName ? formValue.name : '',
+        surname: hasPersonalName ? formValue.surname : '',
+        tradeName: hasTradeName ? formValue.tradeName : '',
+        email: formValue.email,
+        phoneNumber: formValue.phoneNumber || '',
+        birthDate: formValue.birthDate,
+        street: formValue.street || '',
+        houseNumber: formValue.houseNumber || '',
+        city: formValue.city || '',
+        zip: formValue.zip || '',
+        country: formValue.country || '',
+        ico: formValue.ico || '',
+        dic: formValue.dic || '',
+        bankCode: formValue.bankCode || '',
+        bankAccount: formValue.bankAccount || '',
+        currency: formValue.currency || 'CZK',
+      };
+
+      console.log('Creating customer with data:', request);
+
+      this.customersService.createCustomer(request).subscribe({
+        next: () => {
+          this.submitting = false;
+          this.success = 'Zákazník byl úspěšně vytvořen';
+          setTimeout(() => this.router.navigate(['/customers']), 800);
+        },
+        error: (err) => {
+          this.submitting = false;
+          this.error = err.message || 'Chyba při vytváření zákazníka';
+          console.error(err);
+        },
+      });
+    }
   }
+
+  async loadInfoFromARES(): Promise<void> {
+    const icoControl = this.form.get('ico');
+    let ico:string = icoControl?.value;
+    ico = ico.trim();
+
+    if (!ico || ico.length !== 8) {
+      console.error('Invalid IČO format.');
+      icoControl?.setErrors({ 'invalidIcoFormat': true });
+      return;
+    }
+    try {
+      const aresInfo = await firstValueFrom(this.customersService.getCustomerInfoFromAres(ico));
+
+      console.log('ARES Info Received:', aresInfo);
+
+      const patchData: { [key: string]: any } = {};
+
+      const isPresent = (value: any): boolean => {
+        return value !== null && value !== undefined && value !== '';
+      }
+
+      if (isPresent(aresInfo.tradeName)) {
+        patchData['name'] = '';
+        patchData['surname'] = '';
+        patchData['tradeName'] = aresInfo.tradeName;
+      }
+
+      patchData['street'] = aresInfo.street;
+      patchData['houseNumber'] = aresInfo.houseNumber;
+      patchData['city'] = aresInfo.city;
+      patchData['zip'] = aresInfo.zip;
+      patchData['country'] = aresInfo.country;
+
+      patchData['ico'] = aresInfo.ico;
+      if (isPresent(aresInfo.dic)) {
+        patchData['dic'] = aresInfo.dic;
+      }
+
+      if (isPresent(aresInfo.bankAccount)) {
+        patchData['bankAccount'] = aresInfo.bankAccount;
+      }
+      if (isPresent(aresInfo.bankCode)) {
+        patchData['bankCode'] = aresInfo.bankCode;
+      }
+
+      if (isPresent(aresInfo.currency)) {
+        patchData['currency'] = aresInfo.currency;
+      }
+      /* ARES doesnt return correct birthday
+      if (isPresent(aresInfo.birthDate)) {
+        patchData['birthDate'] = new Date(aresInfo.birthDate!);
+      }
+    */
+      this.form.patchValue(patchData);
+
+    } catch (error) {
+      console.error('Error fetching ARES information:', error);
+      icoControl?.setErrors({ 'aresLookupFailed': true });
+    }
+  }
+
 }

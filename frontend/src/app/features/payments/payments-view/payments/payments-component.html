@@ -1,0 +1,84 @@
+<div class="payments-container">
+  <mat-card class="payment-card">
+    <mat-card-content>
+      <div class="payment-header">
+        <h2>💳 Platba faktury</h2>
+      </div>
+
+      @if (loading()) {
+        <div class="loading-container">
+          <mat-progress-spinner mode="indeterminate" diameter="50"></mat-progress-spinner>
+          <p>Zpracovávám platbu...</p>
+        </div>
+      }
+
+      @if (error()) {
+        <div class="error-message">
+          <mat-icon>error</mat-icon>
+          <p>{{ error() }}</p>
+        </div>
+      }
+
+      @if (!loading() && !paymentCreated() && !error()) {
+        <div class="payment-info">
+          <div class="info-row">
+            <span class="label">Faktura č.:</span>
+            <span class="value">{{ invoiceId() }}</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Částka k úhradě:</span>
+            <span class="value amount">{{ amount() }} {{ currency() }}</span>
+          </div>
+          @if (description()) {
+            <div class="info-row">
+              <span class="label">Popis:</span>
+              <span class="value">{{ description() }}</span>
+            </div>
+          }
+        </div>
+
+        <div class="payment-methods">
+          <h3>Způsob platby</h3>
+          <div class="method-card active">
+            <mat-icon>account_balance</mat-icon>
+            <div>
+              <strong>Mock Payment Gateway</strong>
+              <p>Testovací platební brána pro vývoj</p>
+            </div>
+          </div>
+        </div>
+      }
+
+      @if (paymentCreated() && approvalUrl()) {
+        <div class="success-message">
+          <mat-icon>check_circle</mat-icon>
+          <h3>Platba byla vytvořena</h3>
+          <p>Budete přesměrováni na stránku pro schválení platby...</p>
+          <p class="order-id">Order ID: {{ orderId() }}</p>
+        </div>
+      }
+    </mat-card-content>
+
+    <mat-card-actions align="end">
+      <button mat-button (click)="goBack()" [disabled]="loading()">
+        <mat-icon>arrow_back</mat-icon>
+        Zpět
+      </button>
+
+      @if (!paymentCreated() && !loading()) {
+        <button mat-raised-button color="primary" (click)="createPayment()">
+          <mat-icon>payment</mat-icon>
+          Zaplatit
+        </button>
+      }
+
+      @if (paymentCreated() && approvalUrl()) {
+        <a [href]="approvalUrl()" mat-raised-button color="accent">
+          <mat-icon>open_in_new</mat-icon>
+          Přejít na platbu
+        </a>
+      }
+    </mat-card-actions>
+  </mat-card>
+</div>
+

@@ -1,4 +1,213 @@
 <section class="page home">
-  <h2>Domovská stránka</h2>
-  <p>Obsah bude doplněn.</p>
+  <form [formGroup]="filterForm">
+    <div class="filter" [ngClass]="responsiveService.isMobile ? 'mobile' : ''">
+    <mat-form-field
+    subscriptSizing="dynamic"
+    [hideRequiredMarker]="true"
+    >
+      <mat-label>Datum od</mat-label>
+      <input matInput [matDatepicker]="IssueDatePicker"
+             formControlName="from" />
+      <mat-datepicker-toggle matIconSuffix [for]="IssueDatePicker"></mat-datepicker-toggle>
+      <mat-datepicker #IssueDatePicker></mat-datepicker>
+    </mat-form-field>
+
+      <mat-form-field
+        subscriptSizing="dynamic"
+        [hideRequiredMarker]="true"
+      >
+      <mat-label>Datum do</mat-label>
+      <input matInput [matDatepicker]="dueDatePicker"
+             formControlName="to" />
+      <mat-datepicker-toggle matIconSuffix [for]="dueDatePicker"></mat-datepicker-toggle>
+      <mat-datepicker #dueDatePicker></mat-datepicker>
+    </mat-form-field>
+
+    @if(keycloakService.hasAdminAccess){
+      <mat-form-field
+        subscriptSizing="dynamic"
+        [hideRequiredMarker]="true"
+      >
+        <mat-label>Zákazník</mat-label>
+        <mat-select formControlName="customerId">
+          <mat-option [value]="null"> zrušit výběr</mat-option>
+          @for(user of users; track $index){
+            <mat-option [value]="user.id">{{user.email}}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    }
+
+      <mat-form-field
+        subscriptSizing="dynamic"
+        [hideRequiredMarker]="true"
+      >
+      <mat-label>Stav</mat-label>
+      <mat-select formControlName="status">
+        <mat-option [value]="null"> zrušit výběr</mat-option>
+        @for (s of statusOptions; track s) {
+          <mat-option [value]="s">{{ statusTranslation.getStatusLabel(s) }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+      <mat-form-field
+        subscriptSizing="dynamic"
+        [hideRequiredMarker]="true"
+      >
+      <mat-label>Částka od</mat-label>
+      <input matInput type="number" formControlName="amountFrom"/>
+    </mat-form-field>
+
+      <mat-form-field
+        subscriptSizing="dynamic"
+        [hideRequiredMarker]="true"
+      >
+      <mat-label>Částka do</mat-label>
+      <input matInput type="number" formControlName="amountTo"/>
+    </mat-form-field>
+
+      <mat-form-field
+        subscriptSizing="dynamic"
+        [hideRequiredMarker]="true"
+      >
+      <mat-label>Měna</mat-label>
+      <mat-select formControlName="currency">
+        <mat-option [value]="null"> zrušit výběr</mat-option>
+        @for (c of currencyOptions; track c) {
+          <mat-option [value]="c">{{ c }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <button mat-raised-button color="primary" (click)="applyFilter()">
+      Filtrovat
+    </button>
+    </div>
+  </form>
+
+  <div class="quick-stats" [ngClass]="responsiveService.isMobile ? 'mobile' : ''">
+    <div class="stat-card">
+      <div class="stat-icon">📊</div>
+      <div class="stat-content">
+        <div class="stat-label">Celkem Faktur</div>
+        <div class="stat-value">{{ quickStats().totalCount }}</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">💰</div>
+      <div class="stat-content">
+        <div class="stat-label">Celková Částka</div>
+        <div class="stat-value">{{ quickStats().totalAmount | number:'1.0-2' }} Kč</div>
+      </div>
+    </div>
+    <div class="stat-card success">
+      <div class="stat-icon">✅</div>
+      <div class="stat-content">
+        <div class="stat-label">Zaplaceno</div>
+        <div class="stat-value">{{ quickStats().paidCount }}</div>
+        <div class="stat-sub">{{ quickStats().paidAmount | number:'1.0-2' }} Kč</div>
+      </div>
+    </div>
+    <div class="stat-card warning">
+      <div class="stat-icon">⏳</div>
+      <div class="stat-content">
+        <div class="stat-label">Čeká na Úhradu</div>
+        <div class="stat-value">{{ quickStats().pendingCount }}</div>
+      </div>
+    </div>
+    <div class="stat-card danger">
+      <div class="stat-icon">⚠️</div>
+      <div class="stat-content">
+        <div class="stat-label">Po Splatnosti</div>
+        <div class="stat-value">{{ quickStats().overdueCount }}</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">📈</div>
+      <div class="stat-content">
+        <div class="stat-label">Průměrná Částka</div>
+        <div class="stat-value">{{ quickStats().avgAmount | number:'1.0-2' }} Kč</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="overview" [ngClass]="responsiveService.isMobile ? 'mobile' : ''">
+    @if(keycloakService.hasAdminAccess){
+      <!-- Admin view -->
+      <div class="chart-card">
+        <invoice-chart-pie
+          [data]="chartDataStatuses()"
+          [title]="'Počet Faktur Dle Statusu'"
+        ></invoice-chart-pie>
+      </div>
+      <div class="chart-card">
+        <invoice-chart-doughnut
+          [data]="chartDataAmountByStatus()"
+          [title]="'Celková Částka Dle Statusu'"
+        ></invoice-chart-doughnut>
+      </div>
+      <div class="chart-card">
+        <invoice-chart-pie
+          [data]="chartDataCustomers()"
+          [title]="'Počet Faktur Dle Zákazníka'"
+        ></invoice-chart-pie>
+      </div>
+      <div class="chart-card">
+        <invoice-chart-pie
+          [data]="chartDataCurrency()"
+          [title]="'Distribuce Měn'"
+        ></invoice-chart-pie>
+      </div>
+      <div class="chart-card">
+        <invoice-chart-stacked-bar
+          [data]="filteredInvoices()"
+          [statusColors]="statusColors()"
+        ></invoice-chart-stacked-bar>
+      </div>
+      <div class="chart-card">
+        <invoice-chart-horizontal-bar
+          [data]="chartDataTopCustomers()"
+          [title]="'Top 10 Zákazníků Dle Částky'"
+        ></invoice-chart-horizontal-bar>
+      </div>
+    } @else {
+      <!-- User view -->
+      <div class="chart-card">
+        <invoice-chart-pie
+          [data]="chartDataStatuses()"
+          [title]="'Počet Faktur Dle Statusu'"
+        ></invoice-chart-pie>
+      </div>
+      <div class="chart-card">
+        <invoice-chart-doughnut
+          [data]="chartDataAmountByStatus()"
+          [title]="'Celková Částka Dle Statusu'"
+        ></invoice-chart-doughnut>
+      </div>
+      <div class="chart-card">
+        <invoice-chart-line
+          [data]="filteredInvoices()"
+        ></invoice-chart-line>
+      </div>
+      <div class="chart-card">
+        <invoice-chart-bar
+          [data]="filteredInvoices()"
+        ></invoice-chart-bar>
+      </div>
+      <div class="chart-card">
+        <invoice-chart-stacked-bar
+          [data]="filteredInvoices()"
+          [statusColors]="statusColors()"
+        ></invoice-chart-stacked-bar>
+      </div>
+      <div class="chart-card">
+        <invoice-chart-pie
+          [data]="chartDataCurrency()"
+          [title]="'Distribuce Měn'"
+        ></invoice-chart-pie>
+      </div>
+    }
+
+  </div>
 </section>

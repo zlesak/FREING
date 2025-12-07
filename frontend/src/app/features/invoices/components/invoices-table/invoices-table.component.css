@@ -1,0 +1,88 @@
+.invoices{
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-content: space-between;
+  padding-bottom: 60px;
+}
+
+.invoices-table {
+  width: 95vw;
+  border-collapse: collapse;
+}
+
+.invoices-table th, .invoice-table td {
+  padding: .5rem .75rem;
+  border-bottom: 1px solid #e4e7ec;
+  text-align: left;
+}
+
+.invoices-table tbody tr:hover {
+  background: #f9fafb;
+}
+
+.status {
+  text-transform: lowercase;
+  font-size: .75rem;
+  letter-spacing: .5px;
+  padding: .15rem .45rem;
+  border-radius: .5rem;
+  background: #eef2ff;
+  color: #4338ca;
+}
+
+.status[data-status='PAID'] {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.status[data-status='OVERDUE'] {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.add-button {
+  background-color: #99fb9f;
+
+  cursor: pointer;
+  border-radius: 10px;
+  margin: 10px;
+  color: white;
+}
+
+.status-badge{
+  padding: 5px;
+  border-radius: 8px;
+}
+
+tr.element-row {
+  cursor: pointer;
+}
+
+tr.table-row:hover {
+  background: #f4f4f4;
+  cursor: pointer;
+}
+
+tr.table-row:active {
+  background: #d9ffe7;
+}
+
+.mat-header-cell, .mat-cell {
+  text-align: center;
+  justify-content: center;
+}
+
+.mat-row, .mat-header-row {
+  align-items: center;
+}
+.paginator {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100vw;
+  background: white;
+  z-index: 1000;
+  padding-bottom: 5px;
+}
+

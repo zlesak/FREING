@@ -42,4 +42,5 @@ management:
     health:
       probes:
         enabled: true
-
+queue:
+  name: customer.requests

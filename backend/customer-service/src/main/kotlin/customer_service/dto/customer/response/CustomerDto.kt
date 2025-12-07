@@ -1,15 +1,16 @@
 package customer_service.dto.customer.response
 
+import customer_service.dto.common.SubjectDto
 import customer_service.models.Customer
 import java.util.Date
 
 data class CustomerDto(
-    val id: Long,
+    override val id: Long,
     val name: String,
     val surname: String,
-    val tradeName: String,
-    val email: String,
-    val phoneNumber: String,
+    override val tradeName: String,
+    override val email: String,
+    override val phoneNumber: String,
     val birthDate: Date?,
     val street: String,
     val houseNumber: String,
@@ -21,7 +22,7 @@ data class CustomerDto(
     val bankCode: String? = null,
     val bankAccount: String? = null,
     val currency: String? = null
-)
+) : SubjectDto
 {
     fun toEntity(): Customer {
         return Customer(

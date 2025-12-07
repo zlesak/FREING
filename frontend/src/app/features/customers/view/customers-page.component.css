@@ -1,7 +1,7 @@
 /* ...existing code... */
 
 .page.customers {
-  max-width: 900px;
+  width: 100%;
   margin: 0 auto;
 }
 
@@ -12,6 +12,7 @@
 .customers-table {
   width: 100%;
   border-collapse: collapse;
+  padding-bottom: 60px
 }
 
 .customers-table th,
@@ -29,3 +30,31 @@
   color: #b30000;
   margin-bottom: 0.5rem;
 }
+.add-button {
+  background-color: #99fb9f;
+
+  cursor: pointer;
+  border-radius: 10px;
+  margin: 10px;
+  color: white;
+}
+
+.paginator {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100vw;
+  background: white;
+  z-index: 1000;
+  padding-bottom: 5px;
+}
+
+.clickable-row {
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.clickable-row:hover {
+  background-color: #f0f4ff !important;
+}
+

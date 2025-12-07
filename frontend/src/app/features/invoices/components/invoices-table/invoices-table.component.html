@@ -1,0 +1,79 @@
+<section class="page invoices">
+  <div>
+  <h2>Faktury</h2>
+  @if(keycloakService.hasAdminAccess){
+    <div>
+      <button mat-button class="add-button" (click)="router.navigate(['/invoices/new'])">
+        <mat-icon color="white" aria-label="add">add</mat-icon>
+        Nová faktura
+      </button>
+    </div>
+  }
+  @if (loading()) {
+    <mat-progress-bar style="width: 80%; margin: auto" mode="indeterminate"></mat-progress-bar>
+  }
+
+  @if (error) {
+    <div class="error">{{ error }}</div>
+  }
+ @if(!loading() && !error && dataSource.data){
+  <div>
+    <table mat-table [dataSource]="dataSource" class="invoices-table" matSort>
+      @if (!loading() && !error && !dataSource.data.length) {
+        <p>Žádné faktury k zobrazení.</p>
+      }
+      <ng-container matColumnDef="invoiceNumber">
+        <th mat-header-cell *matHeaderCellDef>Číslo</th>
+        <td mat-cell *matCellDef="let inv">{{ inv.invoiceNumber }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="customerName">
+        <th mat-header-cell *matHeaderCellDef>Zákazník</th>
+        <td mat-cell *matCellDef="let inv">{{ inv.customerName ?? inv.customerId }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="issueDate">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Datum</th>
+        <td mat-cell *matCellDef="let inv">{{ inv.issueDate | date }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="dueDate">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Splatnost</th>
+        <td mat-cell *matCellDef="let inv">{{ inv.dueDate | date }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="amount">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Částka</th>
+        <td mat-cell *matCellDef="let inv">{{ inv.amount }} {{ inv.currency }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Stav</th>
+        <td mat-cell *matCellDef="let inv">
+          <span class="status-badge" [style.background-color]="getStatusColor(inv.status).background" [style.color]="getStatusColor(inv.status).color">
+            {{ statusTranslation.getStatusLabel(inv.status) }}
+          </span>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+
+      <tr class="table-row"
+          mat-row *matRowDef="let row;
+           columns: displayedColumns;"
+          (click)="onInvoiceClick(row)"
+      ></tr>
+    </table>
+    <mat-paginator #paginator class="paginator"
+                   [length]="totalElements"
+                   [pageSize]="currentSize"
+                   [pageSizeOptions]="[10, 25, 50, 100]"
+                   [showFirstLastButtons]="true"
+                   [disabled]="loading()"
+                   (page)="pageUpdate($event)"
+                   aria-label="Select page">
+    </mat-paginator>
+    </div>
+ }
+  </div>
+</section>

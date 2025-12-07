@@ -1,0 +1,188 @@
+<mat-card class="invoice-detail"
+          [ngClass]="responsiveService.isMobile ? 'mobile' : ''">
+@if(invoiceDetail()){
+    <div class="invoice-header">
+      <h2>Faktura č. {{invoiceDetail()?.invoiceNumber}}</h2>
+      <span class="status-badge" [ngStyle]="getStatusStyle()">
+        {{ getStatusLabel(invoiceDetail()?.status) }}
+      </span>
+    </div>
+
+    <mat-card-content>
+
+      <div class="invoice-dates">
+        <div>
+          <strong>Datum vytvoření:</strong>
+          <span>{{ invoiceDetail()?.issueDate | date: 'dd.MM.yyyy' }}</span>
+        </div>
+        <div>
+          <strong>Datum splatnosti:</strong>
+          <span>{{ invoiceDetail()?.dueDate | date: 'dd.MM.yyyy' }}</span>
+        </div>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <div class="parties-container">
+
+        <div class="party-box">
+          <h3>Odběratel:</h3>
+
+          <p>
+            <strong>{{customerDetail()?.name}} {{customerDetail()?.surname}}</strong><br>
+            {{customerDetail()?.email}}<br>
+            {{customerDetail()?.phoneNumber}}
+          </p>
+
+          <div class="customer-section">
+            <div class="customer-row">
+              <span class="label">Ulice, č.p.:</span>
+              <span class="value">{{customerDetail()?.street}} {{customerDetail()?.houseNumber}}</span>
+            </div>
+
+            <div class="customer-row">
+              <span class="label">PSČ, Město:</span>
+              <span class="value">{{customerDetail()?.zip}} {{customerDetail()?.city}}</span>
+            </div>
+
+            <div class="customer-row">
+              <span class="label">Země:</span>
+              <span class="value">{{customerDetail()?.country}}</span>
+            </div>
+          </div>
+
+          <div class="customer-section">
+            <div class="customer-row">
+              <span class="label">IČO:</span>
+              <span class="value">{{customerDetail()?.ico}}</span>
+            </div>
+
+            <div class="customer-row">
+              <span class="label">DIČ:</span>
+              <span class="value">{{customerDetail()?.dic}}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="party-box">
+          <h3>Dodavatel:</h3>
+
+          <p>
+            <strong>{{supplierDetail()?.tradeName}}</strong><br>
+            {{supplierDetail()?.email}}<br>
+            {{supplierDetail()?.phoneNumber}}
+          </p>
+
+          <div class="customer-section">
+            <div class="customer-row">
+              <span class="label">Ulice, č.p.:</span>
+              <span class="value">{{supplierDetail()?.street}} {{supplierDetail()?.houseNumber}}</span>
+            </div>
+
+            <div class="customer-row">
+              <span class="label">PSČ, Město:</span>
+              <span class="value">{{supplierDetail()?.zip}} {{supplierDetail()?.city}}</span>
+            </div>
+
+            <div class="customer-row">
+              <span class="label">Země:</span>
+              <span class="value">{{supplierDetail()?.country}}</span>
+            </div>
+          </div>
+
+          <div class="customer-section">
+            <div class="customer-row">
+              <span class="label">IČO:</span>
+              <span class="value">{{supplierDetail()?.ico}}</span>
+            </div>
+
+            <div class="customer-row">
+              <span class="label">DIČ:</span>
+              <span class="value">{{supplierDetail()?.dic}}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <mat-divider></mat-divider>
+
+      <h3>Položky faktury</h3>
+      <table class="items-table">
+        <thead>
+        <tr>
+          <th>Počet</th>
+          <th>Název</th>
+          <th>Jedn. cena</th>
+          <th>Sazba DPH(v %)</th>
+          <th>Základ daně</th>
+        </tr>
+        </thead>
+        <tbody>
+        @for(item of invoiceDetail()?.items; track $index){
+          <tr>
+            <td>{{ item.quantity }}</td>
+            <td>{{ item.name }}</td>
+            <td>{{ item.unitPrice}} </td>
+            <td>{{ item.vatRate }}</td>
+            <td>{{ item.unitPrice * item.quantity }}</td>
+          </tr>
+        }
+        </tbody>
+      </table>
+
+      <div class="total-summary">
+        <div class="total-row">
+          <span>Základ daně celkem:</span>
+          <strong>{{ getTaxBaseTotal() | currency:'CZK':'symbol-narrow' }}</strong>
+        </div>
+        <div class="total-row">
+          <span>DPH celkem:</span>
+          <strong>{{ getVatTotal() | currency:'CZK':'symbol-narrow' }}</strong>
+        </div>
+        <div class="total-row grand-total">
+          <span>Celkem k úhradě:</span>
+          <strong>{{ invoiceDetail()?.amount | currency:'CZK':'symbol-narrow' }}</strong>
+        </div>
+      </div>
+
+    </mat-card-content>
+    <!-- only admins can delete invoices -->
+    <mat-card-actions align="end">
+      @if (keycloakService.hasAdminAccess && editStatuses.includes(invoiceDetail()?.status!)){
+        <button mat-raised-button color="secondary" (click)="delete()">
+          <mat-icon>delete</mat-icon>
+          Smazat
+        </button>
+      }
+    <!-- only admins can edit invoices, only invoices in draft can be edited -->
+      @if (keycloakService.hasAdminAccess && editStatuses.includes(invoiceDetail()?.status!)){
+        <button mat-raised-button color="secondary" (click)="edit()">
+          <mat-icon>edit</mat-icon>
+          Editovat
+        </button>
+      }
+      <!-- invoices that cannot be edited are exportable -->
+      @if(!editStatuses.includes(invoiceDetail()?.status!)){
+      <button mat-raised-button color="primary" (click)="generatePDF()">
+        <mat-icon>picture_as_pdf</mat-icon>
+        Export do PDF
+      </button>
+      }
+      <!-- only customer can pay an invoice -->
+      @if (
+        !keycloakService.hasAdminAccess &&
+        paymentStatuses.includes(invoiceDetail()?.status!)
+        ) {
+
+      <button mat-raised-button color="accent" (click)="pay()">
+        <mat-icon>payment</mat-icon>
+        Zaplatit
+      </button>
+      }
+    </mat-card-actions>
+  }
+  @if(error()){
+   <div style="color:red">{{error()}}</div>
+  }
+</mat-card>
