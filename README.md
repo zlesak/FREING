@@ -17,20 +17,28 @@ Zápočtový projekt týmu Endor předmětu MOIS ZS AR 2025/26
 ├── `frontend` - Zdrojové kódy frontendu  
 └── `screenshots` - Snímky obrazovky aplikace  
 
-### Pohledy na aplikaci
+### Pohledy na aplikaci  
 
+#### Pohledy účetního  
 ![Dashboards](./screenshots/accountant_main_page.png "Main page")  
 ![Add customer](./screenshots/accountant_add_customer.png "Add customer")  
 ![Add invoice](./screenshots/accountant_add_invoice.png "Add invoice")  
 ![Invoice detail](./screenshots/accountant_invoice_detail.png "Invoice detail")  
 ![PDF View](./screenshots/accountant_pdf_view.png "PDF View")  
+
+#### Pohledy zákazníka  
 ![Payment page step one](./screenshots/customer_payment_step_one.png "Payment page step one")  
 ![Payment page step two](./screenshots/customer_payment_step_two.png "Payment page step two")  
 ![Payed invoice page customer](./screenshots/customer_paid_invoice.png "Payed invoice page customer")  
 
-### Základní diagramy
+#### Pohledy manažera  
+![Manager supplier page](./screenshots/manager_supplier_page.png "Manager supplier page")  
+![Manager new supplier](./screenshots/manager_new_supplier.png "Manager new suplier page")  
+![Manager report page](./screenshots/manager_report_page.png "Manager report page")  
 
-#### Use case diagram
+### Základní diagramy  
+
+#### Use case diagram  
 
 ![Use Case](./diagrams/FREING_USE_CASE_DIAGRAM.png "Use Case")
 
