@@ -1,10 +1,10 @@
-import { environment } from '../../environments/environment';
+import { environment } from '../../../../environments/environment';
 import {inject, Injectable} from '@angular/core';
 import { from, Observable, map } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { InvoiceApi } from '../api/generated';
-import {InvoicesService, ReportingService} from '../api/generated/invoice';
-import {handleError} from './common.service';
+import { InvoiceApi } from '../../../api/generated';
+import {InvoicesService, ReportingService} from '../../../api/generated/invoice';
+import {handleError} from '../../common/controller/common.service';
 
 @Injectable({ providedIn: 'root' })
 export class InvoicesServiceController {

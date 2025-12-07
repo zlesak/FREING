@@ -1,5 +1,5 @@
 import {Component, inject} from '@angular/core';
-import { KeycloakService } from '../../keycloak.service';
+import { KeycloakService } from '../../../security/keycloak.service';
 import {RouterLink, RouterLinkActive} from '@angular/router';
 
 @Component({

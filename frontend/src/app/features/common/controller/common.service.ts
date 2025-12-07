@@ -14,10 +14,8 @@ export class ResponsiveService {
   public isMobile = this.isMobileSubject.value;
 
   constructor() {
-    // Update at startup
     this.checkWidth(window.innerWidth);
 
-    // Listen to resize events
     window.addEventListener('resize', () => {
       this.checkWidth(window.innerWidth);
     });

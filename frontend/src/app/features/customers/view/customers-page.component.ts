@@ -10,7 +10,7 @@ import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatPaginator, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import {Customer, CustomerDto} from '../../../api/generated/customer';
-import { PageTitleService } from '../../../services/page-title.service';
+import { PageTitleService } from '../../common/controller/page-title.service';
 
 @Component({
   selector: 'app-customers-page',

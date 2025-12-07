@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { InvoiceStatus } from '../features/common/Enums.js';
+import { InvoiceStatus } from '../Enums.js';
 
 @Injectable({
   providedIn: 'root'

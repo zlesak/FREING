@@ -1,4 +1,4 @@
-import { environment } from '../../environments/environment';
+import { environment } from '../../../../environments/environment';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import {
@@ -9,9 +9,9 @@ import {
   CapturePaymentRequest,
   CapturePaymentResponse,
   PaymentStatusResponse
-} from '../api/generated/payment';
+} from '../../../api/generated/payment';
 import { catchError } from 'rxjs/operators';
-import { handleError } from './common.service';
+import { handleError } from '../../common/controller/common.service';
 import { HttpClient } from '@angular/common/http';
 
 @Injectable({ providedIn: 'root' })

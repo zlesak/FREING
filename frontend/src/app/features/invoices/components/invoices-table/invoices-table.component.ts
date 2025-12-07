@@ -2,7 +2,7 @@ import {
   AfterViewInit, Component,
   inject, OnInit, output, signal, ViewChild
 } from '@angular/core';
-import { InvoicesServiceController } from '../../../../controller/invoices.service';
+import { InvoicesServiceController } from '../../controller/invoices.service';
 import { InvoiceApi } from '../../../../api/generated';
 import {MatIconModule} from '@angular/material/icon';
 import {MatDividerModule} from '@angular/material/divider';
@@ -17,9 +17,9 @@ import {MatSort, MatSortModule} from '@angular/material/sort';
 import {MatPaginator, MatPaginatorModule, PageEvent} from '@angular/material/paginator';
 import {Invoice, PagedModelInvoice} from '../../../../api/generated/invoice';
 import {getStatusColor} from '../../../home/view/home-page.component';
-import {KeycloakService} from '../../../../keycloak.service';
-import { PageTitleService } from '../../../../services/page-title.service';
-import { InvoiceStatusTranslationService } from '../../../../services/invoice-status-translation.service';
+import {KeycloakService} from '../../../../security/keycloak.service';
+import { PageTitleService } from '../../../common/controller/page-title.service';
+import { InvoiceStatusTranslationService } from '../../../common/controller/invoice-status-translation.service';
 import { CustomersServiceController } from '../../../customers/controller/customers.service';
 import { CustomerDto } from '../../../../api/generated/customer/models/CustomerDto';
 import { SuppliersServiceController } from '../../../suppliers/controller/suppliers.service';

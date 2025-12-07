@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { Chart, ChartConfiguration, ChartType, registerables } from 'chart.js';
 import { Invoice } from '../../../../api/generated/invoice';
-import { InvoiceStatusTranslationService } from '../../../../services/invoice-status-translation.service';
+import { InvoiceStatusTranslationService } from '../../../common/controller/invoice-status-translation.service';
 
 Chart.register(...registerables);
 

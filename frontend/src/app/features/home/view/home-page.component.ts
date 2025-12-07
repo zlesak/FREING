@@ -1,9 +1,9 @@
 import {Component, computed, inject, OnInit, signal} from '@angular/core';
-import { KeycloakService } from '../../../keycloak.service';
+import { KeycloakService } from '../../../security/keycloak.service';
 import { InvoiceChartPie } from '../../invoices/components/invoice-charts/invoice-chart-pie';
 import {Invoice, PagedModelInvoice} from '../../../api/generated/invoice';
 import { CommonModule } from '@angular/common';
-import {InvoicesServiceController} from '../../../controller/invoices.service';
+import {InvoicesServiceController} from '../../invoices/controller/invoices.service';
 import {
   MatDatepickerModule,
 } from '@angular/material/datepicker';
@@ -16,14 +16,14 @@ import {CurrencyOptions, InvoiceStatus} from '../../common/Enums.js';
 import {MatSelectModule} from '@angular/material/select';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatButton} from '@angular/material/button';
-import {ResponsiveService} from '../../../controller/common.service';
+import {ResponsiveService} from '../../common/controller/common.service';
 import {InvoiceChartLine} from '../../invoices/components/invoice-charts/invoice-chart-line.component';
-import { PageTitleService } from '../../../services/page-title.service';
+import { PageTitleService } from '../../common/controller/page-title.service';
 import {InvoiceChartBar} from '../../invoices/components/invoice-charts/invoice-chart-bar';
 import {InvoiceChartDoughnut} from '../../invoices/components/invoice-charts/invoice-chart-doughnut';
 import {InvoiceChartStackedBar} from '../../invoices/components/invoice-charts/invoice-chart-stacked-bar';
 import {InvoiceChartHorizontalBar} from '../../invoices/components/invoice-charts/invoice-chart-horizontal-bar';
-import { InvoiceStatusTranslationService } from '../../../services/invoice-status-translation.service';
+import { InvoiceStatusTranslationService } from '../../common/controller/invoice-status-translation.service';
 @Component({
   imports: [
     CommonModule,

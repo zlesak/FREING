@@ -1,8 +1,8 @@
 import {inject, Injectable} from '@angular/core';
 import { Observable, from } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { InvoiceApi } from '../api/generated';
-import {ExchangeService} from '../api/generated/invoice';
+import { InvoiceApi } from '../../../api/generated';
+import {ExchangeService} from '../../../api/generated/invoice';
 
 @Injectable({ providedIn: 'root' })
 export class ExchangeRatesController {

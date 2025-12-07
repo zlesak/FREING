@@ -7,9 +7,9 @@ import {
   Validators
 } from '@angular/forms';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
-import { InvoicesServiceController } from '../../../../controller/invoices.service';
+import { InvoicesServiceController } from '../../controller/invoices.service';
 import { InvoiceApi } from '../../../../api/generated';
-import { ExchangeRatesController } from '../../../../controller/exchange.service';
+import { ExchangeRatesController } from '../../controller/exchange.service';
 import {
   MatCard, MatCardContent, MatCardHeader
 } from '@angular/material/card';
@@ -28,13 +28,13 @@ import {
 } from '@angular/material/datepicker';
 import {distinctUntilChanged, firstValueFrom} from 'rxjs';
 import {CurrencyOptions, InvoiceStatus} from '../../../common/Enums.js';
-import {KeycloakService} from '../../../../keycloak.service';
+import {KeycloakService} from '../../../../security/keycloak.service';
 import {CustomersServiceController} from '../../../customers/controller/customers.service';
 import {SuppliersServiceController} from '../../../suppliers/controller/suppliers.service';
-import {ResponsiveService} from '../../../../controller/common.service';
+import {ResponsiveService} from '../../../common/controller/common.service';
 import { CommonModule } from '@angular/common';
-import { PageTitleService } from '../../../../services/page-title.service';
-import { InvoiceStatusTranslationService } from '../../../../services/invoice-status-translation.service';
+import { PageTitleService } from '../../../common/controller/page-title.service';
+import { InvoiceStatusTranslationService } from '../../../common/controller/invoice-status-translation.service';
 
 @Component({
   selector: 'app-invoice-create',
