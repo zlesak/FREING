@@ -7,6 +7,8 @@ import invoice_service.dtos.reports.requests.InvoiceReportRequest
 import invoice_service.dtos.reports.responses.AggregatedReportResponse
 import invoice_service.extensions.specifications
 import invoice_service.extensions.totalAmount
+import invoice_service.messaging.handlers.CustomerServiceRequestHandler
+import invoice_service.messaging.handlers.RenderingServiceRequestHandler
 import invoice_service.models.invoices.Invoice
 import invoice_service.repository.InvoiceRepository
 import org.springframework.data.domain.Page
@@ -20,7 +22,9 @@ import java.time.LocalDateTime
 class ReportingSubService(
     private val repo: InvoiceRepository,
     private val mapper: InvoiceReportMapper,
-    private val csvGenerator: CsvReportGenerator
+    private val csvGenerator: CsvReportGenerator,
+    private val renderingServiceRequestHandler: RenderingServiceRequestHandler,
+    private val customerServiceRequestHandler: CustomerServiceRequestHandler
 ) {
 
     companion object {
@@ -42,7 +46,10 @@ class ReportingSubService(
 
     fun makeAggregatedReportByFilter(request: InvoiceReportRequest): AggregatedReportResponse {
         val invoices = getFilteredInvoicesPaged(request, PageRequest.of(0, MAX_REPORT_SIZE))
-        val limitReached = invoices.size >= MAX_REPORT_SIZE
+        val limitReached = invoices.totalElements >= MAX_REPORT_SIZE
+        println(invoices.totalElements)
+        println(MAX_REPORT_SIZE)
+        println(invoices.totalElements >= MAX_REPORT_SIZE)
         return generateAggregatedReport(invoices, limitReached)
     }
 
@@ -67,4 +74,7 @@ class ReportingSubService(
             (authentication.principal as? JwtUserPrincipal)?.let { request.customerId = it.id }
         }
     }
+
+    fun renderAggregatedReportPdf(request: InvoiceReportRequest): ByteArray =
+        renderingServiceRequestHandler.renderReportByInvoiceId(makeAggregatedReportByFilter(request), request)
 }

@@ -14,6 +14,8 @@ import {InvoicesTableComponent} from './features/invoices/components/invoices-ta
 import {MockApprovalComponent} from './features/payments/mock-approval/mock-approval.component';
 import { SuppliersPageComponent } from './features/suppliers/view/suppliers-page.component';
 import { SupplierCreateComponent } from './features/suppliers/components/supplier-create/supplier-create.component';
+import { RenderingPageComponent } from './features/rendering/view/rendering-page.component';
+import { RenderingPdfDetailComponent } from './features/rendering/view/rendering-pdf-detail.component';
 
 export const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'home' },
@@ -31,6 +33,8 @@ export const routes: Routes = [
   { path: 'suppliers/edit/:id', component: SupplierCreateComponent, canActivate: [AuthGuard], data: { roles: ['manager'] } },
   { path: 'invoice/:id', component: InvoiceDetailComponent, canActivate: [AuthGuard] },
   { path: 'invoice/pdf/:id', component: InvoicePdfComponent, canActivate: [AuthGuard] },
+  { path: 'rendering', component: RenderingPageComponent, canActivate: [AuthGuard], data: { roles: ['manager'] }  },
+  { path: 'rendering/view/:id', component: RenderingPdfDetailComponent, canActivate: [AuthGuard], data: { roles: ['manager'] }  },
   { path: '**', redirectTo: 'home'}
 ];
 

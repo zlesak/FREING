@@ -49,7 +49,18 @@ class MessageListener(
                         payload = null
                     )
                 ).payload
-                val pdfBytes = pdfRenderingService.renderInvoicePdf(invoiceData)
+                val xml = invoiceData["payload"] as? String
+                    ?: throw IllegalArgumentException("Missing XML data in payload")
+                val pdfBytes = pdfRenderingService.renderInvoicePdf(xml)
+                return Base64.getEncoder().encodeToString(pdfBytes)
+            }
+
+            RenderMessageAction.RENDER_REPORT -> {
+                val payload = request.payload as? Map<String, Any?>
+                    ?: throw IllegalArgumentException("Missing or invalid payload for report rendering")
+                val xml = payload["payload"] as? String
+                    ?: throw IllegalArgumentException("Missing XML data in payload")
+                val pdfBytes = pdfRenderingService.renderReportPdf(xml)
                 return Base64.getEncoder().encodeToString(pdfBytes)
             }
         }

@@ -15,6 +15,12 @@ data class AllInvoicesReportResponse(
     val referenceNumber: String?,
     @field:Schema(description = "ID zákazníka")
     val customerId: Long,
+    @field:Schema(description = "Jméno zákazníka")
+    val customerName: String?,
+    @field:Schema(description = "ID dodavatele")
+    val supplierId: Long?,
+    @field:Schema(description = "Jméno dodavatele")
+    val supplierName: String?,
     @field:Schema(description = "Datum vystavení faktury")
     val issueDate: LocalDate,
     @field:Schema(description = "Datum splatnosti faktury")

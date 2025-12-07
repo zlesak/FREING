@@ -1,13 +1,12 @@
 package customer_service.messaging
 
+import com.uhk.fim.prototype.common.messaging.AbstractMessageListener
 import com.uhk.fim.prototype.common.messaging.ActiveMessagingManager
 import com.uhk.fim.prototype.common.messaging.InvalidMessageActionHandler
 import com.uhk.fim.prototype.common.messaging.MessageSender
 import com.uhk.fim.prototype.common.messaging.dto.MessageRequest
 import com.uhk.fim.prototype.common.messaging.enums.actions.CustomerMessageAction
-import customer_service.dto.common.SubjectDto
 import customer_service.service.CustomerService
-import com.uhk.fim.prototype.common.messaging.AbstractMessageListener
 import customer_service.service.SupplierService
 import kotlinx.coroutines.CoroutineScope
 import org.springframework.amqp.support.converter.MessageConverter
@@ -34,7 +33,7 @@ class MessageListener(
         request: MessageRequest<CustomerMessageAction>,
         correlationId: String,
         replyTo: String?
-    ): SubjectDto {
+    ): Any {
         return when (request.action) {
             CustomerMessageAction.GET_CUSTOMER_BY_ID -> {
                 val customer = customerService.getCustomerById(request.targetId ?: -1, true)
