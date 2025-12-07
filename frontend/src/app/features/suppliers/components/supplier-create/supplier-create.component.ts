@@ -10,7 +10,7 @@ import { CreateSupplierDto, Supplier, SupplierDto } from '../../../../api/genera
 import { CurrencyOptions } from '../../../common/Enums.js';
 import { MatSelectModule } from '@angular/material/select';
 import { MatOptionModule } from '@angular/material/core';
-import { PageTitleService } from '../../../../services/page-title.service';
+import { PageTitleService } from '../../../common/controller/page-title.service';
 
 @Component({
   selector: 'app-supplier-create',

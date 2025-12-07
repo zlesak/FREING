@@ -1,12 +1,12 @@
 import {Component, inject, OnInit, signal} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {firstValueFrom} from 'rxjs';
-import {PaymentServiceController} from '../../../../../controller/payment.service';
+import {PaymentServiceController} from '../../../../payments/controller/payment.service';
 import {DomSanitizer, SafeResourceUrl} from '@angular/platform-browser';
-import {ResponsiveService} from '../../../../../controller/common.service';
+import {ResponsiveService} from '../../../../common/controller/common.service';
 import {NgClass} from '@angular/common';
 import {MatProgressBar} from '@angular/material/progress-bar';
-import { PageTitleService } from '../../../../../services/page-title.service';
+import { PageTitleService } from '../../../../common/controller/page-title.service';
 
 @Component({
   selector: 'app-invoice-pdf-component',

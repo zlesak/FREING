@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat
 
 @JsonFormat(shape = JsonFormat.Shape.STRING)
 enum class RenderMessageAction : IMessageAction {
-    RENDER
+    RENDER,
+    RENDER_REPORT
 
 }

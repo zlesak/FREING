@@ -1,0 +1,29 @@
+<header class="app-header">
+  <div class="brand" aria-label="Application name">
+    <span class="logo" aria-hidden="true">🧾</span>
+    <span class="title">{{ title }}</span>
+  </div>
+
+  <nav class="nav" aria-label="Hlavní navigace">
+    <a routerLink="/home" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Přehled</a>
+    <a routerLink="/invoices" routerLinkActive="active">Faktury</a>
+    @if(keycloakService.hasAdminAccess){
+      <a routerLink="/customers" routerLinkActive="active">Zákazníci</a>
+    }
+    @if(isManager()){
+      <a routerLink="/suppliers" routerLinkActive="active">Dodavatelé</a>
+      <a routerLink="/rendering" routerLinkActive="active">Reporty</a>
+    }
+
+  </nav>
+
+  <div class="actions">
+    <div class="user-info">
+      <div class="user-details">
+        <span class="user-name">{{ getUserName() }}</span>
+        <span class="user-role">{{ getUserRole() }}</span>
+      </div>
+    </div>
+    <button type="button" class="primary-btn" (click)="logout()">Odhlásit</button>
+  </div>
+</header>

@@ -60,4 +60,17 @@ class ReportingController(private val reportingService: ReportingSubService) {
     ): Page<Invoice> =
         reportingService.getFilteredInvoicesPaged(request, PageRequest.of(page, size))
 
+    @Operation(
+        summary = "Exportovat report jako PDF",
+        description = "Vygeneruje PDF soubor s reportem podle filtru a vrátí jej ke stažení. " +
+                "Pro ochranu databáze je maximální počet faktur v reportu omezen na 10 000."
+    )
+    @PreAuthorize("hasRole('MANAGER')")
+    @PostMapping("/report/pdf", produces = ["text/csv;charset=UTF-8"])
+    fun exportAggregatedReportPdf(@RequestBody request: InvoiceReportRequest): ResponseEntity<ByteArray> =
+        ResponseEntity
+            .ok()
+            .header("Content-Type", "application/pdf")
+            .header("Content-Disposition", "inline; filename=report.pdf")
+            .body(reportingService.renderAggregatedReportPdf(request))
 }

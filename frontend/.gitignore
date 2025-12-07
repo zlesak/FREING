@@ -1,0 +1,5 @@
+.openapi*.hash
+src/app/api/generated/
+.angular/cache/
+openapi-*.json
+openapitools.json

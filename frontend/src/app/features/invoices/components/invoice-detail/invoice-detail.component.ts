@@ -9,13 +9,13 @@ import {MatDivider} from '@angular/material/divider';
 import{MatIcon} from '@angular/material/icon';
 import {CustomersServiceController} from '../../../customers/controller/customers.service';
 import {SuppliersServiceController} from '../../../suppliers/controller/suppliers.service';
-import {InvoicesServiceController} from '../../../../controller/invoices.service';
-import {KeycloakService} from '../../../../keycloak.service';
+import {InvoicesServiceController} from '../../controller/invoices.service';
+import {KeycloakService} from '../../../../security/keycloak.service';
 import {InvoiceStatus} from '../../../common/Enums.js';
-import {ResponsiveService} from '../../../../controller/common.service';
-import { PageTitleService } from '../../../../services/page-title.service';
+import {ResponsiveService} from '../../../common/controller/common.service';
+import { PageTitleService } from '../../../common/controller/page-title.service';
 import {Customer, Supplier} from '../../../../api/generated/customer';
-import { InvoiceStatusTranslationService } from '../../../../services/invoice-status-translation.service';
+import { InvoiceStatusTranslationService } from '../../../common/controller/invoice-status-translation.service';
 
 @Component({
   selector: 'app-invoice-detail-component',

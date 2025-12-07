@@ -1,0 +1,13 @@
+<section>
+  <ng-container *ngIf="error(); else pdfBlock">
+    <div style="color:red">{{error()}}</div>
+  </ng-container>
+  <ng-template #pdfBlock>
+    <ng-container *ngIf="loading(); else iframeBlock">
+      <mat-progress-bar style="width: 80%; margin: auto" mode="indeterminate"></mat-progress-bar>
+    </ng-container>
+    <ng-template #iframeBlock>
+      <iframe *ngIf="pdfUrl" [src]="pdfUrl" style="width:100%;height:80vh;border:none" title="Zobrazení PDF"></iframe>
+    </ng-template>
+  </ng-template>
+</section>

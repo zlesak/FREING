@@ -1,9 +1,9 @@
 import {Component, computed, inject, OnInit, signal} from '@angular/core';
-import { KeycloakService } from '../../../keycloak.service';
-import { InvoiceChartPie } from '../../invoices/components/invoice-chart-pie/invoice-chart-pie';
+import { KeycloakService } from '../../../security/keycloak.service';
+import { InvoiceChartPie } from '../../invoices/components/invoice-charts/invoice-chart-pie';
 import {Invoice, PagedModelInvoice} from '../../../api/generated/invoice';
 import { CommonModule } from '@angular/common';
-import {InvoicesServiceController} from '../../../controller/invoices.service';
+import {InvoicesServiceController} from '../../invoices/controller/invoices.service';
 import {
   MatDatepickerModule,
 } from '@angular/material/datepicker';
@@ -16,14 +16,15 @@ import {CurrencyOptions, InvoiceStatus} from '../../common/Enums.js';
 import {MatSelectModule} from '@angular/material/select';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatButton} from '@angular/material/button';
-import {ResponsiveService} from '../../../controller/common.service';
-import {InvoiceChartLine} from '../../invoices/components/invoice-chart-line/invoice-chart-line.component';
-import { PageTitleService } from '../../../services/page-title.service';
-import {InvoiceChartBar} from '../../invoices/components/invoice-chart-bar/invoice-chart-bar';
-import {InvoiceChartDoughnut} from '../../invoices/components/invoice-chart-doughnut/invoice-chart-doughnut';
-import {InvoiceChartStackedBar} from '../../invoices/components/invoice-chart-stacked-bar/invoice-chart-stacked-bar';
-import {InvoiceChartHorizontalBar} from '../../invoices/components/invoice-chart-horizontal-bar/invoice-chart-horizontal-bar';
-import { InvoiceStatusTranslationService } from '../../../services/invoice-status-translation.service';
+import {ResponsiveService} from '../../common/controller/common.service';
+import {InvoiceChartLine} from '../../invoices/components/invoice-charts/invoice-chart-line.component';
+import { PageTitleService } from '../../common/controller/page-title.service';
+import {InvoiceChartBar} from '../../invoices/components/invoice-charts/invoice-chart-bar';
+import {InvoiceChartDoughnut} from '../../invoices/components/invoice-charts/invoice-chart-doughnut';
+import {InvoiceChartStackedBar} from '../../invoices/components/invoice-charts/invoice-chart-stacked-bar';
+import {InvoiceChartHorizontalBar} from '../../invoices/components/invoice-charts/invoice-chart-horizontal-bar';
+import { InvoiceStatusTranslationService } from '../../common/controller/invoice-status-translation.service';
+import { CommonFilterComponent } from '../../common/filter/filter.component';
 @Component({
   imports: [
     CommonModule,
@@ -41,6 +42,7 @@ import { InvoiceStatusTranslationService } from '../../../services/invoice-statu
     InvoiceChartDoughnut,
     InvoiceChartStackedBar,
     InvoiceChartHorizontalBar,
+    CommonFilterComponent,
   ],
   selector: 'app-home-page',
   standalone: true,
@@ -61,6 +63,8 @@ export class HomePageComponent implements OnInit{
   private readonly pageTitleService = inject(PageTitleService);
   protected users: {email: string, id: number}[]= [];
 
+  statusOptions = Object.values(InvoiceStatus);
+  currencyOptions = Object.values(CurrencyOptions);
   filterForm: FormGroup = this.fb.group({
     from: [null],
     to: [null],
@@ -70,9 +74,6 @@ export class HomePageComponent implements OnInit{
     amountTo: [null],
     currency: [null]
   });
-
-  statusOptions = Object.values(InvoiceStatus);
-  currencyOptions = Object.values(CurrencyOptions);
 
   protected chartDataStatuses = computed(() => {
     const statusCount: Record<string, { occurrence: number; color: string }> = {};
@@ -205,18 +206,16 @@ export class HomePageComponent implements OnInit{
 
   ngOnInit(){
     this.pageTitleService.setTitle('Přehled');
+    this.loadAllInvoices();
     if (this.keycloakService.hasAdminAccess){
-      this.loadAllInvoices();
       this.loadUsers();
-    } else {
-      this.loadInvoicesForUser();
     }
   }
 
   loadAllInvoices(): void {
     this.loading.set(true);
     this.error = undefined;
-    this.invoicesService.getInvoices(0, 999).subscribe({
+    this.invoicesService.getInvoices({ page: 0, size: 999 }).subscribe({
       next: (resp: PagedModelInvoice) => {
         const invoices = resp.content;
         if(invoices){
@@ -224,36 +223,7 @@ export class HomePageComponent implements OnInit{
         } else {
           this.invoices.set([]);
         }
-        this.applyFilter();
-        this.loading.set(false);
-      },
-      error: (err) => {
-        this.error = err.message || 'Nepodařilo se načíst faktury';
-        this.loading.set(false);
-      }
-    });
-  }
-
-  loadInvoicesForUser(){
-    this.loading.set(true);
-    this.error = undefined;
-    const userId = this.keycloakService.currentCustomerId;
-    if (!userId){
-      console.log('user ID missing!');
-      this.error = 'Error - user data missing';
-      this.loading.set(false);
-      return;
-    }
-    this.invoicesService.getMyInvoices(0, 999).subscribe({
-      next: (resp: PagedModelInvoice) => {
-        const invoices = resp.content;
-        if(invoices){
-          this.invoices.set(invoices);
-          console.log(`setting invoices! ${this.invoices()}`);
-        } else {
-          this.invoices.set([]);
-        }
-        this.applyFilter();
+        this.filteredInvoices.set(this.invoices());
         this.loading.set(false);
       },
       error: (err) => {
@@ -264,7 +234,7 @@ export class HomePageComponent implements OnInit{
   }
 
   async loadUsers(){
-    const usersFromDb = await firstValueFrom(this.customerService.getCustomers(0,999));
+    const usersFromDb = await firstValueFrom(this.customerService.getCustomers({ page: 0, size: 999 }));
     if(usersFromDb.content){
       usersFromDb.content.forEach(user=>{
         this.users.push({email: user.email, id: user.id!});
@@ -272,24 +242,18 @@ export class HomePageComponent implements OnInit{
     }
   }
 
-  applyFilter() {
-    const { from, to, customerId, status, amountFrom, amountTo, currency } =
-      this.filterForm.value;
-
+  onFilter(filterValues: any) {
+    this.filterForm.patchValue(filterValues);
+    const { from, to, customerId, status, amountFrom, amountTo, currency } = filterValues;
     const filtered = this.invoices().filter(inv => {
-
       if (from && new Date(inv.issueDate) < new Date(from)) return false;
       if (to && new Date(inv.dueDate) > new Date(to)) return false;
-
       if (customerId && inv.customerId !== Number(customerId)) return false;
-
       if (status && inv.status !== status) return false;
-
       if (amountFrom !== null && inv.amount < amountFrom) return false;
       if (amountTo !== null && inv.amount > amountTo) return false;
-
-      return !(currency && inv.currency !== currency);
-
+      if (currency && inv.currency !== currency) return false;
+      return true;
     });
     this.filteredInvoices.set(filtered);
   }

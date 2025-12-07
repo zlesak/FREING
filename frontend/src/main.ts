@@ -9,8 +9,8 @@ import localeCs from '@angular/common/locales/cs';
 
 import { App } from './app/app';
 import { routes } from './app/app-routing-module';
-import { KeycloakService } from './app/keycloak.service';
-import { AuthInterceptor } from './app/AuthInterceptor';
+import { KeycloakService } from './app/security/keycloak.service';
+import { AuthInterceptor } from './app/security/AuthInterceptor';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 
 registerLocaleData(localeCs);

@@ -7,9 +7,9 @@ import {
   Validators
 } from '@angular/forms';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
-import { InvoicesServiceController } from '../../../../controller/invoices.service';
+import { InvoicesServiceController } from '../../controller/invoices.service';
 import { InvoiceApi } from '../../../../api/generated';
-import { ExchangeRatesController } from '../../../../controller/exchange.service';
+import { ExchangeRatesController } from '../../controller/exchange.service';
 import {
   MatCard, MatCardContent, MatCardHeader
 } from '@angular/material/card';
@@ -28,13 +28,13 @@ import {
 } from '@angular/material/datepicker';
 import {distinctUntilChanged, firstValueFrom} from 'rxjs';
 import {CurrencyOptions, InvoiceStatus} from '../../../common/Enums.js';
-import {KeycloakService} from '../../../../keycloak.service';
+import {KeycloakService} from '../../../../security/keycloak.service';
 import {CustomersServiceController} from '../../../customers/controller/customers.service';
 import {SuppliersServiceController} from '../../../suppliers/controller/suppliers.service';
-import {ResponsiveService} from '../../../../controller/common.service';
+import {ResponsiveService} from '../../../common/controller/common.service';
 import { CommonModule } from '@angular/common';
-import { PageTitleService } from '../../../../services/page-title.service';
-import { InvoiceStatusTranslationService } from '../../../../services/invoice-status-translation.service';
+import { PageTitleService } from '../../../common/controller/page-title.service';
+import { InvoiceStatusTranslationService } from '../../../common/controller/invoice-status-translation.service';
 
 @Component({
   selector: 'app-invoice-create',
@@ -334,7 +334,7 @@ export class InvoiceCreateEditComponent implements OnInit {
   }
 
   async loadUsersInfo(){
-    const usersFromDb = await firstValueFrom(this.customerService.getCustomers(0,999));
+    const usersFromDb = await firstValueFrom(this.customerService.getCustomers({ page: 0, size: 999 }));
     if(usersFromDb.content){
       usersFromDb.content.forEach(user=>{
         this.users.push({email: user.email, id: user.id!});
@@ -342,7 +342,7 @@ export class InvoiceCreateEditComponent implements OnInit {
     }
   }
   async loadSuppliersInfo(){
-    const suppliers = await firstValueFrom(this.supplierService.getSuppliers(0,999));
+    const suppliers = await firstValueFrom(this.supplierService.getSuppliers({ page: 0, size: 999 }));
     if(suppliers.content){
       suppliers.content.forEach(supplier=>{
         this.suppliers.push({tradeName: supplier.tradeName, id: supplier.id!});

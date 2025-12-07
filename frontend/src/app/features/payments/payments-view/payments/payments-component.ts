@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { PageTitleService } from '../../../../services/page-title.service';
-import { PaymentServiceController } from '../../../../controller/payment.service';
+import { PageTitleService } from '../../../common/controller/page-title.service';
+import { PaymentServiceController } from '../../controller/payment.service';
 import { firstValueFrom } from 'rxjs';
 import { MatCard, MatCardContent, MatCardActions } from '@angular/material/card';
 import { MatButton } from '@angular/material/button';

@@ -2,33 +2,40 @@ import { AfterViewChecked, Component, inject, OnInit, signal, ViewChild } from '
 import { CustomersServiceController } from '../controller/customers.service';
 import { CustomerApi } from '../../../api/generated';
 import { Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBar } from '@angular/material/progress-bar';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatPaginator, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatSort, MatSortModule } from '@angular/material/sort';
-import {Customer, CustomerDto} from '../../../api/generated/customer';
-import { PageTitleService } from '../../../services/page-title.service';
+import { Customer, CustomerDto } from '../../../api/generated/customer';
+import { PageTitleService } from '../../common/controller/page-title.service';
+import { EntityFilterComponent } from '../../common/filter/entity-filter.component';
+import { ResponsiveService } from '../../common/controller/common.service';
 
 @Component({
   selector: 'app-customers-page',
   standalone: true,
   templateUrl: './customers-page.component.html',
-  styleUrl: './customers-page.component.css',
+  styleUrls: ['../../common/common-table-cards.css'],
   imports: [
+    CommonModule,
     MatButtonModule,
     MatIconModule,
     MatProgressBar,
     MatTableModule,
     MatPaginatorModule,
     MatSortModule,
+    EntityFilterComponent,
   ],
 })
 export class CustomersPageComponent implements OnInit, AfterViewChecked {
+    filterValues: any = {};
   private readonly customersService = inject(CustomersServiceController);
   protected readonly router = inject(Router);
   private readonly pageTitleService = inject(PageTitleService);
+  protected readonly responsiveService = inject(ResponsiveService);
 
   protected dataSource = new MatTableDataSource<CustomerDto>([]);
   protected loading = signal<boolean>(false);
@@ -46,12 +53,12 @@ export class CustomersPageComponent implements OnInit, AfterViewChecked {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   displayedColumns: string[] = [
-    'index',
     'name',
-    'surname',
+    'ico',
+    'dic',
+    'address',
     'email',
-    'phoneNumber',
-    'city'
+    'phoneNumber'
   ];
 
   ngOnInit(): void {
@@ -70,7 +77,8 @@ export class CustomersPageComponent implements OnInit, AfterViewChecked {
   loadAllCustomers(): void {
     this.loading.set(true);
     this.error = undefined;
-    this.customersService.getCustomers(this.page, this.size).subscribe({
+    const params = { page: this.page, size: this.size, ...this.filterValues };
+    this.customersService.getCustomers(params).subscribe({
       next: (resp: CustomerApi.PagedModelCustomerDto) => {
         this.dataSource.data = resp.content ?? [];
         this.page = resp.page?.number ?? 0;
@@ -86,8 +94,16 @@ export class CustomersPageComponent implements OnInit, AfterViewChecked {
     });
   }
 
+  onFilter(values: any) {
+    this.filterValues = values;
+    this.loadAllCustomers();
+  }
+
   pageUpdate(event: PageEvent): void {
     this.currentPage = event.pageIndex;
     this.currentSize = event.pageSize;
+    this.page = event.pageIndex;
+    this.size = event.pageSize;
+    this.loadAllCustomers();
   }
 }

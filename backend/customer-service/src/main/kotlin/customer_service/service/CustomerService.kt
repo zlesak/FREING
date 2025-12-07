@@ -9,6 +9,7 @@ import customer_service.repo.CustomerRepo
 import org.keycloak.representations.idm.UserRepresentation
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
+import org.springframework.data.jpa.domain.Specification
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -87,7 +88,41 @@ class CustomerService(
     private fun getCustomerByEmailOrPhoneNumber(email: String, phoneNumber: String): Customer? =
         customerRepo.findByEmailOrPhoneNumber(email, phoneNumber)?.takeIf { !it.deleted }
 
-    fun getAllCustomers(pageable: Pageable): Page<Customer> = customerRepo.findAll(pageable)
+    fun getAllCustomers(
+        pageable: Pageable,
+        customerId: Long? = null,
+        customerIds: List<Long>? = null,
+        tradeName: String? = null,
+        name: String? = null,
+        surname: String? = null,
+        email: String? = null,
+        phoneNumber: String? = null,
+        city: String? = null,
+        ico: String? = null,
+        dic: String? = null,
+        country: String? = null,
+        currency: String? = null
+    ): Page<Customer> {
+        val spec: Specification<Customer>? = when {
+            !customerIds.isNullOrEmpty() -> Specification { root, _, _ -> root.get<Long>("id").`in`(customerIds) }
+            customerId != null -> Specification { root, _, cb -> cb.equal(root.get<Long>("id"), customerId) }
+            else -> {
+                val filters = mutableListOf<Specification<Customer>>()
+                tradeName?.let { filters.add(Specification { root, _, cb -> cb.like(cb.lower(root.get("tradeName")), "%" + it.lowercase() + "%") }) }
+                name?.let { filters.add(Specification { root, _, cb -> cb.like(cb.lower(root.get("name")), "%" + it.lowercase() + "%") }) }
+                surname?.let { filters.add(Specification { root, _, cb -> cb.like(cb.lower(root.get("surname")), "%" + it.lowercase() + "%") }) }
+                email?.let { filters.add(Specification { root, _, cb -> cb.like(cb.lower(root.get("email")), "%" + it.lowercase() + "%") }) }
+                phoneNumber?.let { filters.add(Specification { root, _, cb -> cb.like(cb.lower(root.get("phoneNumber")), "%" + it.lowercase() + "%") }) }
+                city?.let { filters.add(Specification { root, _, cb -> cb.like(cb.lower(root.get("city")), "%" + it.lowercase() + "%") }) }
+                ico?.let { filters.add(Specification { root, _, cb -> cb.like(cb.lower(root.get("ico")), "%" + it.lowercase() + "%") }) }
+                dic?.let { filters.add(Specification { root, _, cb -> cb.like(cb.lower(root.get("dic")), "%" + it.lowercase() + "%") }) }
+                country?.let { filters.add(Specification { root, _, cb -> cb.like(cb.lower(root.get("country")), "%" + it.lowercase() + "%") }) }
+                currency?.let { filters.add(Specification { root, _, cb -> cb.like(cb.lower(root.get("currency")), "%" + it.lowercase() + "%") }) }
+                filters.reduceOrNull { acc, s -> acc.and(s) }
+            }
+        }
+        return if (spec != null) customerRepo.findAll(spec, pageable) else customerRepo.findAll(pageable)
+    }
 
     fun getCustomersNotDeleted(pageable: Pageable): Page<Customer> =
         customerRepo.findAllByDeletedFalse(pageable)

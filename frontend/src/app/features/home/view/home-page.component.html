@@ -1,90 +1,14 @@
 <section class="page home">
-  <form [formGroup]="filterForm">
-    <div class="filter" [ngClass]="responsiveService.isMobile ? 'mobile' : ''">
-    <mat-form-field
-    subscriptSizing="dynamic"
-    [hideRequiredMarker]="true"
-    >
-      <mat-label>Datum od</mat-label>
-      <input matInput [matDatepicker]="IssueDatePicker"
-             formControlName="from" />
-      <mat-datepicker-toggle matIconSuffix [for]="IssueDatePicker"></mat-datepicker-toggle>
-      <mat-datepicker #IssueDatePicker></mat-datepicker>
-    </mat-form-field>
-
-      <mat-form-field
-        subscriptSizing="dynamic"
-        [hideRequiredMarker]="true"
-      >
-      <mat-label>Datum do</mat-label>
-      <input matInput [matDatepicker]="dueDatePicker"
-             formControlName="to" />
-      <mat-datepicker-toggle matIconSuffix [for]="dueDatePicker"></mat-datepicker-toggle>
-      <mat-datepicker #dueDatePicker></mat-datepicker>
-    </mat-form-field>
-
-    @if(keycloakService.hasAdminAccess){
-      <mat-form-field
-        subscriptSizing="dynamic"
-        [hideRequiredMarker]="true"
-      >
-        <mat-label>Zákazník</mat-label>
-        <mat-select formControlName="customerId">
-          <mat-option [value]="null"> zrušit výběr</mat-option>
-          @for(user of users; track $index){
-            <mat-option [value]="user.id">{{user.email}}</mat-option>
-          }
-        </mat-select>
-      </mat-form-field>
-    }
-
-      <mat-form-field
-        subscriptSizing="dynamic"
-        [hideRequiredMarker]="true"
-      >
-      <mat-label>Stav</mat-label>
-      <mat-select formControlName="status">
-        <mat-option [value]="null"> zrušit výběr</mat-option>
-        @for (s of statusOptions; track s) {
-          <mat-option [value]="s">{{ statusTranslation.getStatusLabel(s) }}</mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
-
-      <mat-form-field
-        subscriptSizing="dynamic"
-        [hideRequiredMarker]="true"
-      >
-      <mat-label>Částka od</mat-label>
-      <input matInput type="number" formControlName="amountFrom"/>
-    </mat-form-field>
-
-      <mat-form-field
-        subscriptSizing="dynamic"
-        [hideRequiredMarker]="true"
-      >
-      <mat-label>Částka do</mat-label>
-      <input matInput type="number" formControlName="amountTo"/>
-    </mat-form-field>
-
-      <mat-form-field
-        subscriptSizing="dynamic"
-        [hideRequiredMarker]="true"
-      >
-      <mat-label>Měna</mat-label>
-      <mat-select formControlName="currency">
-        <mat-option [value]="null"> zrušit výběr</mat-option>
-        @for (c of currencyOptions; track c) {
-          <mat-option [value]="c">{{ c }}</mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
-
-    <button mat-raised-button color="primary" (click)="applyFilter()">
-      Filtrovat
-    </button>
-    </div>
-  </form>
+  <app-common-filter
+    [users]="users"
+    [statusOptions]="statusOptions"
+    [currencyOptions]="currencyOptions"
+    [showCustomer]="keycloakService.hasAdminAccess"
+    [statusTranslation]="statusTranslation"
+    [responsiveService]="responsiveService"
+    [initialValues]="filterForm.value"
+    (filter)="onFilter($event)"
+  />
 
   <div class="quick-stats" [ngClass]="responsiveService.isMobile ? 'mobile' : ''">
     <div class="stat-card">

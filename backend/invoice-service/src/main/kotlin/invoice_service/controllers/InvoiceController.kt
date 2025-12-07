@@ -4,6 +4,7 @@ import com.uhk.fim.prototype.common.security.JwtUserPrincipal
 import invoice_service.dtos.invoices.requests.InvoiceCreateRequest
 import invoice_service.dtos.invoices.requests.InvoiceUpdateRequest
 import invoice_service.models.invoices.Invoice
+import invoice_service.models.invoices.InvoiceStatusEnum
 import invoice_service.services.InvoiceService
 import invoice_service.services.ZugferdService
 import io.swagger.v3.oas.annotations.Operation
@@ -27,37 +28,6 @@ class InvoiceController(
     private val service: InvoiceService,
     private val zugferdService: ZugferdService
 ) {
-
-    @Operation(summary = "Získat všechny faktury", description = "Vrací stránkovaný seznam všech faktur pro účetní.")
-    @PreAuthorize("hasRole('ACCOUNTANT') or hasRole('MANAGER')")
-    @GetMapping("/get-invoices-pages")
-    fun getAllInvoices(
-        @Parameter(description = "Číslo stránky", example = "0")
-        @RequestParam(defaultValue = "0") page: Int,
-        @Parameter(description = "Velikost stránky", example = "10")
-        @RequestParam(defaultValue = "10") size: Int
-    ): Page<Invoice> = service.getAllInvoices(PageRequest.of(page, size))
-
-    @Operation(
-        summary = "Získat faktury přihlášeného zákazníka",
-        description = "Vrací stránkovaný seznam faktur pro přihlášeného zákazníka."
-    )
-    @PreAuthorize("hasRole('CUSTOMER')")
-    @GetMapping("/get-my-invoices-pages")
-    fun getMyInvoices(
-        authentication: Authentication,
-        @Parameter(description = "Číslo stránky", example = "0")
-        @RequestParam(defaultValue = "0") page: Int,
-        @Parameter(description = "Velikost stránky", example = "10")
-        @RequestParam(defaultValue = "10") size: Int
-    ): Page<Invoice> {
-        val principal =
-            authentication.principal as? JwtUserPrincipal ?: throw IllegalStateException("Invalid principal type")
-        return service.getAllInvoicesForLoggedInCustomer(
-            principal.id,
-            PageRequest.of(page, size)
-        )
-    }
 
     @Operation(summary = "Získat fakturu podle ID", description = "Vrací detail faktury podle jejího ID.")
     @PostAuthorize("hasRole('ACCOUNTANT') or hasRole('MANAGER') or (returnObject.customerId == authentication.principal.id and returnObject.status.name() != 'DRAFT')")
@@ -129,5 +99,38 @@ class InvoiceController(
     ) {
         getInvoice(authentication, id)
         service.markInvoiceAsRead(id)
+    }
+
+    @Operation(summary = "Získat faktury", description = "Vrací stránkovaný seznam faktur. Pokud nejsou nastaveny žádné filtry, vrací všechny faktury.")
+    @PreAuthorize("hasRole('ACCOUNTANT') or hasRole('MANAGER') or hasRole('CUSTOMER')")
+    @GetMapping("/get-invoices")
+    fun getInvoices(
+        authentication: Authentication,
+        @RequestParam(defaultValue = "0") page: Int,
+        @RequestParam(defaultValue = "10") size: Int,
+        @RequestParam(required = false) dateFrom: String?,
+        @RequestParam(required = false) dateTo: String?,
+        @RequestParam(required = false) customerId: Long?,
+        @RequestParam(required = false) status: InvoiceStatusEnum?,
+        @RequestParam(required = false) amountFrom: Double?,
+        @RequestParam(required = false) amountTo: Double?,
+        @RequestParam(required = false) currency: String?
+    ): Page<Invoice> {
+        val principal = authentication.principal as? JwtUserPrincipal ?: throw IllegalStateException("Invalid principal type")
+        val isCustomer = authentication.authorities.any { it.authority == "ROLE_CUSTOMER" }
+        val effectiveCustomerId = if (isCustomer) principal.id else customerId
+        val dateFromParsed = dateFrom?.let { java.time.LocalDate.parse(it) }
+        val dateToParsed = dateTo?.let { java.time.LocalDate.parse(it) }
+        return service.getFilteredInvoices(
+            PageRequest.of(page, size),
+            dateFromParsed,
+            dateToParsed,
+            effectiveCustomerId,
+            status,
+            amountFrom,
+            amountTo,
+            currency,
+            isCustomer
+        )
     }
 }

@@ -1,0 +1,98 @@
+.error {
+  color: #b30000;
+  margin-bottom: 0.5rem;
+}
+
+.clickable-row {
+  cursor: pointer;
+}
+
+.clickable-row:hover {
+  background: #f4f4f4;
+  cursor: pointer;
+}
+
+.page-table-cards {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-content: space-between;
+  padding-bottom: 60px;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.8rem;
+}
+
+.table-cards-table {
+  width: 95vw;
+  border-collapse: collapse;
+}
+
+.table-cards-table th,
+.table-cards-table td {
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid #e4e7ec;
+  text-align: left;
+}
+
+.table-cards-table tbody tr:hover {
+  background: #f9fafb;
+}
+
+.add-button {
+  background-color: #99fb9f;
+  cursor: pointer;
+  border-radius: 10px;
+  margin: 10px;
+  color: white;
+}
+
+.paginator {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100vw;
+  background: white;
+  z-index: 1000;
+  padding-bottom: 5px;
+}
+
+.mobile-cards {
+  display: none;
+  padding-bottom: 100px;
+}
+.table-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  margin: 12px 0;
+  padding: 16px 12px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: box-shadow 0.2s;
+}
+.table-card:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.13);
+}
+.card-row {
+  margin-bottom: 6px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+@media (max-width: 700px) {
+  .desktop-table {
+    display: none !important;
+  }
+  .mobile-cards {
+    display: block !important;
+  }
+  .table-card {
+    font-size: 0.97em;
+    padding: 12px 8px;
+  }
+}

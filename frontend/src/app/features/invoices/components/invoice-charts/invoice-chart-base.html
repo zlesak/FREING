@@ -1,0 +1,7 @@
+<div class="chart-container">
+  <canvas #chartCanvas></canvas>
+  <div *ngIf="!data() || !data().length" class="no-data-overlay">
+    <mat-icon style="font-size: 48px; color: #bdbdbd;">insert_chart</mat-icon>
+    <div class="no-data-text">Žádná data k zobrazení</div>
+  </div>
+</div>

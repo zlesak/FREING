@@ -31,6 +31,9 @@ class InvoiceReportMapper(
                 invoiceNumber = invoice.invoiceNumber,
                 referenceNumber = invoice.referenceNumber,
                 customerId = invoice.customerId,
+                customerName = customerServiceRequestHandler.getCustomerNameById(invoice.customerId),
+                supplierId = invoice.supplierId,
+                supplierName = invoice.supplierId?.let { customerServiceRequestHandler.getSupplierById(it)["tradeName"] as? String },
                 issueDate = invoice.issueDate,
                 dueDate = invoice.dueDate,
                 amount = invoice.amount,
@@ -39,4 +42,3 @@ class InvoiceReportMapper(
             )
         }
 }
-

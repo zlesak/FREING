@@ -9,6 +9,7 @@ import com.uhk.fim.prototype.common.messaging.dto.MessageResponse
 import com.uhk.fim.prototype.common.messaging.enums.MessageStatus
 import com.uhk.fim.prototype.common.messaging.enums.actions.IMessageAction
 import kotlinx.coroutines.CoroutineScope
+import org.slf4j.LoggerFactory
 import org.springframework.amqp.core.Message
 import org.springframework.amqp.rabbit.annotation.RabbitListener
 import org.springframework.amqp.support.converter.MessageConverter
@@ -21,6 +22,8 @@ abstract class AbstractMessageListener<T : IMessageAction>(
     private val rabbitScope: CoroutineScope,
     private val actionClass: Class<T>
 ) {
+    private val logger = LoggerFactory.getLogger(AbstractMessageListener::class.java)
+
     @RabbitListener(queues = ["\${queue.name}"])
     fun receiveRequest(message: Message) {
         message.processInCoroutine(rabbitScope) {
@@ -30,7 +33,11 @@ abstract class AbstractMessageListener<T : IMessageAction>(
             val correlationId = message.messageProperties.correlationId ?: request?.requestId
             val replyTo = message.messageProperties.replyTo
             if (request == null) {
-                println("Nelze provést cast na MessageRequest<IMessageAction>")
+                logger.warn(
+                    "Cannot cast to MessageRequest<IMessageAction> for correlationId={}, replyTo={}",
+                    correlationId,
+                    replyTo
+                )
                 @Suppress("UNCHECKED_CAST")
                 invalidMessageActionHandler.handleInvalidMessageAction(
                     messageConverter.fromMessage(message) as MessageRequest<IMessageAction>,
@@ -52,6 +59,7 @@ abstract class AbstractMessageListener<T : IMessageAction>(
                     error = null
                 )
             } catch (ex: BadGatewayException) {
+                logger.error("BadGatewayException while processing requestId={}: {}", request.requestId, ex.message)
                 response = MessageResponse(
                     requestId = request.requestId,
                     targetId = request.targetId,
@@ -59,6 +67,7 @@ abstract class AbstractMessageListener<T : IMessageAction>(
                     error = ex.getErrorProps()
                 )
             } catch (ex: NotFoundException) {
+                logger.info("NotFoundException while processing requestId={}: {}", request.requestId, ex.message)
                 response = MessageResponse(
                     requestId = request.requestId,
                     targetId = request.targetId,
@@ -66,6 +75,7 @@ abstract class AbstractMessageListener<T : IMessageAction>(
                     error = ex.getErrorProps()
                 )
             } catch (ex: Exception) {
+                logger.error("Exception while processing requestId={}: {}", request.requestId, ex.message)
                 response = MessageResponse(
                     requestId = request.requestId,
                     targetId = request.targetId,
@@ -82,7 +92,7 @@ abstract class AbstractMessageListener<T : IMessageAction>(
     @RabbitListener(queues = ["#{messageSender.replyQueueName}"])
     fun receiveReplyMessage(message: Message) {
         message.processInCoroutine(rabbitScope) {
-            println("ReceiveMessage called, messageProperties: ${message.messageProperties}")
+            logger.debug("ReceiveMessage called, messageProperties: {}", message.messageProperties)
             try {
                 val deserializedMessage = messageConverter.fromMessage(message) as MessageResponse
                 val correlationId = message.messageProperties.correlationId
@@ -90,8 +100,7 @@ abstract class AbstractMessageListener<T : IMessageAction>(
                 activeMessagingManager.unregisterMessage(correlationId, deserializedMessage)
 
             } catch (ex: Exception) {
-                println("ERROR in receiveMessage: ${ex.message}")
-                ex.printStackTrace()
+                logger.error("ERROR in receiveMessage: {}", ex.message, ex)
             }
         }
     }

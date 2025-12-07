@@ -6,6 +6,7 @@ import customer_service.models.Supplier
 import customer_service.repo.SupplierRepo
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
+import org.springframework.data.jpa.domain.Specification
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -52,5 +53,35 @@ class SupplierService(
     private fun getSupplierByEmailOrPhoneNumber(email: String, phoneNumber: String): Supplier? =
         supplierRepo.findByEmailOrPhoneNumber(email, phoneNumber)
 
-    fun getAllSuppliers(pageable: Pageable): Page<Supplier> = supplierRepo.findAll(pageable)
+    fun getAllSuppliers(
+        pageable: Pageable,
+        supplierId: Long? = null,
+        supplierIds: List<Long>? = null,
+        tradeName: String? = null,
+        email: String? = null,
+        phoneNumber: String? = null,
+        city: String? = null,
+        ico: String? = null,
+        dic: String? = null,
+        country: String? = null,
+        currency: String? = null
+    ): Page<Supplier> {
+        val spec: Specification<Supplier>? = when {
+            !supplierIds.isNullOrEmpty() -> Specification { root, _, _ -> root.get<Long>("id").`in`(supplierIds) }
+            supplierId != null -> Specification { root, _, cb -> cb.equal(root.get<Long>("id"), supplierId) }
+            else -> {
+                val filters = mutableListOf<Specification<Supplier>>()
+                tradeName?.let { filters.add(Specification { root, _, cb -> cb.like(cb.lower(root.get("tradeName")), "%" + it.lowercase() + "%") }) }
+                email?.let { filters.add(Specification { root, _, cb -> cb.like(cb.lower(root.get("email")), "%" + it.lowercase() + "%") }) }
+                phoneNumber?.let { filters.add(Specification { root, _, cb -> cb.like(cb.lower(root.get("phoneNumber")), "%" + it.lowercase() + "%") }) }
+                city?.let { filters.add(Specification { root, _, cb -> cb.like(cb.lower(root.get("city")), "%" + it.lowercase() + "%") }) }
+                ico?.let { filters.add(Specification { root, _, cb -> cb.like(cb.lower(root.get("ico")), "%" + it.lowercase() + "%") }) }
+                dic?.let { filters.add(Specification { root, _, cb -> cb.like(cb.lower(root.get("dic")), "%" + it.lowercase() + "%") }) }
+                country?.let { filters.add(Specification { root, _, cb -> cb.like(cb.lower(root.get("country")), "%" + it.lowercase() + "%") }) }
+                currency?.let { filters.add(Specification { root, _, cb -> cb.like(cb.lower(root.get("currency")), "%" + it.lowercase() + "%") }) }
+                filters.reduceOrNull { acc, s -> acc.and(s) }
+            }
+        }
+        return if (spec != null) supplierRepo.findAll(spec, pageable) else supplierRepo.findAll(pageable)
+    }
 }

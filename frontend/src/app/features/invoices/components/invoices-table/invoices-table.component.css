@@ -1,25 +1,4 @@
-.invoices{
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-content: space-between;
-  padding-bottom: 60px;
-}
-
-.invoices-table {
-  width: 95vw;
-  border-collapse: collapse;
-}
-
-.invoices-table th, .invoice-table td {
-  padding: .5rem .75rem;
-  border-bottom: 1px solid #e4e7ec;
-  text-align: left;
-}
-
-.invoices-table tbody tr:hover {
-  background: #f9fafb;
-}
+@import '../../../common/common-table-cards.css';
 
 .status {
   text-transform: lowercase;
@@ -41,25 +20,17 @@
   color: #991b1b;
 }
 
-.add-button {
-  background-color: #99fb9f;
-
-  cursor: pointer;
-  border-radius: 10px;
-  margin: 10px;
-  color: white;
-}
-
 .status-badge{
   padding: 5px;
   border-radius: 8px;
 }
 
-tr.element-row {
+
+.clickable-row {
   cursor: pointer;
 }
 
-tr.table-row:hover {
+.clickable-row:hover {
   background: #f4f4f4;
   cursor: pointer;
 }
@@ -76,13 +47,3 @@ tr.table-row:active {
 .mat-row, .mat-header-row {
   align-items: center;
 }
-.paginator {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100vw;
-  background: white;
-  z-index: 1000;
-  padding-bottom: 5px;
-}
-
