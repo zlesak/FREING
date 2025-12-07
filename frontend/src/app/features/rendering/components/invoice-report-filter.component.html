@@ -1,0 +1,90 @@
+<form [formGroup]="filterForm">
+  <div class="filter" [ngClass]="responsiveService?.isMobile ? 'mobile' : ''">
+    <mat-form-field subscriptSizing="dynamic" [hideRequiredMarker]="true">
+      <mat-label>Zákazník</mat-label>
+      <mat-select formControlName="customerId">
+        <mat-option [value]="null">zrušit výběr</mat-option>
+        <ng-container *ngFor="let user of users">
+          <mat-option [value]="user.id">{{ user.email }}</mat-option>
+        </ng-container>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field subscriptSizing="dynamic" [hideRequiredMarker]="true">
+      <mat-label>Stav faktury</mat-label>
+      <mat-select formControlName="status">
+        <mat-option [value]="null">zrušit výběr</mat-option>
+        <mat-option value="DRAFT">Návrh</mat-option>
+        <mat-option value="SENT">Odesláno</mat-option>
+        <mat-option value="PENDING">Čeká na úhradu</mat-option>
+        <mat-option value="PAID">Zaplaceno</mat-option>
+        <mat-option value="OVERDUE">Po splatnosti</mat-option>
+        <mat-option value="PAID_OVERDUE">Zaplaceno po splatnosti</mat-option>
+        <mat-option value="CANCELLED">Zrušeno</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field subscriptSizing="dynamic" [hideRequiredMarker]="true">
+      <mat-label>Číslo faktury</mat-label>
+      <input matInput formControlName="invoiceNumber">
+    </mat-form-field>
+
+    <mat-form-field subscriptSizing="dynamic" [hideRequiredMarker]="true">
+      <mat-label>Referenční číslo</mat-label>
+      <input matInput formControlName="referenceNumber">
+    </mat-form-field>
+
+    <mat-form-field subscriptSizing="dynamic" [hideRequiredMarker]="true">
+      <mat-label>Datum vystavení od</mat-label>
+      <input matInput [matDatepicker]="issueDateFromPicker" formControlName="issueDateFrom">
+      <mat-datepicker-toggle matIconSuffix [for]="issueDateFromPicker"></mat-datepicker-toggle>
+      <mat-datepicker #issueDateFromPicker></mat-datepicker>
+    </mat-form-field>
+
+    <mat-form-field subscriptSizing="dynamic" [hideRequiredMarker]="true">
+      <mat-label>Datum vystavení do</mat-label>
+      <input matInput [matDatepicker]="issueDateToPicker" formControlName="issueDateTo">
+      <mat-datepicker-toggle matIconSuffix [for]="issueDateToPicker"></mat-datepicker-toggle>
+      <mat-datepicker #issueDateToPicker></mat-datepicker>
+    </mat-form-field>
+
+    <mat-form-field subscriptSizing="dynamic" [hideRequiredMarker]="true">
+      <mat-label>Datum splatnosti od</mat-label>
+      <input matInput [matDatepicker]="dueDateFromPicker" formControlName="dueDateFrom">
+      <mat-datepicker-toggle matIconSuffix [for]="dueDateFromPicker"></mat-datepicker-toggle>
+      <mat-datepicker #dueDateFromPicker></mat-datepicker>
+    </mat-form-field>
+
+    <mat-form-field subscriptSizing="dynamic" [hideRequiredMarker]="true">
+      <mat-label>Datum splatnosti do</mat-label>
+      <input matInput [matDatepicker]="dueDateToPicker" formControlName="dueDateTo">
+      <mat-datepicker-toggle matIconSuffix [for]="dueDateToPicker"></mat-datepicker-toggle>
+      <mat-datepicker #dueDateToPicker></mat-datepicker>
+    </mat-form-field>
+
+    <mat-form-field subscriptSizing="dynamic" [hideRequiredMarker]="true">
+      <mat-label>Minimální částka</mat-label>
+      <input matInput type="number" formControlName="minAmount">
+    </mat-form-field>
+
+    <mat-form-field subscriptSizing="dynamic" [hideRequiredMarker]="true">
+      <mat-label>Maximální částka</mat-label>
+      <input matInput type="number" formControlName="maxAmount">
+    </mat-form-field>
+
+    <mat-form-field subscriptSizing="dynamic" [hideRequiredMarker]="true">
+      <mat-label>Měna</mat-label>
+      <input matInput formControlName="currency" placeholder="CZK, EUR, USD...">
+    </mat-form-field>
+
+    <button mat-raised-button type="button" (click)="resetFilter()">
+      Vymazat
+    </button>
+
+    <button mat-raised-button color="primary" 
+            (click)="generateReport()" 
+            [disabled]="!filterForm.valid || generating()">
+      {{ generating() ? 'Generuji...' : 'Vygenerovat PDF' }}
+    </button>
+  </div>
+</form>
