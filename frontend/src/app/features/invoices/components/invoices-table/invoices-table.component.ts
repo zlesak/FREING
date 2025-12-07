@@ -64,12 +64,7 @@ export class InvoicesTableComponent implements OnInit, AfterViewChecked {
 
   ngOnInit(): void {
     this.pageTitleService.setTitle('Faktury');
-
-    if (this.keycloakService.hasAdminAccess){
-      this.loadAllInvoices();
-    } else {
-      this.loadInvoicesForUser();
-    }
+    this.loadAllInvoices();
   }
 
   ngAfterViewChecked() {
@@ -102,31 +97,6 @@ export class InvoicesTableComponent implements OnInit, AfterViewChecked {
       }
     });
   }
-
-  loadInvoicesForUser(){
-      this.loading.set(true);
-      this.error = undefined;
-      this.invoicesService.getMyInvoices(0, 999).subscribe({
-        next: (resp: PagedModelInvoice) => {
-          if(resp.content){
-            this.dataSource.data = resp.content;
-            this.outputData.emit(this.dataSource.data);
-          }
-          if (this.paginator) {
-            this.paginator.length = this.totalElements;
-            this.paginator.pageSize = this.currentSize;
-            this.paginator.pageIndex = 0;
-          }
-          if (this.sort) this.dataSource.sort = this.sort;
-          if (this.paginator) this.dataSource.paginator = this.paginator;
-          this.loading.set(false);
-        },
-        error: (err) => {
-          this.error = err.message || 'Nepodařilo se načíst faktury';
-          this.loading.set(false);
-        }
-      });
-    }
 
   pageUpdate(event: PageEvent){
     this.currentPage = event.pageIndex;

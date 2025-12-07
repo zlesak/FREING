@@ -205,11 +205,9 @@ export class HomePageComponent implements OnInit{
 
   ngOnInit(){
     this.pageTitleService.setTitle('Přehled');
+    this.loadAllInvoices();
     if (this.keycloakService.hasAdminAccess){
-      this.loadAllInvoices();
       this.loadUsers();
-    } else {
-      this.loadInvoicesForUser();
     }
   }
 
@@ -221,35 +219,6 @@ export class HomePageComponent implements OnInit{
         const invoices = resp.content;
         if(invoices){
           this.invoices.set(invoices);
-        } else {
-          this.invoices.set([]);
-        }
-        this.applyFilter();
-        this.loading.set(false);
-      },
-      error: (err) => {
-        this.error = err.message || 'Nepodařilo se načíst faktury';
-        this.loading.set(false);
-      }
-    });
-  }
-
-  loadInvoicesForUser(){
-    this.loading.set(true);
-    this.error = undefined;
-    const userId = this.keycloakService.currentCustomerId;
-    if (!userId){
-      console.log('user ID missing!');
-      this.error = 'Error - user data missing';
-      this.loading.set(false);
-      return;
-    }
-    this.invoicesService.getMyInvoices(0, 999).subscribe({
-      next: (resp: PagedModelInvoice) => {
-        const invoices = resp.content;
-        if(invoices){
-          this.invoices.set(invoices);
-          console.log(`setting invoices! ${this.invoices()}`);
         } else {
           this.invoices.set([]);
         }

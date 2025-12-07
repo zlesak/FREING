@@ -15,13 +15,7 @@ export class InvoicesServiceController {
   }
 
   getInvoices(page = 0, size = 10): Observable<InvoiceApi.PagedModelInvoice> {
-    return from(this.invoicesService.getAllInvoices({ page, size })).pipe(
-      catchError(handleError)
-    );
-  }
-
-  getMyInvoices(page = 0, size = 10): Observable<InvoiceApi.PagedModelInvoice> {
-    return from(this.invoicesService.getMyInvoices({ page, size })).pipe(
+    return from(this.invoicesService.getInvoices({ page, size })).pipe(
       catchError(handleError)
     );
   }
