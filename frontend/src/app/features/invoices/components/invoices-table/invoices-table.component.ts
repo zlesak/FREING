@@ -17,18 +17,11 @@ import { KeycloakService } from '../../../../security/keycloak.service';
 import { PageTitleService } from '../../../common/controller/page-title.service';
 import { InvoiceStatusTranslationService } from '../../../common/controller/invoice-status-translation.service';
 import { CustomersServiceController } from '../../../customers/controller/customers.service';
-import { CustomerDto } from '../../../../api/generated/customer/models/CustomerDto';
+import { CustomerDto } from '../../../../api/generated/customer';
 import { SuppliersServiceController } from '../../../suppliers/controller/suppliers.service';
-import { SupplierDto } from '../../../../api/generated/customer/models/SupplierDto';
+import { SupplierDto } from '../../../../api/generated/customer';
 import { ResponsiveService } from '../../../common/controller/common.service';
-
-export enum InvoiceStatus {
-  DRAFT = 'DRAFT',
-  PENDING = 'PENDING',
-  PAID = 'PAID',
-  OVERDUE = 'OVERDUE',
-  CANCELLED = 'CANCELLED'
-}
+import { InvoiceStatus } from '../../../common/Enums.js';
 
 @Component({
   selector: 'app-invoices-page',
