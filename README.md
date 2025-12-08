@@ -36,6 +36,14 @@ Zápočtový projekt týmu Endor předmětu MOIS ZS AR 2025/26
 ![Manager new supplier](./screenshots/manager_new_supplier.png "Manager new suplier page")  
 ![Manager report page](./screenshots/manager_report_page.png "Manager report page")  
 
+#### Generované PDF  
+![Generated invoice PDF](./screenshots/invoice_pdf_has_data_invoice_f.png "Generated invoice PDF")  
+V /docs/ je také k dispozici vygenerovaný facturx dokument přikládaný ke každé faktuře jako digitální příloha.  
+  
+![Generated report PDF 1](./screenshots/report_pdf_1.png "Generated report 1 PDF")  
+![Generated report PDF 2](./screenshots/report_pdf_2.png "Generated report 2 PDF")  
+I pro reporty se přikládají data v xml podobě ze kterých byl report vygenerován.
+
 ### Základní diagramy  
 
 #### Use case diagram  
@@ -45,6 +53,10 @@ Zápočtový projekt týmu Endor předmětu MOIS ZS AR 2025/26
 #### Big picture
 
 ![Big picture](./diagrams/FREING_BIG_PIC_DIAGRAM.png "Use Case")
+
+#### Data diagram
+
+![All service data diagram](./diagrams/all_service_data_diagram.png "All service data diagram")
 
 #### Business context
 
