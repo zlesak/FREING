@@ -1,0 +1,16 @@
+@startuml
+
+!theme plain
+top to bottom direction
+skinparam linetype ortho
+
+class pdf {
+   filename: varchar(255)
+   generated_at: timestamp(6)
+   pdf_data: oid
+   type: varchar(255)
+   xml_data: oid
+   id: bigint
+}
+
+@enduml

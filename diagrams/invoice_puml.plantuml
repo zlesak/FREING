@@ -1,0 +1,35 @@
+@startuml
+
+!theme plain
+top to bottom direction
+skinparam linetype ortho
+
+class invoice_items {
+   description: varchar(255)
+   name: varchar(255)
+   quantity: numeric(38,2)
+   total_price: numeric(10,2)
+   unit: varchar(255)
+   unit_price: numeric(10,2)
+   vat_rate: numeric(38,2)
+   invoice_id: bigint
+   id: bigint
+}
+class invoices {
+   amount: numeric(10,2)
+   created_at: timestamp(6) with time zone
+   currency: varchar(3)
+   customer_id: bigint
+   due_date: date
+   invoice_number: varchar(255)
+   issue_date: date
+   reference_number: varchar(255)
+   status: varchar(255)
+   supplier_id: bigint
+   updated_at: timestamp(6) with time zone
+   receive_date: date
+   id: bigint
+}
+
+invoice_items  -[#595959,plain]-^  invoices      : "invoice_id:id"
+@enduml

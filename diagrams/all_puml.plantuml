@@ -1,0 +1,93 @@
+@startuml
+
+!theme plain
+top to bottom direction
+skinparam linetype ortho
+skinparam nodesep 150
+skinparam ranksep 100
+
+class customer {
+   bank_account: varchar
+   bank_code: varchar
+   birth_date: timestamp
+   city: varchar
+   country: varchar
+   currency: varchar
+   deleted: boolean
+   dic: varchar
+   email: varchar
+   house_number: varchar
+   ico: varchar
+   name: varchar
+   phone_number: varchar
+   street: varchar
+   surname: varchar
+   trade_name: varchar
+   zip: varchar
+   id: bigint
+}
+
+class supplier {
+   bank_account: varchar
+   bank_code: varchar
+   city: varchar
+   country: varchar
+   currency: varchar
+   dic: varchar
+   email: varchar
+   house_number: varchar
+   ico: varchar
+   phone_number: varchar
+   street: varchar
+   trade_name: varchar
+   zip: varchar
+   id: bigint
+}
+class invoice_item {
+   description: varchar
+   name: varchar
+   quantity: numeric
+   total_price: numeric
+   unit: varchar
+   unit_price: numeric
+   vat_rate: numeric
+   invoice_id: bigint
+   id: bigint
+}
+class invoice {
+   amount: numeric
+   created_at: timestamp
+   currency: varchar
+   customer_id: bigint
+   due_date: date
+   invoice_number: varchar
+   issue_date: date
+   reference_number: varchar
+   status: varchar
+   supplier_id: bigint
+   updated_at: timestamp
+   receive_date: date
+   id: bigint
+}
+
+class payment {
+   amount: double precision
+   cancel_url: varchar
+   capture_id: varchar
+   created_at: timestamp
+   currency: varchar
+   description: varchar
+   invoice_id: bigint
+   order_id: varchar
+   return_url: varchar
+   status: varchar
+   updated_at: timestamp
+   id: bigint
+}
+
+invoice_item "1..*" -up-* "1" invoice : "id:invoice_id"
+supplier "1" -left-o "0..*" invoice : "supplier_id:id"
+customer "1" -right-o "0..*" invoice : "id:customer_id"
+payment "1" -down-* "1" invoice : "invoice_id:id"
+
+@enduml

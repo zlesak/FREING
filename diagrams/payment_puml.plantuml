@@ -1,0 +1,22 @@
+@startuml
+
+!theme plain
+top to bottom direction
+skinparam linetype ortho
+
+class payments {
+   amount: double precision
+   cancel_url: varchar(500)
+   capture_id: varchar(255)
+   created_at: timestamp(6)
+   currency: varchar(3)
+   description: varchar(500)
+   invoice_id: bigint
+   order_id: varchar(255)
+   return_url: varchar(500)
+   status: varchar(255)
+   updated_at: timestamp(6)
+   id: bigint
+}
+
+@enduml
